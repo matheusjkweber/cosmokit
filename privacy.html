@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | CosmoProxy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .last-updated {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #7f8c8d;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last Updated: December 30, 2025</p>
+        
+        <h2>Introduction</h2>
+        <p>CosmoProxy is a local HTTP/HTTPS debugging proxy for macOS. This policy explains how the app processes and protects data on your device.</p>
+        
+        <h2>Local-First Processing</h2>
+        <p>CosmoProxy operates locally on your Mac. Captured traffic, rules, and logs are processed and stored on your device only. We do not run servers that receive your proxy traffic.</p>
+        
+        <h2>Data the App Processes</h2>
+        <p>CosmoProxy processes the following data on your device:</p>
+        <ul>
+            <li>Network traffic data: URLs, methods, headers, status codes, timings, sizes, and optionally request/response bodies when you capture or edit them.</li>
+            <li>TLS decryption data: If you enable HTTPS decryption and install the CosmoProxy CA certificate, the app can decrypt HTTPS traffic for inspection. If disabled, HTTPS traffic is tunneled.</li>
+            <li>App configuration: breakpoints, map rules, session history names, pinned requests, filters, and privacy lists (allow list, deny list, sensitive domains).</li>
+            <li>Diagnostics and logs: In-memory logs and optional file logs if you enable logging. Logs are stored locally and sensitive values are masked by default.</li>
+            <li>Subscription status: App Store subscription entitlement status used to unlock Pro features.</li>
+        </ul>
+        
+        <h2>Redaction and Privacy Controls</h2>
+        <p>CosmoProxy provides privacy controls such as auto-redaction and domain allow/deny lists. Redaction can mask sensitive headers (for example Authorization and Cookie) and common secrets in URLs and bodies. Redaction is applied in the UI and during exports.</p>
+        
+        <h2>Exports and Sharing</h2>
+        <p>You can export sessions (HAR or JSON), logs, and diagnostics bundles. These exports are created locally. Data is only shared if you choose to send or upload it (for example, when contacting support).</p>
+        
+        <h2>What We Do Not Collect</h2>
+        <ul>
+            <li>No analytics, advertising, or tracking data is collected by CosmoProxy.</li>
+            <li>We do not automatically upload captured traffic, logs, or diagnostics.</li>
+        </ul>
+        
+        <h2>Third-Party Services</h2>
+        <p>CosmoProxy uses Apple services for subscriptions and App Store reviews (StoreKit). Payments are processed by Apple, and we do not receive your payment card details. Apple may collect information according to its own policies.</p>
+        <p>Websites and services you access through the proxy are not operated by us and have their own privacy policies.</p>
+        
+        <h2>Subscriptions and Pricing</h2>
+        <p>CosmoProxy Pro is offered as a monthly subscription priced at $2.99 (may vary by region and taxes). Subscription management and billing are handled by Apple.</p>
+        
+        <h2>Data Retention and Deletion</h2>
+        <p>Captured traffic, session history, and settings are stored locally until you delete them. You can clear the current session, clear persisted history, or clear all data from the Privacy & Safety section in the app. Uninstalling the app also removes stored data.</p>
+        
+        <h2>Data Security</h2>
+        <p>CosmoProxy stores data in the macOS app sandbox and relies on operating system protections to keep it secure.</p>
+        
+        <h2>Changes to This Privacy Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will post updates here and revise the "Last Updated" date.</p>
+        
+        <h2>Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, email us at <a href="mailto:matheus.jk.weber@gmail.com">matheus.jk.weber@gmail.com</a>.</p>
+        
+        <footer>
+            <p>&copy; 2025 CosmoProxy. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

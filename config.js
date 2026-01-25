@@ -1,0 +1,87 @@
+// CosmoKit Remote Configuration
+// URL: https://matheusjkweber.github.io/cosmokit-privacy/config.js
+
+const CosmoKitConfig = {
+    // What's New content for each version
+    whatsNew: {
+        "2.1": {
+            features: [
+                {
+                    icon: "photo.badge.checkmark",
+                    iconColor: "blue",
+                    title: "Media Preview Window",
+                    description: "New floating preview window appears after capturing screenshots or recordings. Copy to clipboard or save with one click."
+                },
+                {
+                    icon: "gift.fill",
+                    iconColor: "green",
+                    title: "Dynamic Trial Period",
+                    description: "Free trial information is now fetched directly from the App Store for accurate display."
+                },
+                {
+                    icon: "square.and.arrow.down",
+                    iconColor: "purple",
+                    title: "Save or Discard Workflow",
+                    description: "Media captures are now saved to a temporary location first. Save only what you want, discard the rest."
+                },
+                {
+                    icon: "doc.on.doc",
+                    iconColor: "orange",
+                    title: "Quick Copy to Clipboard",
+                    description: "Instantly copy screenshots and recordings to your clipboard from the preview window."
+                }
+            ]
+        },
+        "2.0": {
+            features: [
+                {
+                    icon: "bolt.fill",
+                    iconColor: "orange",
+                    title: "Smoother Window Following",
+                    description: "CosmoKit now follows your simulator at 60fps for buttery smooth attachment."
+                },
+                {
+                    icon: "photo.on.rectangle.angled",
+                    iconColor: "purple",
+                    title: "App Store Screenshots",
+                    description: "Generate beautiful App Store screenshots with device frames and custom backgrounds."
+                },
+                {
+                    icon: "wrench.and.screwdriver.fill",
+                    iconColor: "blue",
+                    title: "Diagnostics Tool",
+                    description: "New diagnostics window to help troubleshoot issues with detailed system information."
+                },
+                {
+                    icon: "globe",
+                    iconColor: "green",
+                    title: "New Languages",
+                    description: "CosmoKit is now available in English, Portuguese, and Spanish."
+                },
+                {
+                    icon: "star.fill",
+                    iconColor: "yellow",
+                    title: "Improved Pro Experience",
+                    description: "Smoother transitions and better window management for Pro features."
+                }
+            ]
+        }
+    },
+    
+    // Current latest version
+    latestVersion: "2.1",
+    
+    // Minimum supported version (for forced updates if needed)
+    minimumVersion: "1.0",
+    
+    // Feature flags (for A/B testing or gradual rollouts)
+    featureFlags: {
+        mediaPreviewEnabled: true,
+        dynamicTrialEnabled: true
+    }
+};
+
+// Export for different environments
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CosmoKitConfig;
+}
