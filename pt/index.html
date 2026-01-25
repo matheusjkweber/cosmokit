@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmoKit - O Companheiro Definitivo do Simulador iOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a2e;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            padding: 20px 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: white;
+        }
+        
+        .hero {
+            padding: 80px 0 100px;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #764ba2;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .features {
+            background: white;
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 60px;
+            color: #1a1a2e;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a2e;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .pro-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            padding: 100px 0;
+            color: white;
+        }
+        
+        .pro-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .pro-text h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .pro-text p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        .pro-features {
+            list-style: none;
+        }
+        
+        .pro-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            font-size: 1.1rem;
+        }
+        
+        .pro-features li::before {
+            content: "✓";
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .pro-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.7);
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .pro-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/pt/" class="logo">
+                    <div class="logo-icon">🚀</div>
+                    CosmoKit
+                </a>
+                <div class="nav-links">
+                    <a href="#features">Recursos</a>
+                    <a href="#pro">Pro</a>
+                    <a href="../privacy.html">Privacidade</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>O Companheiro Definitivo do Simulador iOS</h1>
+            <p class="subtitle">Controle seu Simulador iOS como nunca. Screenshots, vídeos, push notifications, deep links e localização - tudo em um app macOS poderoso.</p>
+            <div class="cta-buttons">
+                <a href="https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12" class="btn btn-primary">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    Baixar na Mac App Store
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    Saiba Mais
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Tudo Que Você Precisa</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Captura de Mídia</h3>
+                    <p>Tire screenshots lindos e grave vídeos suaves. Exporte como MP4 ou GIF com molduras de dispositivos e sombras.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Notificações Push</h3>
+                    <p>Teste notificações push sem um dispositivo real. Crie templates e envie payloads JSON personalizados instantaneamente.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Deep Links</h3>
+                    <p>Teste URL schemes e universal links. Salve deep links usados frequentemente para acesso rápido.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Simulação de Localização</h3>
+                    <p>Defina qualquer coordenada GPS no seu simulador. Busque endereços e salve localizações favoritas.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🖥️</div>
+                    <h3>Multi-Simulador</h3>
+                    <p>Controle múltiplos simuladores simultaneamente. Capture screenshots de todos os dispositivos de uma vez.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Anexo à Janela</h3>
+                    <p>O CosmoKit se anexa perfeitamente à janela do seu Simulador, colocando ferramentas na ponta dos seus dedos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="pro-section" id="pro">
+        <div class="container">
+            <div class="pro-content">
+                <div class="pro-text">
+                    <span class="pro-badge">✨ CosmoKit Pro</span>
+                    <h2>Libere Todo o Poder</h2>
+                    <p>Leve seu fluxo de trabalho de desenvolvimento ao próximo nível com recursos Pro projetados para profissionais.</p>
+                    <ul class="pro-features">
+                        <li>Remova marcas d'água das capturas</li>
+                        <li>Molduras de dispositivos com bordas realistas</li>
+                        <li>Indicadores de toque em gravações</li>
+                        <li>Gravação de áudio com microfone</li>
+                        <li>Entradas salvas ilimitadas</li>
+                        <li>Suporte prioritário</li>
+                    </ul>
+                </div>
+                <div class="pro-visual" style="text-align: center;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; font-size: 6rem;">
+                        🚀
+                    </div>
+                    <p style="margin-top: 20px; font-size: 1.2rem; opacity: 0.8;">Comece seu teste gratuito hoje</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../privacy.html">Política de Privacidade</a>
+                <a href="mailto:matheus.jk.weber@gmail.com">Contato</a>
+                <a href="https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12">App Store</a>
+            </div>
+            <p class="copyright">&copy; 2025 CosmoKit. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
