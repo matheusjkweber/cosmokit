@@ -2,33 +2,85 @@
 // URL: https://matheusjkweber.github.io/cosmokit-privacy/config.js
 
 const CosmoKitConfig = {
-    // What's New content for each version
+    // What's New content for each version (with full localization support)
     whatsNew: {
+        "3.0": {
+            features: [
+                {
+                    icon: "infinity.circle.fill",
+                    iconColor: "purple",
+                    localizations: {
+                        en: { title: "Lifetime Access", description: "Buy CosmoKit Pro once and keep it forever — no subscription required." },
+                        pt: { title: "Acesso Vitalício", description: "Compre o CosmoKit Pro uma vez e tenha acesso para sempre — sem assinatura." },
+                        es: { title: "Acceso de por Vida", description: "Compra CosmoKit Pro una vez y consérvalo para siempre — sin suscripción." }
+                    }
+                },
+                {
+                    icon: "calendar.badge.plus",
+                    iconColor: "blue",
+                    localizations: {
+                        en: { title: "Yearly Plan", description: "New annual subscription with full Pro access at a discounted yearly rate." },
+                        pt: { title: "Plano Anual", description: "Nova assinatura anual com acesso Pro completo e preço reduzido." },
+                        es: { title: "Plan Anual", description: "Nueva suscripción anual con acceso Pro completo a una tarifa anual con descuento." }
+                    }
+                },
+                {
+                    icon: "sparkles",
+                    iconColor: "orange",
+                    localizations: {
+                        en: { title: "What's New Screen", description: "CosmoKit now shows a summary of new features every time you update the app." },
+                        pt: { title: "Tela de Novidades", description: "O CosmoKit agora exibe um resumo das novidades toda vez que você atualizar o app." },
+                        es: { title: "Pantalla de Novedades", description: "CosmoKit ahora muestra un resumen de las novedades cada vez que actualizas la app." }
+                    }
+                },
+                {
+                    icon: "wrench.and.screwdriver.fill",
+                    iconColor: "green",
+                    localizations: {
+                        en: { title: "Stability & Improvements", description: "Fixed unresponsive tab buttons. Improved window attachment, simulator validation, and performance." },
+                        pt: { title: "Estabilidade e Melhorias", description: "Corrigidos botões de abas sem resposta. Melhorias na anexação de janela, validação do simulador e desempenho." },
+                        es: { title: "Estabilidad y Mejoras", description: "Se corrigieron botones de pestañas sin respuesta. Mejoras en la ventana, validación del simulador y rendimiento." }
+                    }
+                }
+            ]
+        },
         "2.1": {
             features: [
                 {
                     icon: "photo.badge.checkmark",
                     iconColor: "blue",
-                    title: "Media Preview Window",
-                    description: "New floating preview window appears after capturing screenshots or recordings. Copy to clipboard or save with one click."
+                    localizations: {
+                        en: { title: "Media Preview Window", description: "New floating preview window appears after capturing screenshots or recordings. Copy to clipboard or save with one click." },
+                        pt: { title: "Janela de Pré-visualização", description: "Nova janela flutuante aparece após capturar screenshots ou gravações. Copie ou salve com um clique." },
+                        es: { title: "Ventana de Vista Previa", description: "Nueva ventana flotante aparece tras capturar screenshots o grabaciones. Copia o guarda con un clic." }
+                    }
                 },
                 {
                     icon: "gift.fill",
                     iconColor: "green",
-                    title: "Dynamic Trial Period",
-                    description: "Free trial information is now fetched directly from the App Store for accurate display."
+                    localizations: {
+                        en: { title: "Dynamic Trial Period", description: "Free trial information is now fetched directly from the App Store for accurate display." },
+                        pt: { title: "Período de Teste Dinâmico", description: "As informações do período de teste gratuito agora são obtidas diretamente da App Store." },
+                        es: { title: "Período de Prueba Dinámico", description: "La información del período de prueba gratuita ahora se obtiene directamente de la App Store." }
+                    }
                 },
                 {
                     icon: "square.and.arrow.down",
                     iconColor: "purple",
-                    title: "Save or Discard Workflow",
-                    description: "Media captures are now saved to a temporary location first. Save only what you want, discard the rest."
+                    localizations: {
+                        en: { title: "Save or Discard Workflow", description: "Media captures are now saved to a temporary location first. Save only what you want, discard the rest." },
+                        pt: { title: "Salvar ou Descartar", description: "As capturas são salvas em local temporário primeiro. Guarde apenas o que quiser e descarte o resto." },
+                        es: { title: "Guardar o Descartar", description: "Las capturas se guardan en ubicación temporal primero. Conserva lo que quieras y descarta el resto." }
+                    }
                 },
                 {
                     icon: "doc.on.doc",
                     iconColor: "orange",
-                    title: "Quick Copy to Clipboard",
-                    description: "Instantly copy screenshots and recordings to your clipboard from the preview window."
+                    localizations: {
+                        en: { title: "Quick Copy to Clipboard", description: "Instantly copy screenshots and recordings to your clipboard from the preview window." },
+                        pt: { title: "Cópia Rápida", description: "Copie screenshots e gravações para a área de transferência instantaneamente pela janela de pré-visualização." },
+                        es: { title: "Copia Rápida al Portapapeles", description: "Copia screenshots y grabaciones al portapapeles al instante desde la ventana de vista previa." }
+                    }
                 }
             ]
         },
@@ -37,47 +89,63 @@ const CosmoKitConfig = {
                 {
                     icon: "bolt.fill",
                     iconColor: "orange",
-                    title: "Smoother Window Following",
-                    description: "CosmoKit now follows your simulator at 60fps for buttery smooth attachment."
+                    localizations: {
+                        en: { title: "Smoother Window Following", description: "CosmoKit now follows your simulator at 60fps for buttery smooth attachment." },
+                        pt: { title: "Seguimento de Janela Mais Suave", description: "O CosmoKit agora segue seu simulador a 60fps para uma anexação perfeitamente suave." },
+                        es: { title: "Seguimiento de Ventana Más Suave", description: "CosmoKit ahora sigue tu simulador a 60fps para una adherencia perfectamente suave." }
+                    }
                 },
                 {
                     icon: "photo.on.rectangle.angled",
                     iconColor: "purple",
-                    title: "App Store Screenshots",
-                    description: "Generate beautiful App Store screenshots with device frames and custom backgrounds."
+                    localizations: {
+                        en: { title: "App Store Screenshots", description: "Generate beautiful App Store screenshots with device frames and custom backgrounds." },
+                        pt: { title: "Capturas para a App Store", description: "Gere screenshots lindos para a App Store com molduras de dispositivos e fundos personalizados." },
+                        es: { title: "Capturas para la App Store", description: "Genera hermosas capturas para la App Store con marcos de dispositivos y fondos personalizados." }
+                    }
                 },
                 {
                     icon: "wrench.and.screwdriver.fill",
                     iconColor: "blue",
-                    title: "Diagnostics Tool",
-                    description: "New diagnostics window to help troubleshoot issues with detailed system information."
+                    localizations: {
+                        en: { title: "Diagnostics Tool", description: "New diagnostics window to help troubleshoot issues with detailed system information." },
+                        pt: { title: "Ferramenta de Diagnósticos", description: "Nova janela de diagnósticos para ajudar a resolver problemas com informações detalhadas do sistema." },
+                        es: { title: "Herramienta de Diagnósticos", description: "Nueva ventana de diagnósticos para ayudar a solucionar problemas con información detallada del sistema." }
+                    }
                 },
                 {
                     icon: "globe",
                     iconColor: "green",
-                    title: "New Languages",
-                    description: "CosmoKit is now available in English, Portuguese, and Spanish."
+                    localizations: {
+                        en: { title: "New Languages", description: "CosmoKit is now available in English, Portuguese, and Spanish." },
+                        pt: { title: "Novos Idiomas", description: "O CosmoKit agora está disponível em Inglês, Português e Espanhol." },
+                        es: { title: "Nuevos Idiomas", description: "CosmoKit ahora está disponible en Inglés, Portugués y Español." }
+                    }
                 },
                 {
                     icon: "star.fill",
                     iconColor: "yellow",
-                    title: "Improved Pro Experience",
-                    description: "Smoother transitions and better window management for Pro features."
+                    localizations: {
+                        en: { title: "Improved Pro Experience", description: "Smoother transitions and better window management for Pro features." },
+                        pt: { title: "Experiência Pro Melhorada", description: "Transições mais suaves e melhor gerenciamento de janelas para recursos Pro." },
+                        es: { title: "Experiencia Pro Mejorada", description: "Transiciones más suaves y mejor gestión de ventanas para las funciones Pro." }
+                    }
                 }
             ]
         }
     },
-    
+
     // Current latest version
-    latestVersion: "2.1",
-    
+    latestVersion: "3.0",
+
     // Minimum supported version (for forced updates if needed)
     minimumVersion: "1.0",
-    
+
     // Feature flags (for A/B testing or gradual rollouts)
     featureFlags: {
         mediaPreviewEnabled: true,
-        dynamicTrialEnabled: true
+        dynamicTrialEnabled: true,
+        lifetimeAccessEnabled: true
     }
 };
 
