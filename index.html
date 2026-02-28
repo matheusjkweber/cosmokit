@@ -558,9 +558,16 @@
         <a href="#features" class="btn-secondary">See features →</a>
     </div>
 
+    <!-- Hero overview banner -->
+    <div class="hero-preview" style="margin-bottom:20px;">
+        <div class="hero-glow"></div>
+        <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 40px 120px rgba(0,0,0,0.55);">
+            <img src="promo_overview.png" alt="CosmoKit — Supercharge Your iOS Simulator Workflow" style="width:100%;display:block;">
+        </div>
+    </div>
+
     <!-- Screenshot carousel -->
     <div class="hero-preview">
-        <div class="hero-glow"></div>
         <div class="carousel-window" id="carousel">
             <div class="titlebar">
                 <div class="tl tl-r"></div>
@@ -570,6 +577,7 @@
             </div>
             <div class="carousel-track-wrap">
                 <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide"><img src="promo_multi.png" alt="Test on Multiple Simulators"></div>
                     <div class="carousel-slide"><img src="ss1.png" alt="Capture tab — Screenshot and Record"></div>
                     <div class="carousel-slide"><img src="ss4.png" alt="Capture tab — options panel"></div>
                     <div class="carousel-slide"><img src="ss3.png" alt="Links tab — deep links"></div>
@@ -585,6 +593,7 @@
                 <div class="carousel-dot" data-idx="2"></div>
                 <div class="carousel-dot" data-idx="3"></div>
                 <div class="carousel-dot" data-idx="4"></div>
+                <div class="carousel-dot" data-idx="5"></div>
             </div>
         </div>
     </div>
@@ -801,7 +810,7 @@
     document.getElementById('nextBtn').addEventListener('click', () => { goTo(current + 1); resetTimer(); });
     dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.idx); resetTimer(); }));
 
-    function resetTimer() { clearInterval(timer); timer = setInterval(() => goTo(current + 1), 4000); }
+    function resetTimer() { clearInterval(timer); timer = setInterval(() => goTo(current + 1), 4500); }
     resetTimer();
 })();
 </script>
