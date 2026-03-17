@@ -1,7 +1,3 @@
-# CosmoKit
-
-## About
-
 Entendi! Vamos estruturar o projeto com base nas informações fornecidas.
 
 **Definição do Projeto**
@@ -100,47 +96,3 @@ Integração completa com o iOS Simulator, oferecendo:
 ```
 
 Agora que o projeto está estruturado, você pode revisar e ajustar as informações conforme necessário!
-
-## Platforms
-
-macOS
-
-## Features
-
-**Captura de Tela e Gravação de video com Watermark** (high) — 
-**Captura de Tela e Gravação de video sem Watermark** (high) — 
-**Capture Options (device frame, bazels, frame color, redord audio, aspect ratio)** (medium) — 
-**Push** (low) — 
-**Deeplink** (low) — 
-**Location** (low) — 
-**Tools (app, appearance, status bar, permissions, face id, keychain, pasteboard, media library)** (medium) — 
-**Apps (drag & install, app container, clear app data, url schemas, log stream)** (medium) — 
-**Proxy** (high) — 
-
-## Monetization
-
-Model: freemium,paid_app
-
-Premium features: Captura de Tela e Gravação de video sem Watermark, Capture Options (device frame, bazels, frame color, redord audio, aspect ratio), Tools (app, appearance, status bar, permissions, face id, keychain, pasteboard, media library), Apps (drag & install, app container, clear app data, url schemas, log stream), Proxy
-Free features: Captura de Tela e Gravação de video com Watermark, Push, Deeplink, Location
-Monthly: R$2.99
-Yearly: R$19.99
-One-time: R$69.99
-
-## Stack
-
-### macOS (CosmoKit)
-- Swift
-- SwiftUI
-- SwiftData
-- StoreKit 2
-- Network.framework (NWListener)
-- OpenSSL
-- Xcode (como IDE)
-
-### Testes
-- XCTest (para testes unitários e de UI)
-
-### Outras Tecnologias
-- Git (para controle de versão)
-- Fastlane (para automação de deploy e outras tarefas)
