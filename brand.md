@@ -139,44 +139,63 @@ macOS
 
 ## Brand Rules
 
-Agora que temos uma compreensão clara do projeto CosmoKit, vamos criar uma identidade visual coerente com o produto, público-alvo e modelo de negócios.
-
 ### Brand Identity — CosmoKit
 
 #### Cores
 
-- **Cor Primária:** `#3498db` (um azul vibrante que inspira tecnologia e inovação)
-- **Cor Secundária:** `#f1c40f` (um laranja suave que sugere criatividade e energia)
-- **Cor de Fundo:** `#f9f9f9` (um cinza claro que oferece neutralidade e profissionalismo)
+- **Cor Primaria (Gradiente):** `#8C4DEB` violeta claro → `#6B33CC` violeta profundo (gradiente monocromatico violeta)
+- **Cor de Acento:** `#7C3AED` (violeta vibrante — AccentColor do sistema, usado em botoes, badges, selecoes ativas)
+- **Cor de Fundo:** Dark mode nativo do macOS — background do sistema
+- **Cor de Sucesso:** `#22C55E` (verde para status ativo, configurado)
+- **Cor de Alerta:** `#F59E0B` (amber para avisos, limites free)
+- **Cor de Erro:** `#EF4444` (vermelho para falhas)
+
+#### Gradientes
+
+- **Primario (UI geral):** `CosmoGradients.primary` — violeta claro(0.55, 0.30, 0.92) → violeta profundo(0.42, 0.20, 0.80)
+- **Espectro monocromatico violeta** — todo o gradiente vive dentro da familia roxo/violeta
+- **Nunca usar azul** como cor primaria — azul era a cor antiga e foi substituido por roxo
+- **Nunca usar laranja** como cor primaria — laranja foi removido do gradiente na atualizacao para espectro monocromatico
+
+#### SwiftUI — Valores Exatos
+
+```swift
+// CosmoColors.primaryStart = Color(red: 0.55, green: 0.30, blue: 0.92)  // Lighter violet (#8C4DEB)
+// CosmoColors.primaryEnd   = Color(red: 0.42, green: 0.20, blue: 0.80)  // Deep violet (#6B33CC)
+// AccentColor = (red: 0.486, green: 0.228, blue: 0.929)                 // Vibrant violet (#7C3AED)
+```
 
 #### Tipografia
 
-- **Fonte Principal:** Open Sans (ou similar) - uma fonte moderna, limpa e altamente legível, ideal para interfaces digitais.
-- **Títulos e Destaques:** Montserrat (ou similar) - uma fonte geométrica e impactante, perfeita para títulos e seções de destaque.
+- **Fonte:** SF Pro (sistema nativo do macOS) — nao usar fontes custom
+- **Titulos:** `.title3.weight(.semibold)` ou `.headline.weight(.bold)`
+- **Corpo:** `.subheadline` ou `.caption`
+- **Badges/Labels:** `.system(size: 9, weight: .black)` com capsule background
 
 #### Tom de Voz
 
-- **Amigável:** O CosmoKit é seu companheiro de jornada no desenvolvimento iOS, sempre pronto para ajudar.
-- **Profissional:** Soluções eficazes e inteligentes para as necessidades do desenvolvedor iOS.
-- **Inovador:** Sempre buscando trazer as últimas tecnologias e funcionalidades para melhorar a experiência de desenvolvimento.
+- **Direto:** Comunicacao objetiva, sem rodeios — desenvolvedores valorizam eficiencia
+- **Tecnico sem ser intimidador:** Termos corretos (bundle ID, deep link, payload) mas com UX amigavel
+- **Confiante:** CosmoKit e a ferramenta que faltava no workflow do dev iOS
 
 #### Personalidade
 
-- **Útil:** O CosmoKit é uma ferramenta indispensável para qualquer desenvolvedor iOS.
-- **Inteligente:** Soluções inteligentes para problemas comuns no desenvolvimento iOS.
-- **Apoio:** Sempre pronto para ajudar e oferecer suporte.
+- **Ferramenta de poder:** Nao e um brinquedo — e uma ferramenta profissional para devs serios
+- **Compacto e eficiente:** UI densa com informacao util, sem desperdicio de espaco
+- **macOS nativo:** Respeita convencoes do sistema — hiddenTitleBar, NSWindow, keyboard shortcuts
 
-#### Ícone Estilo
+#### Icone do App
 
-- **Ícone do App:** Um ícone simples, moderno e reconhecível que incorpora elementos de tecnologia e desenvolvimento, possivelmente com uma representação estilizada de um cosmos ou elementos relacionados à simulação iOS.
-- **Ícones na Interface:** Utilizar um estilo minimalista e consistente com o design do sistema operacional, garantindo uma experiência de usuário coesa.
+- Fundo gradiente roxo/violeta com elementos que remetem a simulador iOS e ferramentas de desenvolvimento
+- Estilo glossy/3D consistente com icones macOS modernos
 
 #### Estilo Visual
 
-- **Imagens:** Utilizar imagens de alta qualidade que demonstrem a funcionalidade e benefícios do CosmoKit, em contextos de desenvolvimento iOS.
-- **Texturas e Patterns:** Utilizar texturas e padrões sutis que complementem as cores e tipografia, evitando sobrecarregar a interface.
-
-Essa identidade visual busca transmitir a essência do CosmoKit como um companheiro definitivo e inovador para desenvolvedores iOS, oferecendo uma experiência de usuário agradável e eficiente.
+- **Dark mode first:** A interface e otimizada para dark mode (maioria dos devs usa dark)
+- **Cards com bordas sutis:** `border-border/60`, `bg-card`, cantos arredondados 8-12px
+- **Gradientes nos CTAs:** Botoes primarios usam `CosmoGradients.primary` (violeta monocromatico)
+- **Badges coloridos:** Status badges com cores semanticas (verde=ativo, amber=aviso, roxo=pro)
+- **Icones SF Symbols:** Consistente com macOS, peso `.semibold`, tamanho 12-16pt
 
 ---
 
