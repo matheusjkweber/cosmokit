@@ -1,1 +1,35 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Xcode
+build/
+DerivedData/
+DerivedData-*/
+**/build/
+*.xcarchive
+*.xcresult
+*.dSYM
+*.dSYM.zip
+*.ipa
+*.pkg
+*.xcuserstate
+**/xcuserdata/
+
+# Node / Next
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+dist/
+*.tsbuildinfo
+
+# Generated promo outputs (regeneratable from render scripts)
+Promo/generated/
+
+# Misc
 .gitnexus
+.env
+.env.*
+!.env.example
