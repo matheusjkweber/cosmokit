@@ -1,0 +1,221 @@
+{
+  "Navbar": {
+    "features": "Características",
+    "screenshots": "Capturas",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "download": "Descargar"
+  },
+  "Hero": {
+    "badge": "Disponible en la Mac App Store",
+    "title1": "Acelera tu",
+    "title2": "flujo",
+    "description": "CosmoKit reúne rutas GPS, deep links, payloads push, pruebas de proxy y herramientas de captura en un único workspace nativo en Mac.",
+    "terminalHint": "Reemplaza {command} con una GUI",
+    "ctaDownload": "Descargar para macOS",
+    "ctaFeatures": "Explorar Características",
+    "subtext": "Plan gratuito disponible · macOS 14+ · Requiere Xcode",
+    "heroImage": "/screenshots/macos-1.png",
+    "heroImageAlt": "Visual principal del espacio de trabajo de CosmoKit que muestra el panel de control nativo de macOS, las herramientas del simulador y el panel de productividad definitivo para desarrolladores de iOS"
+  },
+  "Features": {
+    "label": "Características",
+    "title": "Todo lo que necesitas, {highlight}",
+    "titleHighlight": "un panel",
+    "subtitle": "Reemplaza decenas de comandos {command} con una interfaz intuitiva.",
+    "items": {
+      "screenshot": {
+        "title": "Captura de Pantalla",
+        "description": "Haz capturas limpias del simulador seleccionado y mantén las opciones de captura junto al resto de tu flujo de pruebas."
+      },
+      "video": {
+        "title": "Grabación",
+        "description": "Graba sesiones del simulador sin depender de comandos en Terminal y guarda todo desde el mismo workspace."
+      },
+      "proxy": {
+        "title": "Proxy de Red",
+        "description": "Inspecciona requests, añade delays, simula fallos y valida casos límite con un flujo de proxy integrado."
+      },
+      "push": {
+        "title": "Notificaciones Push",
+        "description": "Lanza notificaciones de prueba, previsualiza cómo se renderizan en el dispositivo y valida payloads personalizados antes de publicar."
+      },
+      "deeplinks": {
+        "title": "Deep Links",
+        "description": "Guarda URL schemes y universal links reutilizables para abrir flujos clave de la app con un clic durante el debug."
+      },
+      "gps": {
+        "title": "Ubicaciones y Rutas",
+        "description": "Crea presets de ubicación, reproduce rutas y coordina cambios de posición sin salir del panel."
+      },
+      "apps": {
+        "title": "Múltiples Simuladores",
+        "description": "Ejecuta y controla más de un simulador desde el mismo workspace, manteniendo cerca las herramientas de runtime, apariencia y control de la app."
+      },
+      "appearance": {
+        "title": "Apariencia",
+        "description": "Cambia la apariencia del simulador y ajustes visuales relacionados mientras pruebas estados lado a lado."
+      },
+      "statusbar": {
+        "title": "Barra de Estado",
+        "description": "Ajusta detalles de presentación del simulador, como la barra de estado, cuando una prueba o captura necesita un frame más limpio."
+      },
+      "permissions": {
+        "title": "Permisos",
+        "description": "Restablece y gestiona permisos de la app — cámara, ubicación, notificaciones — sin reinstalar."
+      },
+      "faceid": {
+        "title": "Face ID",
+        "description": "Simula registro, coincidencia y fallo para pruebas de autenticación biométrica."
+      },
+      "keychain": {
+        "title": "Keychain",
+        "description": "Navega y gestiona elementos del keychain almacenados por tu app en el simulador."
+      }
+    }
+  },
+  "Gallery": {
+    "label": "Galería",
+    "title": "Míralo en acción",
+    "subtitle": "Una interfaz macOS nativa diseñada para velocidad y claridad.",
+    "items": {
+      "workspace": "Acelera tu Flujo",
+      "location": "Simulación de Ubicación y Rutas",
+      "tools": "Múltiplos Simuladores",
+      "push": "Lanza Payloads Push",
+      "proxy": "Proxy de Red y Overrides",
+      "more": "Y Mucho Más"
+    },
+    "images": {
+      "workspace": "/screenshots/macos-1.png",
+      "location": "/screenshots/macos-13.png",
+      "tools": "/screenshots/macos-14.png",
+      "push": "/screenshots/macos-15.png",
+      "proxy": "/screenshots/macos-12.png",
+      "more": "/screenshots/macos-2.png"
+    }
+  },
+  "Pricing": {
+    "label": "Precios",
+    "title": "Precios simples y {highlight}",
+    "titleHighlight": "transparentes",
+    "subtitle": "Comienza gratis, mejora cuando necesites más. Todos los planes incluyen todas las actualizaciones futuras.",
+    "free": {
+      "name": "Gratuito",
+      "price": "R$ 0",
+      "period": "",
+      "description": "Herramientas esenciales para empezar",
+      "cta": "Descargar Gratis"
+    },
+    "monthly": {
+      "name": "Mensual",
+      "price": "R$ 2,99",
+      "period": "/mes",
+      "description": "Acceso total, cancela cuando quieras",
+      "cta": "Suscribir Mensual"
+    },
+    "yearly": {
+      "name": "Anual",
+      "price": "R$ 19,99",
+      "period": "/año",
+      "description": "Mejor valor — ahorra 44%",
+      "cta": "Suscribir Anual",
+      "badge": "Ahorra 44%"
+    },
+    "lifetime": {
+      "name": "Vitalicio",
+      "price": "R$ 69,99",
+      "period": "único",
+      "description": "Paga una vez, úsalo para siempre",
+      "cta": "Comprar Vitalicio",
+      "badge": "Mejor Oferta"
+    },
+    "freeFeatures": {
+      "f1": "1 simulador",
+      "f2": "Captura de pantalla (con marca de agua)",
+      "f3": "Grabación de video (con marca de agua)",
+      "f4": "Notificaciones push",
+      "f5": "Deep links",
+      "f6": "Simulación de ubicación GPS",
+      "f7": "5 entradas guardadas por herramienta"
+    },
+    "proFeatures": {
+      "f1": "Simuladores ilimitados",
+      "f2": "Capturas sin marca de agua",
+      "f3": "Grabación de video sin marca de agua",
+      "f4": "Marcos de dispositivo y biseles",
+      "f5": "Colores de marco personalizados",
+      "f6": "Grabación de audio",
+      "f7": "Indicadores de toque",
+      "f8": "Proporción personalizada",
+      "f9": "Proxy de red",
+      "f10": "Herramientas de gestión de apps",
+      "f11": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)",
+      "f12": "Rutas de ubicación",
+      "f13": "Entradas guardadas ilimitadas"
+    },
+    "footnote": "Todos los planes se gestionan a través de la Mac App Store. Cancela o cambia en cualquier momento."
+  },
+  "Downloads": {
+    "title1": "¿Listo para optimizar",
+    "title2": "tu flujo de trabajo?",
+    "subtitle": "Descarga CosmoKit de la Mac App Store y toma el control total de tu iOS Simulator.",
+    "cta": "Descargar para macOS",
+    "helperCta": "Descargar Proxy Helper",
+    "helperTitle": "CosmoKit Proxy Helper opcional",
+    "helperDescription": "Instala este helper firmado para que CosmoKit configure el proxy HTTP/HTTPS de macOS en un clic. La suscripción y el acceso Pro siguen dentro de la app de la Mac App Store.",
+    "info1": "macOS 14+",
+    "info2": "Plan gratuito disponible",
+    "info3": "Sin necesidad de cuenta"
+  },
+  "FAQ": {
+    "label": "FAQ",
+    "title": "Preguntas frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre CosmoKit.",
+    "items": {
+      "q1": {
+        "question": "¿Qué es CosmoKit?",
+        "answer": "CosmoKit es una app macOS nativa que proporciona un panel de control unificado para el iOS Simulator. Reemplaza decenas de comandos de terminal (xcrun simctl) con una interfaz gráfica intuitiva — captura de pantalla, grabación de video, notificaciones push, deep links, simulación GPS, proxy de red, gestión de apps y más."
+      },
+      "q2": {
+        "question": "¿Cuáles son los requisitos del sistema?",
+        "answer": "CosmoKit requiere macOS 14 (Sonoma) o posterior y Xcode instalado en tu Mac. Funciona con todos los runtimes del iOS Simulator soportados por tu versión de Xcode."
+      },
+      "q3": {
+        "question": "¿Qué incluye el plan gratuito?",
+        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS y 5 entradas guardadas por herramienta. Soporta un simulador a la vez."
+      },
+      "q4": {
+        "question": "¿Qué desbloquea CosmoKit Pro?",
+        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores ilimitados, añade marcos de dispositivo y biseles para capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, controles de apariencia/barra de estado/permisos/Face ID/keychain del simulador, rutas de ubicación y entradas guardadas ilimitadas."
+      },
+      "q5": {
+        "question": "¿Cómo funciona la facturación?",
+        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (R$ 2,99/mes), anual (R$ 19,99/año — ahorra 44%), o compra única vitalicia (R$ 69,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID."
+      },
+      "q6": {
+        "question": "¿CosmoKit es sandboxed?",
+        "answer": "Sí, CosmoKit se distribuye a través de la Mac App Store y se ejecuta en un entorno sandboxed. Se comunica con el iOS Simulator a través de APIs de sistema aprobadas y comandos xcrun simctl."
+      },
+      "q7": {
+        "question": "¿Funciona con dispositivos físicos?",
+        "answer": "CosmoKit está diseñado específicamente para el iOS Simulator. No se conecta a dispositivos iOS físicos — se enfoca en hacer que el desarrollo y las pruebas basadas en simulador sean lo más eficiente posible."
+      },
+      "q8": {
+        "question": "¿Cómo obtengo soporte?",
+        "answer": "Puedes contactarnos al correo contato@usecosmoskittool.com o a través de la opción de feedback en la app. Respondemos activamente a todas las solicitudes de soporte y sugerencias de funciones."
+      }
+    }
+  },
+  "Footer": {
+    "description": "El compañero definitivo para desarrolladores iOS en macOS. Pruebas en simulador simplificadas.",
+    "appStore": "Disponible en la Mac App Store",
+    "product": "Producto",
+    "legal": "Legal",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "macAppStore": "Mac App Store",
+    "copyright": "© {year} CosmoHQ. Todos los derechos reservados.",
+    "builtWith": "Hecho con SwiftUI · macOS 14+"
+  }
+}
