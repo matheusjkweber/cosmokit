@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 260 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 260 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 10% 10%;
+    --primary: 263 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 20% 96%;
+    --secondary-foreground: 260 10% 10%;
+    --muted: 260 20% 96%;
+    --muted-foreground: 260 10% 45%;
+    --accent: 260 20% 96%;
+    --accent-foreground: 260 10% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 15% 90%;
+    --input: 260 15% 90%;
+    --ring: 263 83% 58%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 260 20% 5%;
+    --foreground: 260 10% 95%;
+    --card: 260 18% 8%;
+    --card-foreground: 260 10% 95%;
+    --popover: 260 18% 8%;
+    --popover-foreground: 260 10% 95%;
+    --primary: 263 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 18% 12%;
+    --secondary-foreground: 260 10% 95%;
+    --muted: 260 18% 12%;
+    --muted-foreground: 260 10% 55%;
+    --accent: 260 18% 14%;
+    --accent-foreground: 260 10% 95%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 260 10% 95%;
+    --border: 260 15% 14%;
+    --input: 260 15% 14%;
+    --ring: 263 83% 58%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+/* Noise texture overlay */
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glow effect for cards */
+.glow-card {
+  position: relative;
+}
+
+.glow-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    hsl(263 80% 61% / 0.2),
+    hsl(280 70% 50% / 0.1),
+    hsl(263 60% 50% / 0.15)
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  filter: blur(12px);
+}
+
+.glow-card:hover::after {
+  opacity: 1;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(260 15% 22%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(260 15% 30%);
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid hsl(263 83% 58%);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Gradient text helper */
+.gradient-text {
+  background: linear-gradient(135deg, #8C4DEB 0%, #A855F7 50%, #6B33CC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card */
+.glass-card {
+  background: hsl(260 18% 8% / 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(260 15% 18% / 0.5);
+}
+
+/* Subtle grid background */
+.grid-bg {
+  background-image: linear-gradient(
+      hsl(263 83% 58% / 0.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, hsl(263 83% 58% / 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Hide scrollbar for carousels */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Section divider */
+.section-divider {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(263 83% 58% / 0.15),
+    transparent
+  );
+  height: 1px;
+}
