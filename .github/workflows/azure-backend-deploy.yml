@@ -1,0 +1,43 @@
+name: Azure Backend Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      APP_SERVICE_NAME: cosmokit-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+
+      - name: Build Linux binary
+        working-directory: backend
+        run: |
+          mkdir -p bin
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -mod=vendor -trimpath -ldflags="-s -w" -o bin/server ./cmd/cosmokit-api
+          cat > startup.sh <<'SH'
+          #!/usr/bin/env sh
+          set -e
+          exec ./bin/server
+          SH
+          chmod +x startup.sh
+
+      - name: Package backend
+        working-directory: backend
+        run: zip -r backend.zip bin startup.sh
+
+      - name: Deploy zip to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.APP_SERVICE_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend/backend.zip

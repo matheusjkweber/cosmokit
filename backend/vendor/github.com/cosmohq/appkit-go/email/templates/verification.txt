@@ -1,0 +1,12 @@
+Olá,
+
+Obrigado por criar sua conta no {{.AppName}}!
+
+Para verificar seu endereço de e-mail, clique no link abaixo:
+
+{{.ActionURL}}
+
+Se você não criou uma conta, ignore este e-mail.
+
+Atenciosamente,
+Equipe {{.AppName}}
