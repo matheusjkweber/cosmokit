@@ -138,8 +138,16 @@ type featureFlagsResponse struct {
 }
 
 type proxyFlagResponse struct {
-	Enabled         bool   `json:"enabled"`
-	DisabledMessage string `json:"disabledMessage"`
+	Enabled         bool                 `json:"enabled"`
+	DisabledMessage string               `json:"disabledMessage"`
+	Notice          proxyNoticeResponse  `json:"notice"`
+}
+
+type proxyNoticeResponse struct {
+	ID       string `json:"id"`
+	Show     bool   `json:"show"`
+	Severity string `json:"severity"`
+	Message  string `json:"message"`
 }
 
 // FeatureFlags returns the per-device resolved feature flags. The deviceId
@@ -159,6 +167,12 @@ func (h *Handlers) FeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Proxy: proxyFlagResponse{
 			Enabled:         enabled,
 			DisabledMessage: flags.Proxy.DisabledMessage.Pick(locale),
+			Notice: proxyNoticeResponse{
+				ID:       flags.Proxy.Notice.ID,
+				Show:     flags.Proxy.Notice.Show,
+				Severity: flags.Proxy.Notice.Severity,
+				Message:  flags.Proxy.Notice.Message.Pick(locale),
+			},
 		},
 	})
 }

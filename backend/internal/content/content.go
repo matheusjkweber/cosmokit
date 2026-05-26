@@ -82,9 +82,17 @@ type HelperInfo struct {
 }
 
 type ProxyFeatureFlag struct {
-	Enabled           bool      `json:"enabled"`
-	EnabledForDevices []string  `json:"enabledForDevices"`
-	DisabledMessage   Localized `json:"disabledMessage"`
+	Enabled           bool        `json:"enabled"`
+	EnabledForDevices []string    `json:"enabledForDevices"`
+	DisabledMessage   Localized   `json:"disabledMessage"`
+	Notice            ProxyNotice `json:"notice"`
+}
+
+type ProxyNotice struct {
+	ID       string    `json:"id"`
+	Show     bool      `json:"show"`
+	Severity string    `json:"severity"`
+	Message  Localized `json:"message"`
 }
 
 type FeatureFlags struct {

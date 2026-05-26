@@ -68,31 +68,6 @@
   ],
   "notifications": [
     {
-      "id": "proxy-maintenance-2026-05-26",
-      "severity": "warning",
-      "category": "proxy",
-      "publishedAt": "2026-05-26T00:00:00Z",
-      "expiresAt": null,
-      "localizations": {
-        "en": {
-          "title": "Proxy temporarily disabled",
-          "body": "We're fixing an issue with the Proxy feature. It will be back shortly. The rest of CosmoKit works normally in the meantime.",
-          "actionLabel": ""
-        },
-        "pt": {
-          "title": "Proxy temporariamente desativado",
-          "body": "Estamos consertando a funcionalidade de Proxy. Ja ja voltamos com ela. O resto do CosmoKit funciona normalmente enquanto isso.",
-          "actionLabel": ""
-        },
-        "es": {
-          "title": "Proxy temporalmente desactivado",
-          "body": "Estamos arreglando un problema con la funcion Proxy. Ya volvemos con ella. El resto de CosmoKit funciona normal mientras tanto.",
-          "actionLabel": ""
-        }
-      },
-      "actionUrl": ""
-    },
-    {
       "id": "helper-1.0.7-update",
       "severity": "info",
       "category": "helper",
@@ -121,12 +96,22 @@
   ],
   "featureFlags": {
     "proxy": {
-      "enabled": false,
+      "enabled": true,
       "enabledForDevices": [],
       "disabledMessage": {
         "en": "The Proxy feature is temporarily unavailable while we ship a fix. Copy your Device ID below and send it to the team if you need early access.",
         "pt": "O recurso Proxy esta temporariamente indisponivel enquanto enviamos uma correcao. Copie o seu Device ID abaixo e envie ao time se precisar de acesso antecipado.",
         "es": "La funcion Proxy esta temporalmente no disponible mientras enviamos una correccion. Copia tu Device ID abajo y envialo al equipo si necesitas acceso anticipado."
+      },
+      "notice": {
+        "id": "proxy-optimizing-2026-05-26",
+        "show": false,
+        "severity": "info",
+        "message": {
+          "en": "We're still polishing the Proxy feature. If something doesn't work as expected, let us know via Help -> Suggest a feature so we can fix it fast.",
+          "pt": "Ainda estamos otimizando a feature de Proxy. Se algo nao funcionar como voce espera, nos avise em Ajuda -> Sugerir um recurso pra gente consertar rapido.",
+          "es": "Aun estamos puliendo la funcion Proxy. Si algo no funciona como esperas, avisanos en Ayuda -> Sugerir una funcion para arreglarlo rapido."
+        }
       }
     }
   },
