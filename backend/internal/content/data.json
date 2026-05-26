@@ -14,15 +14,15 @@
           "localizations": {
             "en": {
               "title": "Slack and ChatGPT login fixed",
-              "description": "Apps that pin their certificates were dropping under the proxy. They now bypass it automatically and sign in normally. Install the 1.0.6 helper to pick up the fix."
+              "description": "Apps that pin their certificates were dropping under the proxy. They now bypass it automatically and sign in normally. Install the 1.0.7 helper to pick up the fix."
             },
             "pt": {
               "title": "Login do Slack e ChatGPT corrigido",
-              "description": "Apps com certificate pinning caiam com o proxy ligado. Agora eles passam direto e fazem login normalmente. Instale o helper 1.0.6 para receber a correcao."
+              "description": "Apps com certificate pinning caiam com o proxy ligado. Agora eles passam direto e fazem login normalmente. Instale o helper 1.0.7 para receber a correcao."
             },
             "es": {
               "title": "Login de Slack y ChatGPT corregido",
-              "description": "Las apps con certificate pinning fallaban con el proxy activo. Ahora lo evitan automaticamente y funcionan. Instala el helper 1.0.6 para aplicar la correccion."
+              "description": "Las apps con certificate pinning fallaban con el proxy activo. Ahora lo evitan automaticamente y funcionan. Instala el helper 1.0.7 para aplicar la correccion."
             }
           }
         },
@@ -68,26 +68,26 @@
   ],
   "notifications": [
     {
-      "id": "helper-1.0.6-update",
+      "id": "helper-1.0.7-update",
       "severity": "info",
       "category": "helper",
       "publishedAt": "2026-05-26T00:00:00Z",
       "expiresAt": null,
-      "minHelperVersion": "1.0.6",
+      "minHelperVersion": "1.0.7",
       "localizations": {
         "en": {
           "title": "Update the Proxy Helper",
-          "body": "A new helper (1.0.6) keeps Slack, ChatGPT, iCloud and the App Store working when the proxy is on. Re-download it to apply the fix.",
+          "body": "A new helper (1.0.7) keeps Slack, ChatGPT, iCloud and the App Store working when the proxy is on. Re-download it to apply the fix.",
           "actionLabel": "Download"
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "Uma nova versao do helper (1.0.6) mantem Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correcao.",
+          "body": "Uma nova versao do helper (1.0.7) mantem Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correcao.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "Una nueva version del helper (1.0.6) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descargalo otra vez para aplicar la correccion.",
+          "body": "Una nueva version del helper (1.0.7) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descargalo otra vez para aplicar la correccion.",
           "actionLabel": "Descargar"
         }
       },
@@ -95,7 +95,7 @@
     }
   ],
   "helper": {
-    "latestVersion": "1.0.6",
+    "latestVersion": "1.0.7",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
     "blockProxy": true,
     "minRequiredVersion": null,
