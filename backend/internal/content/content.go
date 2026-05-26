@@ -81,9 +81,20 @@ type HelperInfo struct {
 	ReleaseNotes       Localized `json:"releaseNotes"`
 }
 
+type ProxyFeatureFlag struct {
+	Enabled           bool      `json:"enabled"`
+	EnabledForDevices []string  `json:"enabledForDevices"`
+	DisabledMessage   Localized `json:"disabledMessage"`
+}
+
+type FeatureFlags struct {
+	Proxy ProxyFeatureFlag `json:"proxy"`
+}
+
 type data struct {
 	WhatsNew      []WhatsNewEntry     `json:"whatsNew"`
 	Notifications []NotificationEntry `json:"notifications"`
+	FeatureFlags  FeatureFlags        `json:"featureFlags"`
 	Helper        HelperInfo          `json:"helper"`
 }
 
@@ -125,4 +136,28 @@ func (s *Store) Notifications() []NotificationEntry {
 // Helper returns the current helper release info.
 func (s *Store) Helper() HelperInfo {
 	return s.d.Helper
+}
+
+// FeatureFlags returns the raw flags including per-device overrides.
+func (s *Store) FeatureFlags() FeatureFlags {
+	return s.d.FeatureFlags
+}
+
+// ResolveProxyEnabled computes whether the proxy feature should be available
+// for the given device id. Returns the global default unless the device id
+// appears in the per-device allowlist.
+func (s *Store) ResolveProxyEnabled(deviceID string) bool {
+	flag := s.d.FeatureFlags.Proxy
+	if flag.Enabled {
+		return true
+	}
+	if deviceID == "" {
+		return false
+	}
+	for _, allowed := range flag.EnabledForDevices {
+		if allowed == deviceID {
+			return true
+		}
+	}
+	return false
 }

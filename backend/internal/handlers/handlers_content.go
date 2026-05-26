@@ -12,6 +12,8 @@ type Content interface {
 	LatestWhatsNew(appVersion string) *content.WhatsNewEntry
 	Notifications() []content.NotificationEntry
 	Helper() content.HelperInfo
+	FeatureFlags() content.FeatureFlags
+	ResolveProxyEnabled(deviceID string) bool
 }
 
 type whatsNewResponse struct {
@@ -128,6 +130,36 @@ func (h *Handlers) HelperLatest(w http.ResponseWriter, r *http.Request) {
 		BlockProxy:         info.BlockProxy,
 		MinRequiredVersion: info.MinRequiredVersion,
 		ReleaseNotes:       info.ReleaseNotes.Pick(r.URL.Query().Get("locale")),
+	})
+}
+
+type featureFlagsResponse struct {
+	Proxy proxyFlagResponse `json:"proxy"`
+}
+
+type proxyFlagResponse struct {
+	Enabled         bool   `json:"enabled"`
+	DisabledMessage string `json:"disabledMessage"`
+}
+
+// FeatureFlags returns the per-device resolved feature flags. The deviceId
+// query param decides whether the proxy override applies for this caller.
+// Query params: ?deviceId=<uuid>&locale=pt-BR (both optional but recommended).
+func (h *Handlers) FeatureFlags(w http.ResponseWriter, r *http.Request) {
+	if h.Content == nil {
+		writeError(w, http.StatusServiceUnavailable, "content not configured")
+		return
+	}
+	deviceID := r.URL.Query().Get("deviceId")
+	locale := r.URL.Query().Get("locale")
+	flags := h.Content.FeatureFlags()
+	enabled := h.Content.ResolveProxyEnabled(deviceID)
+
+	writeJSON(w, http.StatusOK, featureFlagsResponse{
+		Proxy: proxyFlagResponse{
+			Enabled:         enabled,
+			DisabledMessage: flags.Proxy.DisabledMessage.Pick(locale),
+		},
 	})
 }
 

@@ -11,10 +11,13 @@ import (
 )
 
 type fakeContent struct {
-	entry        *content.WhatsNewEntry
-	notes        []content.NotificationEntry
-	helper       content.HelperInfo
-	gotVersion   string
+	entry            *content.WhatsNewEntry
+	notes            []content.NotificationEntry
+	helper           content.HelperInfo
+	flags            content.FeatureFlags
+	proxyEnabledFor  map[string]bool
+	gotVersion       string
+	gotProxyDeviceID string
 }
 
 func (f *fakeContent) LatestWhatsNew(v string) *content.WhatsNewEntry {
@@ -23,6 +26,14 @@ func (f *fakeContent) LatestWhatsNew(v string) *content.WhatsNewEntry {
 }
 func (f *fakeContent) Notifications() []content.NotificationEntry { return f.notes }
 func (f *fakeContent) Helper() content.HelperInfo                 { return f.helper }
+func (f *fakeContent) FeatureFlags() content.FeatureFlags         { return f.flags }
+func (f *fakeContent) ResolveProxyEnabled(deviceID string) bool {
+	f.gotProxyDeviceID = deviceID
+	if f.proxyEnabledFor == nil {
+		return f.flags.Proxy.Enabled
+	}
+	return f.proxyEnabledFor[deviceID]
+}
 
 func TestWhatsNew_LocalePicked(t *testing.T) {
 	fc := &fakeContent{
@@ -121,6 +132,57 @@ func TestHelperLatest_ReturnsInfo(t *testing.T) {
 	}
 	if got.LatestVersion != "1.0.4" || !got.BlockProxy || got.ReleaseNotes != "notes" {
 		t.Fatalf("got %+v", got)
+	}
+}
+
+func TestFeatureFlags_DefaultDisabled(t *testing.T) {
+	fc := &fakeContent{
+		flags: content.FeatureFlags{
+			Proxy: content.ProxyFeatureFlag{
+				Enabled:         false,
+				DisabledMessage: content.Localized{"en": "Proxy is paused.", "pt": "Proxy pausado."},
+			},
+		},
+	}
+	h := &Handlers{Content: fc}
+	req := httptest.NewRequest(http.MethodGet, "/v1/feature-flags?locale=pt", nil)
+	w := httptest.NewRecorder()
+	h.FeatureFlags(w, req)
+
+	var got featureFlagsResponse
+	if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got.Proxy.Enabled {
+		t.Fatalf("expected proxy disabled by default")
+	}
+	if got.Proxy.DisabledMessage != "Proxy pausado." {
+		t.Fatalf("expected pt message, got %q", got.Proxy.DisabledMessage)
+	}
+}
+
+func TestFeatureFlags_DeviceOverride(t *testing.T) {
+	fc := &fakeContent{
+		flags: content.FeatureFlags{
+			Proxy: content.ProxyFeatureFlag{
+				Enabled:         false,
+				DisabledMessage: content.Localized{"en": "off"},
+			},
+		},
+		proxyEnabledFor: map[string]bool{"allowed-device": true},
+	}
+	h := &Handlers{Content: fc}
+	req := httptest.NewRequest(http.MethodGet, "/v1/feature-flags?deviceId=allowed-device", nil)
+	w := httptest.NewRecorder()
+	h.FeatureFlags(w, req)
+
+	var got featureFlagsResponse
+	_ = json.NewDecoder(w.Body).Decode(&got)
+	if !got.Proxy.Enabled {
+		t.Fatalf("expected override to enable proxy for allowed-device")
+	}
+	if fc.gotProxyDeviceID != "allowed-device" {
+		t.Fatalf("device id not forwarded: %q", fc.gotProxyDeviceID)
 	}
 }
 

@@ -74,6 +74,7 @@ func main() {
 		r.Get("/whats-new", h.WhatsNew)
 		r.Get("/notifications", h.Notifications)
 		r.Get("/helper/latest", h.HelperLatest)
+		r.Get("/feature-flags", h.FeatureFlags)
 	})
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

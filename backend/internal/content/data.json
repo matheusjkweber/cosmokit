@@ -68,6 +68,31 @@
   ],
   "notifications": [
     {
+      "id": "proxy-maintenance-2026-05-26",
+      "severity": "warning",
+      "category": "proxy",
+      "publishedAt": "2026-05-26T00:00:00Z",
+      "expiresAt": null,
+      "localizations": {
+        "en": {
+          "title": "Proxy temporarily disabled",
+          "body": "We're fixing an issue with the Proxy feature. It will be back shortly. The rest of CosmoKit works normally in the meantime.",
+          "actionLabel": ""
+        },
+        "pt": {
+          "title": "Proxy temporariamente desativado",
+          "body": "Estamos consertando a funcionalidade de Proxy. Ja ja voltamos com ela. O resto do CosmoKit funciona normalmente enquanto isso.",
+          "actionLabel": ""
+        },
+        "es": {
+          "title": "Proxy temporalmente desactivado",
+          "body": "Estamos arreglando un problema con la funcion Proxy. Ya volvemos con ella. El resto de CosmoKit funciona normal mientras tanto.",
+          "actionLabel": ""
+        }
+      },
+      "actionUrl": ""
+    },
+    {
       "id": "helper-1.0.7-update",
       "severity": "info",
       "category": "helper",
@@ -94,6 +119,17 @@
       "actionUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg"
     }
   ],
+  "featureFlags": {
+    "proxy": {
+      "enabled": false,
+      "enabledForDevices": [],
+      "disabledMessage": {
+        "en": "The Proxy feature is temporarily unavailable while we ship a fix. Copy your Device ID below and send it to the team if you need early access.",
+        "pt": "O recurso Proxy esta temporariamente indisponivel enquanto enviamos uma correcao. Copie o seu Device ID abaixo e envie ao time se precisar de acesso antecipado.",
+        "es": "La funcion Proxy esta temporalmente no disponible mientras enviamos una correccion. Copia tu Device ID abajo y envialo al equipo si necesitas acceso anticipado."
+      }
+    }
+  },
   "helper": {
     "latestVersion": "1.0.7",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
