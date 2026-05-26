@@ -1,7 +1,7 @@
 {
   "whatsNew": [
     {
-      "version": "1.0.4",
+      "version": "4.4.0",
       "title": {
         "en": "Slack and ChatGPT now play nicely with the proxy",
         "pt": "Slack e ChatGPT agora funcionam normalmente com o proxy",
@@ -13,26 +13,44 @@
           "iconColor": "green",
           "localizations": {
             "en": {
-              "title": "Login fixed for pinned apps",
-              "description": "Slack and ChatGPT use certificate pinning, so they refused to talk through the proxy. They now bypass it automatically and sign in normally."
+              "title": "Slack and ChatGPT login fixed",
+              "description": "Apps that pin their certificates were dropping under the proxy. They now bypass it automatically and sign in normally. Install the 1.0.5 helper to pick up the fix."
             },
             "pt": {
-              "title": "Login corrigido para apps com cert pinning",
-              "description": "Slack e ChatGPT usam certificate pinning e recusavam o proxy. Agora eles passam direto e fazem login normalmente."
+              "title": "Login do Slack e ChatGPT corrigido",
+              "description": "Apps com certificate pinning caiam com o proxy ligado. Agora eles passam direto e fazem login normalmente. Instale o helper 1.0.5 para receber a correcao."
             },
             "es": {
-              "title": "Login corregido para apps con cert pinning",
-              "description": "Slack y ChatGPT usan certificate pinning y rechazaban el proxy. Ahora lo evitan automaticamente y funcionan."
+              "title": "Login de Slack y ChatGPT corregido",
+              "description": "Las apps con certificate pinning fallaban con el proxy activo. Ahora lo evitan automaticamente y funcionan. Instala el helper 1.0.5 para aplicar la correccion."
+            }
+          }
+        },
+        {
+          "icon": "bell.badge",
+          "iconColor": "blue",
+          "localizations": {
+            "en": {
+              "title": "Notifications and What's New, live from the server",
+              "description": "Heads-up about new helper releases and product news now arrives in-app under Help → Notifications, without waiting for an App Store update."
+            },
+            "pt": {
+              "title": "Notificacoes e Novidades agora vem do servidor",
+              "description": "Avisos sobre novas versoes do helper e novidades aparecem direto no app em Ajuda → Notificacoes, sem esperar atualizacao da App Store."
+            },
+            "es": {
+              "title": "Notificaciones y Novedades, en vivo desde el servidor",
+              "description": "Avisos de nuevas versiones del helper y novedades aparecen ahora en Ayuda → Notificaciones, sin esperar una actualizacion en la App Store."
             }
           }
         },
         {
           "icon": "house.fill",
-          "iconColor": "blue",
+          "iconColor": "purple",
           "localizations": {
             "en": {
               "title": "iCloud and App Store stay direct",
-              "description": "Apple system services skip the proxy too, so iCloud sync, Software Update and the App Store keep working when you're inspecting traffic."
+              "description": "Apple system services skip the proxy too, so iCloud sync, Software Update and the App Store keep working while you inspect traffic."
             },
             "pt": {
               "title": "iCloud e App Store continuam diretos",
@@ -45,31 +63,31 @@
           }
         }
       ],
-      "publishedAt": "2026-05-25T17:42:00Z"
+      "publishedAt": "2026-05-26T00:00:00Z"
     }
   ],
   "notifications": [
     {
-      "id": "helper-1.0.4-update",
+      "id": "helper-1.0.5-update",
       "severity": "info",
       "category": "helper",
-      "publishedAt": "2026-05-25T17:42:00Z",
+      "publishedAt": "2026-05-26T00:00:00Z",
       "expiresAt": null,
-      "minHelperVersion": "1.0.4",
+      "minHelperVersion": "1.0.5",
       "localizations": {
         "en": {
           "title": "Update the Proxy Helper",
-          "body": "A new helper fixes Slack and ChatGPT logins while the proxy is on. Re-download it from the website to apply the fix.",
+          "body": "A new helper (1.0.5) keeps Slack, ChatGPT, iCloud and the App Store working when the proxy is on. Re-download it to apply the fix.",
           "actionLabel": "Download"
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "Uma nova versao do helper corrige o login do Slack e do ChatGPT com o proxy ligado. Baixe de novo no site para aplicar a correcao.",
+          "body": "Uma nova versao do helper (1.0.5) mantem Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correcao.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "Una nueva version del helper arregla el login de Slack y ChatGPT con el proxy activo. Descargalo otra vez en el sitio para aplicar la correccion.",
+          "body": "Una nueva version del helper (1.0.5) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descargalo otra vez para aplicar la correccion.",
           "actionLabel": "Descargar"
         }
       },
@@ -77,14 +95,14 @@
     }
   ],
   "helper": {
-    "latestVersion": "1.0.4",
+    "latestVersion": "1.0.5",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
-    "blockProxy": false,
+    "blockProxy": true,
     "minRequiredVersion": null,
     "releaseNotes": {
-      "en": "Slack, ChatGPT and Apple system services now bypass the proxy automatically.",
-      "pt": "Slack, ChatGPT e servicos do sistema da Apple agora passam fora do proxy automaticamente.",
-      "es": "Slack, ChatGPT y servicios del sistema de Apple ahora evitan el proxy automaticamente."
+      "en": "Slack, ChatGPT, iCloud and App Store now bypass the proxy automatically. Adds readVersion XPC so the app can detect outdated helpers.",
+      "pt": "Slack, ChatGPT, iCloud e App Store passam fora do proxy automaticamente. Adiciona o XPC readVersion para o app detectar helpers desatualizados.",
+      "es": "Slack, ChatGPT, iCloud y App Store ahora evitan el proxy automaticamente. Agrega el XPC readVersion para que la app detecte helpers desactualizados."
     }
   }
 }
