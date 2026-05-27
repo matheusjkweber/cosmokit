@@ -38,9 +38,9 @@ func (l Localized) Pick(locale string) string {
 }
 
 type WhatsNewItem struct {
-	Icon          string                          `json:"icon"`
-	IconColor     string                          `json:"iconColor"`
-	Localizations map[string]WhatsNewItemContent  `json:"localizations"`
+	Icon          string                         `json:"icon"`
+	IconColor     string                         `json:"iconColor"`
+	Localizations map[string]WhatsNewItemContent `json:"localizations"`
 }
 
 type WhatsNewItemContent struct {
@@ -56,15 +56,15 @@ type WhatsNewEntry struct {
 }
 
 type NotificationEntry struct {
-	ID               string                            `json:"id"`
-	Severity         string                            `json:"severity"`
-	Category         string                            `json:"category"`
-	PublishedAt      string                            `json:"publishedAt"`
-	ExpiresAt        *string                           `json:"expiresAt"`
-	MinHelperVersion *string                           `json:"minHelperVersion,omitempty"`
-	MinAppVersion    *string                           `json:"minAppVersion,omitempty"`
-	Localizations    map[string]NotificationLocalized  `json:"localizations"`
-	ActionURL        string                            `json:"actionUrl,omitempty"`
+	ID               string                           `json:"id"`
+	Severity         string                           `json:"severity"`
+	Category         string                           `json:"category"`
+	PublishedAt      string                           `json:"publishedAt"`
+	ExpiresAt        *string                          `json:"expiresAt"`
+	MinHelperVersion *string                          `json:"minHelperVersion,omitempty"`
+	MinAppVersion    *string                          `json:"minAppVersion,omitempty"`
+	Localizations    map[string]NotificationLocalized `json:"localizations"`
+	ActionURL        string                           `json:"actionUrl,omitempty"`
 }
 
 type NotificationLocalized struct {
@@ -84,6 +84,8 @@ type HelperInfo struct {
 type ProxyFeatureFlag struct {
 	Enabled           bool        `json:"enabled"`
 	EnabledForDevices []string    `json:"enabledForDevices"`
+	HTTPSMitmEnabled  bool        `json:"httpsMitmEnabled"`
+	HTTPSMitmBackend  string      `json:"httpsMitmBackend"`
 	DisabledMessage   Localized   `json:"disabledMessage"`
 	Notice            ProxyNotice `json:"notice"`
 }

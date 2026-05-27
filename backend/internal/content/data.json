@@ -98,6 +98,8 @@
     "proxy": {
       "enabled": true,
       "enabledForDevices": [],
+      "httpsMitmEnabled": true,
+      "httpsMitmBackend": "nio",
       "disabledMessage": {
         "en": "The Proxy feature is temporarily unavailable while we ship a fix. Copy your Device ID below and send it to the team if you need early access.",
         "pt": "O recurso Proxy esta temporariamente indisponivel enquanto enviamos uma correcao. Copie o seu Device ID abaixo e envie ao time se precisar de acesso antecipado.",

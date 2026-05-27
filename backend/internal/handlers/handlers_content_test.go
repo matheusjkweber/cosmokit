@@ -159,6 +159,12 @@ func TestFeatureFlags_DefaultDisabled(t *testing.T) {
 	if got.Proxy.DisabledMessage != "Proxy pausado." {
 		t.Fatalf("expected pt message, got %q", got.Proxy.DisabledMessage)
 	}
+	if got.Proxy.HTTPSMitmEnabled {
+		t.Fatal("expected HTTPS MITM disabled by default")
+	}
+	if got.Proxy.HTTPSMitmBackend != "off" {
+		t.Fatalf("expected empty HTTPS MITM backend to default to off, got %q", got.Proxy.HTTPSMitmBackend)
+	}
 }
 
 func TestFeatureFlags_DeviceOverride(t *testing.T) {
@@ -183,6 +189,34 @@ func TestFeatureFlags_DeviceOverride(t *testing.T) {
 	}
 	if fc.gotProxyDeviceID != "allowed-device" {
 		t.Fatalf("device id not forwarded: %q", fc.gotProxyDeviceID)
+	}
+}
+
+func TestFeatureFlags_ReturnsHTTPSMITMFields(t *testing.T) {
+	fc := &fakeContent{
+		flags: content.FeatureFlags{
+			Proxy: content.ProxyFeatureFlag{
+				Enabled:          true,
+				HTTPSMitmEnabled: true,
+				HTTPSMitmBackend: "nio",
+				DisabledMessage:  content.Localized{"en": "on"},
+			},
+		},
+	}
+	h := &Handlers{Content: fc}
+	req := httptest.NewRequest(http.MethodGet, "/v1/feature-flags?deviceId=test&locale=en", nil)
+	w := httptest.NewRecorder()
+	h.FeatureFlags(w, req)
+
+	var got featureFlagsResponse
+	if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if !got.Proxy.HTTPSMitmEnabled {
+		t.Fatal("expected HTTPS MITM enabled")
+	}
+	if got.Proxy.HTTPSMitmBackend != "nio" {
+		t.Fatalf("https MITM backend = %q, want nio", got.Proxy.HTTPSMitmBackend)
 	}
 }
 

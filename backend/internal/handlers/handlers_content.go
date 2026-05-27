@@ -17,10 +17,10 @@ type Content interface {
 }
 
 type whatsNewResponse struct {
-	Version     string                  `json:"version"`
-	Title       string                  `json:"title"`
-	Items       []whatsNewItemResponse  `json:"items"`
-	PublishedAt string                  `json:"publishedAt"`
+	Version     string                 `json:"version"`
+	Title       string                 `json:"title"`
+	Items       []whatsNewItemResponse `json:"items"`
+	PublishedAt string                 `json:"publishedAt"`
 }
 
 type whatsNewItemResponse struct {
@@ -138,9 +138,11 @@ type featureFlagsResponse struct {
 }
 
 type proxyFlagResponse struct {
-	Enabled         bool                 `json:"enabled"`
-	DisabledMessage string               `json:"disabledMessage"`
-	Notice          proxyNoticeResponse  `json:"notice"`
+	Enabled          bool                `json:"enabled"`
+	DisabledMessage  string              `json:"disabledMessage"`
+	HTTPSMitmEnabled bool                `json:"httpsMitmEnabled"`
+	HTTPSMitmBackend string              `json:"httpsMitmBackend"`
+	Notice           proxyNoticeResponse `json:"notice"`
 }
 
 type proxyNoticeResponse struct {
@@ -162,11 +164,17 @@ func (h *Handlers) FeatureFlags(w http.ResponseWriter, r *http.Request) {
 	locale := r.URL.Query().Get("locale")
 	flags := h.Content.FeatureFlags()
 	enabled := h.Content.ResolveProxyEnabled(deviceID)
+	httpsMitmBackend := flags.Proxy.HTTPSMitmBackend
+	if httpsMitmBackend == "" {
+		httpsMitmBackend = "off"
+	}
 
 	writeJSON(w, http.StatusOK, featureFlagsResponse{
 		Proxy: proxyFlagResponse{
-			Enabled:         enabled,
-			DisabledMessage: flags.Proxy.DisabledMessage.Pick(locale),
+			Enabled:          enabled,
+			DisabledMessage:  flags.Proxy.DisabledMessage.Pick(locale),
+			HTTPSMitmEnabled: flags.Proxy.HTTPSMitmEnabled,
+			HTTPSMitmBackend: httpsMitmBackend,
 			Notice: proxyNoticeResponse{
 				ID:       flags.Proxy.Notice.ID,
 				Show:     flags.Proxy.Notice.Show,
