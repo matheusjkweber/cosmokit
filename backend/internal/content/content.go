@@ -63,6 +63,7 @@ type NotificationEntry struct {
 	ExpiresAt        *string                          `json:"expiresAt"`
 	MinHelperVersion *string                          `json:"minHelperVersion,omitempty"`
 	MinAppVersion    *string                          `json:"minAppVersion,omitempty"`
+	MaxAppVersion    *string                          `json:"maxAppVersion,omitempty"`
 	Localizations    map[string]NotificationLocalized `json:"localizations"`
 	ActionURL        string                           `json:"actionUrl,omitempty"`
 }
@@ -91,10 +92,12 @@ type ProxyFeatureFlag struct {
 }
 
 type ProxyNotice struct {
-	ID       string    `json:"id"`
-	Show     bool      `json:"show"`
-	Severity string    `json:"severity"`
-	Message  Localized `json:"message"`
+	ID            string    `json:"id"`
+	Show          bool      `json:"show"`
+	Severity      string    `json:"severity"`
+	Message       Localized `json:"message"`
+	MinAppVersion *string   `json:"minAppVersion,omitempty"`
+	MaxAppVersion *string   `json:"maxAppVersion,omitempty"`
 }
 
 type FeatureFlags struct {

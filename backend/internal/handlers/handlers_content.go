@@ -38,6 +38,7 @@ type notificationResponse struct {
 	ExpiresAt        *string `json:"expiresAt"`
 	MinHelperVersion *string `json:"minHelperVersion,omitempty"`
 	MinAppVersion    *string `json:"minAppVersion,omitempty"`
+	MaxAppVersion    *string `json:"maxAppVersion,omitempty"`
 	Title            string  `json:"title"`
 	Body             string  `json:"body"`
 	ActionLabel      string  `json:"actionLabel"`
@@ -107,6 +108,7 @@ func (h *Handlers) Notifications(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt:        n.ExpiresAt,
 			MinHelperVersion: n.MinHelperVersion,
 			MinAppVersion:    n.MinAppVersion,
+			MaxAppVersion:    n.MaxAppVersion,
 			Title:            loc.Title,
 			Body:             loc.Body,
 			ActionLabel:      loc.ActionLabel,
@@ -146,10 +148,12 @@ type proxyFlagResponse struct {
 }
 
 type proxyNoticeResponse struct {
-	ID       string `json:"id"`
-	Show     bool   `json:"show"`
-	Severity string `json:"severity"`
-	Message  string `json:"message"`
+	ID            string  `json:"id"`
+	Show          bool    `json:"show"`
+	Severity      string  `json:"severity"`
+	Message       string  `json:"message"`
+	MinAppVersion *string `json:"minAppVersion,omitempty"`
+	MaxAppVersion *string `json:"maxAppVersion,omitempty"`
 }
 
 // FeatureFlags returns the per-device resolved feature flags. The deviceId
@@ -176,10 +180,12 @@ func (h *Handlers) FeatureFlags(w http.ResponseWriter, r *http.Request) {
 			HTTPSMitmEnabled: flags.Proxy.HTTPSMitmEnabled,
 			HTTPSMitmBackend: httpsMitmBackend,
 			Notice: proxyNoticeResponse{
-				ID:       flags.Proxy.Notice.ID,
-				Show:     flags.Proxy.Notice.Show,
-				Severity: flags.Proxy.Notice.Severity,
-				Message:  flags.Proxy.Notice.Message.Pick(locale),
+				ID:            flags.Proxy.Notice.ID,
+				Show:          flags.Proxy.Notice.Show,
+				Severity:      flags.Proxy.Notice.Severity,
+				Message:       flags.Proxy.Notice.Message.Pick(locale),
+				MinAppVersion: flags.Proxy.Notice.MinAppVersion,
+				MaxAppVersion: flags.Proxy.Notice.MaxAppVersion,
 			},
 		},
 	})

@@ -92,6 +92,31 @@
         }
       },
       "actionUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg"
+    },
+    {
+      "id": "proxy-fix-in-review-2026-06-01",
+      "severity": "info",
+      "category": "proxy",
+      "publishedAt": "2026-06-01T00:00:00Z",
+      "expiresAt": null,
+      "maxAppVersion": "4.4.0",
+      "localizations": {
+        "en": {
+          "title": "Proxy fix on the way",
+          "body": "The Proxy isn't working reliably in this version. We've already fixed it - the update is submitted and waiting on Apple's review, and it'll install automatically once approved. Thanks for your patience!",
+          "actionLabel": ""
+        },
+        "pt": {
+          "title": "Correcao do Proxy a caminho",
+          "body": "O Proxy nao esta funcionando de forma confiavel nesta versao. Ja corrigimos - a atualizacao foi enviada e esta aguardando a revisao da Apple, e sera instalada automaticamente assim que aprovada. Obrigado pela paciencia!",
+          "actionLabel": ""
+        },
+        "es": {
+          "title": "Arreglo del Proxy en camino",
+          "body": "El Proxy no funciona de forma confiable en esta version. Ya lo corregimos - la actualizacion fue enviada y esta esperando la revision de Apple, y se instalara automaticamente una vez aprobada. Gracias por tu paciencia!",
+          "actionLabel": ""
+        }
+      }
     }
   ],
   "featureFlags": {
@@ -106,13 +131,13 @@
         "es": "La funcion Proxy esta temporalmente no disponible mientras enviamos una correccion. Copia tu Device ID abajo y envialo al equipo si necesitas acceso anticipado."
       },
       "notice": {
-        "id": "proxy-optimizing-2026-05-26",
+        "id": "proxy-fix-in-review-2026-06-01",
         "show": false,
         "severity": "info",
         "message": {
-          "en": "We're still polishing the Proxy feature. If something doesn't work as expected, let us know via Help -> Suggest a feature so we can fix it fast.",
-          "pt": "Ainda estamos otimizando a feature de Proxy. Se algo nao funcionar como voce espera, nos avise em Ajuda -> Sugerir um recurso pra gente consertar rapido.",
-          "es": "Aun estamos puliendo la funcion Proxy. Si algo no funciona como esperas, avisanos en Ayuda -> Sugerir una funcion para arreglarlo rapido."
+          "en": "Heads-up: the Proxy isn't working reliably in this version. We've already fixed it — the update is submitted and waiting on Apple's review, and it'll update automatically once approved. Thanks for your patience.",
+          "pt": "Aviso: o Proxy nao esta funcionando de forma confiavel nesta versao. Ja corrigimos — a atualizacao foi enviada e esta aguardando a revisao da Apple, e sera instalada automaticamente assim que aprovada. Obrigado pela paciencia.",
+          "es": "Aviso: el Proxy no funciona de forma confiable en esta version. Ya lo corregimos — la actualizacion fue enviada y esta esperando la revision de Apple, y se instalara automaticamente una vez aprobada. Gracias por tu paciencia."
         }
       }
     }
