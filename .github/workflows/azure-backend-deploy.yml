@@ -23,7 +23,7 @@ jobs:
         working-directory: backend
         run: |
           mkdir -p bin
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -mod=vendor -trimpath -ldflags="-s -w" -o bin/server ./cmd/cosmokit-api
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/server ./cmd/server
           cat > startup.sh <<'SH'
           #!/usr/bin/env sh
           set -e
@@ -33,7 +33,7 @@ jobs:
 
       - name: Package backend
         working-directory: backend
-        run: zip -r backend.zip bin startup.sh
+        run: zip -r backend.zip bin migrations startup.sh
 
       - name: Deploy zip to Azure App Service
         uses: azure/webapps-deploy@v3
