@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { GoogleAds } from "@/components/analytics/GoogleAds";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default function RootLayout({
   return (
     <html className="dark">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
+        <GoogleAds />
         {children}
       </body>
     </html>
