@@ -68,26 +68,26 @@
   ],
   "notifications": [
     {
-      "id": "helper-1.0.7-update",
+      "id": "helper-1.0.8-update",
       "severity": "info",
       "category": "helper",
-      "publishedAt": "2026-05-26T00:00:00Z",
+      "publishedAt": "2026-06-28T00:00:00Z",
       "expiresAt": null,
-      "minHelperVersion": "1.0.7",
+      "minHelperVersion": "1.0.8",
       "localizations": {
         "en": {
           "title": "Update the Proxy Helper",
-          "body": "A new helper (1.0.7) keeps Slack, ChatGPT, iCloud and the App Store working when the proxy is on. Re-download it to apply the fix.",
+          "body": "Version 1.0.8 attributes traffic to the right simulator when you run more than one. Download to update.",
           "actionLabel": "Download"
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "Uma nova versao do helper (1.0.7) mantem Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correcao.",
+          "body": "A versao 1.0.8 atribui o trafego ao simulador certo quando voce roda mais de um. Baixe para atualizar.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "Una nueva version del helper (1.0.7) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descargalo otra vez para aplicar la correccion.",
+          "body": "La version 1.0.8 atribuye el trafico al simulador correcto cuando ejecutas mas de uno. Descarga para actualizar.",
           "actionLabel": "Descargar"
         }
       },
@@ -143,14 +143,14 @@
     }
   },
   "helper": {
-    "latestVersion": "1.0.7",
+    "latestVersion": "1.0.8",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
-    "blockProxy": true,
+    "blockProxy": false,
     "minRequiredVersion": null,
     "releaseNotes": {
-      "en": "Slack, ChatGPT, iCloud and App Store now bypass the proxy automatically. Adds readVersion XPC so the app can detect outdated helpers.",
-      "pt": "Slack, ChatGPT, iCloud e App Store passam fora do proxy automaticamente. Adiciona o XPC readVersion para o app detectar helpers desatualizados.",
-      "es": "Slack, ChatGPT, iCloud y App Store ahora evitan el proxy automaticamente. Agrega el XPC readVersion para que la app detecte helpers desactualizados."
+      "en": "Attributes traffic to the correct simulator when more than one is running.",
+      "pt": "Atribui o trafego ao simulador correto quando mais de um esta rodando.",
+      "es": "Atribuye el trafico al simulador correcto cuando hay mas de uno en ejecucion."
     }
   }
 }
