@@ -68,26 +68,26 @@
   ],
   "notifications": [
     {
-      "id": "helper-1.0.8-update",
+      "id": "helper-1.0.9-update",
       "severity": "info",
       "category": "helper",
       "publishedAt": "2026-06-28T00:00:00Z",
       "expiresAt": null,
-      "minHelperVersion": "1.0.8",
+      "minHelperVersion": "1.0.9",
       "localizations": {
         "en": {
           "title": "Update the Proxy Helper",
-          "body": "Version 1.0.8 attributes traffic to the right simulator when you run more than one. Download to update.",
+          "body": "Version 1.0.9 also pins Safari and other built-in app traffic to the right simulator. Download to update.",
           "actionLabel": "Download"
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "A versao 1.0.8 atribui o trafego ao simulador certo quando voce roda mais de um. Baixe para atualizar.",
+          "body": "A versao 1.0.9 tambem atribui o trafego do Safari e de outros apps internos ao simulador certo. Baixe para atualizar.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "La version 1.0.8 atribuye el trafico al simulador correcto cuando ejecutas mas de uno. Descarga para actualizar.",
+          "body": "La version 1.0.9 tambien asigna el trafico de Safari y otras apps integradas al simulador correcto. Descarga para actualizar.",
           "actionLabel": "Descargar"
         }
       },
@@ -143,14 +143,14 @@
     }
   },
   "helper": {
-    "latestVersion": "1.0.8",
+    "latestVersion": "1.0.9",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
     "blockProxy": false,
     "minRequiredVersion": null,
     "releaseNotes": {
-      "en": "Attributes traffic to the correct simulator when more than one is running.",
-      "pt": "Atribui o trafego ao simulador correto quando mais de um esta rodando.",
-      "es": "Atribuye el trafico al simulador correcto cuando hay mas de uno en ejecucion."
+      "en": "Now attributes Safari and other built-in app traffic to the right simulator too, even with several running.",
+      "pt": "Agora tambem atribui o trafego do Safari e de outros apps internos ao simulador certo, mesmo com varios rodando.",
+      "es": "Ahora tambien atribuye el trafico de Safari y otras apps integradas al simulador correcto, incluso con varios en ejecucion."
     }
   }
 }
