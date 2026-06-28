@@ -23,7 +23,7 @@ jobs:
         working-directory: backend
         run: |
           mkdir -p bin
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/server ./cmd/server
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/server ./cmd/cosmokit-api
           cat > startup.sh <<'SH'
           #!/usr/bin/env sh
           set -e
