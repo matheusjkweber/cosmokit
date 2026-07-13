@@ -64,6 +64,71 @@
         }
       ],
       "publishedAt": "2026-05-26T00:00:00Z"
+    },
+    {
+      "version": "4.5.0",
+      "title": {
+        "en": "Get set up in under two minutes",
+        "pt": "Configure em menos de dois minutos",
+        "es": "Configura en menos de dos minutos"
+      },
+      "items": [
+        {
+          "icon": "checklist",
+          "iconColor": "orange",
+          "localizations": {
+            "en": {
+              "title": "New Getting Started checklist",
+              "description": "A clean three-step checklist walks you through Xcode setup, your first simulator boot, and your first screenshot — no more guessing what to do next."
+            },
+            "pt": {
+              "title": "Nova lista de Primeiros Passos",
+              "description": "Uma lista de tres etapas te guia pela configuracao do Xcode, o primeiro boot de simulador e seu primeiro screenshot — sem adivinhar o proximo passo."
+            },
+            "es": {
+              "title": "Nueva lista de Primeros Pasos",
+              "description": "Una lista de tres pasos te guia por la configuracion de Xcode, tu primer arranque de simulador y tu primera captura — sin tener que adivinar que hacer."
+            }
+          }
+        },
+        {
+          "icon": "menubar.rectangle",
+          "iconColor": "blue",
+          "localizations": {
+            "en": {
+              "title": "Menu bar quick capture",
+              "description": "Snap a screenshot of any simulator right from the menu bar without switching windows — keep your flow going."
+            },
+            "pt": {
+              "title": "Captura rapida na barra de menus",
+              "description": "Capture a tela de qualquer simulador direto da barra de menus sem trocar de janela — mantenha seu fluxo."
+            },
+            "es": {
+              "title": "Captura rapida en la barra de menus",
+              "description": "Captura la pantalla de cualquier simulador desde la barra de menus sin cambiar de ventana — no pierdas el hilo."
+            }
+          }
+        },
+        {
+          "icon": "sparkles",
+          "iconColor": "purple",
+          "localizations": {
+            "en": {
+              "title": "Smarter tool guidance",
+              "description": "Tools now tell you exactly what's missing — Xcode not selected, no simulator booted — instead of a generic error, so you fix it in one tap."
+            },
+            "pt": {
+              "title": "Orientacao mais inteligente nas ferramentas",
+              "description": "As ferramentas agora dizem exatamente o que esta faltando — Xcode nao selecionado, nenhum simulador ativo — em vez de um erro generico, para resolver com um toque."
+            },
+            "es": {
+              "title": "Orientacion mas inteligente en las herramientas",
+              "description": "Las herramientas ahora te dicen exactamente que falta — Xcode no seleccionado, ningun simulador arrancado — en lugar de un error generico, para resolverlo en un toque."
+            }
+          }
+        }
+      ],
+      "publishedAt": "2026-07-13T00:00:00Z"
     }
   ],
   "notifications": [
@@ -114,6 +179,31 @@
         "es": {
           "title": "Arreglo del Proxy en camino",
           "body": "El Proxy no funciona de forma confiable en esta version. Ya lo corregimos - la actualizacion fue enviada y esta esperando la revision de Apple, y se instalara automaticamente una vez aprobada. Gracias por tu paciencia!",
+          "actionLabel": ""
+        }
+      }
+    },
+    {
+      "id": "getting-started-tips-2026-07",
+      "severity": "info",
+      "category": "tip",
+      "publishedAt": "2026-07-13T00:00:00Z",
+      "expiresAt": null,
+      "minAppVersion": "4.5.0",
+      "localizations": {
+        "en": {
+          "title": "Tip: Pin your simulator window",
+          "body": "CosmoKit can attach to your Simulator window — click the pin in the toolbar and it follows your simulator around, so you can capture screenshots without hunting for the right window.",
+          "actionLabel": ""
+        },
+        "pt": {
+          "title": "Dica: Fixe a janela do simulador",
+          "body": "O CosmoKit pode se anexar a janela do Simulador — clique no pino na barra de ferramentas e ele segue o simulador, para voce capturar telas sem precisar procurar a janela certa.",
+          "actionLabel": ""
+        },
+        "es": {
+          "title": "Consejo: Fija la ventana del simulador",
+          "body": "CosmoKit puede acoplarse a la ventana del Simulador — haz clic en el pin de la barra de herramientas y seguira al simulador, para que captures pantallas sin tener que buscar la ventana correcta.",
           "actionLabel": ""
         }
       }
