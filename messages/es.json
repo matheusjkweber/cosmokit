@@ -120,7 +120,7 @@
       "name": "Mensual",
       "price": "€2,99",
       "period": "/mes",
-      "description": "Acceso total, cancela cuando quieras",
+      "description": "Prueba gratuita de 3 días, luego €2,99/mes",
       "cta": "Suscribir Mensual"
     },
     "yearly": {
@@ -200,7 +200,7 @@
       },
       "q5": {
         "question": "¿Cómo funciona la facturación?",
-        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (R$ 2,99/mes), anual (R$ 19,99/año — ahorra 44%), o compra única vitalicia (R$ 69,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID."
+        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual ($2.99/mes — 3 días de prueba gratis), anual ($19.99/año — ahorra 44%), o compra única vitalicia ($69.99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID. Los precios varían según la región — el precio final se muestra en la Mac App Store."
       },
       "q6": {
         "question": "¿CosmoKit es sandboxed?",

@@ -120,7 +120,7 @@
       "name": "Mensal",
       "price": "R$ 9,90",
       "period": "/mês",
-      "description": "Acesso total, cancele quando quiser",
+      "description": "Teste grátis de 3 dias, depois R$ 9,90/mês",
       "cta": "Assinar Mensal"
     },
     "yearly": {
@@ -200,7 +200,7 @@
       },
       "q5": {
         "question": "Como funciona a cobrança?",
-        "answer": "Todas as assinaturas são gerenciadas pela Mac App Store. Você pode escolher mensal (R$ 2,99/mês), anual (R$ 19,99/ano — economize 44%), ou compra única vitalícia (R$ 69,99). Você pode cancelar ou trocar de plano a qualquer momento nas configurações do seu Apple ID."
+        "answer": "Todas as assinaturas são gerenciadas pela Mac App Store. Você pode escolher mensal ($2.99/mês — 3 dias de teste grátis), anual ($19.99/ano — economize 44%), ou compra única vitalícia ($69.99). Você pode cancelar ou trocar de plano a qualquer momento nas configurações do seu Apple ID. Os preços variam por região — o preço final é exibido na Mac App Store."
       },
       "q6": {
         "question": "O CosmoKit é sandboxed?",

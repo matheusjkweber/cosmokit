@@ -120,7 +120,7 @@
       "name": "Monthly",
       "price": "$2.99",
       "period": "/mo",
-      "description": "Full access, cancel anytime",
+      "description": "3-day free trial, then $2.99/mo",
       "cta": "Start Monthly"
     },
     "yearly": {
@@ -200,7 +200,7 @@
       },
       "q5": {
         "question": "How does billing work?",
-        "answer": "All subscriptions are managed through the Mac App Store. You can choose monthly (R$ 2,99/mo), yearly (R$ 19,99/yr — save 44%), or a one-time lifetime purchase (R$ 69,99). You can cancel or switch plans anytime through your Apple ID settings."
+        "answer": "All subscriptions are managed through the Mac App Store. You can choose monthly ($2.99/mo — 3-day free trial), yearly ($19.99/yr — save 44%), or a one-time lifetime purchase ($69.99). You can cancel or switch plans anytime through your Apple ID settings. Prices vary by region — final price shown in the Mac App Store."
       },
       "q6": {
         "question": "Is CosmoKit sandboxed?",

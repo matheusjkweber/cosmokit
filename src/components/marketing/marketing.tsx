@@ -31,6 +31,7 @@ export type Feature = {
   tagline: string;
   description: string;
   bullets: string[];
+  proQualifier?: string; // Pro-gated feature disclaimer shown inline (e.g. "Network Proxy is part of CosmoKit Pro (free trial included).")
 };
 
 export const FEATURES: Feature[] = [
@@ -75,8 +76,9 @@ export const FEATURES: Feature[] = [
       "Inspect HTTPS requests and responses",
       "Debug API integrations fast",
       "Test offline and slow-network behaviour",
-      "No manual proxy configuration",
+      "One-click proxy setup",
     ],
+    proQualifier: "Network Proxy is part of CosmoKit Pro (free trial included).",
   },
   {
     id: "push",
@@ -295,6 +297,14 @@ export function FeaturePage({ featureId }: { featureId: string }) {
               All features <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground/60">
+            Requires macOS 14+, Xcode and the iOS Simulator.
+          </p>
+          {f.proQualifier && (
+            <p className="mt-2 text-sm text-violet-light/80 font-medium">
+              {f.proQualifier}
+            </p>
+          )}
         </div>
 
         <div className="max-w-xl mx-auto mt-14 rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-8">
