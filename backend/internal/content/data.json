@@ -18,11 +18,11 @@
             },
             "pt": {
               "title": "Login do Slack e ChatGPT corrigido",
-              "description": "Apps com certificate pinning caiam com o proxy ligado. Agora eles passam direto e fazem login normalmente. Instale o helper 1.0.7 para receber a correcao."
+              "description": "Apps com certificate pinning caíam com o proxy ligado. Agora eles passam direto e fazem login normalmente. Instale o helper 1.0.7 para receber a correção."
             },
             "es": {
               "title": "Login de Slack y ChatGPT corregido",
-              "description": "Las apps con certificate pinning fallaban con el proxy activo. Ahora lo evitan automaticamente y funcionan. Instala el helper 1.0.7 para aplicar la correccion."
+              "description": "Las apps con certificate pinning fallaban con el proxy activo. Ahora lo evitan automáticamente y funcionan. Instala el helper 1.0.7 para aplicar la corrección."
             }
           }
         },
@@ -35,12 +35,12 @@
               "description": "Heads-up about new helper releases and product news now arrives in-app under Help → Notifications, without waiting for an App Store update."
             },
             "pt": {
-              "title": "Notificacoes e Novidades agora vem do servidor",
-              "description": "Avisos sobre novas versoes do helper e novidades aparecem direto no app em Ajuda → Notificacoes, sem esperar atualizacao da App Store."
+              "title": "Notificações e Novidades agora vêm do servidor",
+              "description": "Avisos sobre novas versões do helper e novidades aparecem direto no app em Ajuda → Notificações, sem esperar atualização da App Store."
             },
             "es": {
               "title": "Notificaciones y Novedades, en vivo desde el servidor",
-              "description": "Avisos de nuevas versiones del helper y novedades aparecen ahora en Ayuda → Notificaciones, sin esperar una actualizacion en la App Store."
+              "description": "Avisos de nuevas versiones del helper y novedades aparecen ahora en Ayuda → Notificaciones, sin esperar una actualización en la App Store."
             }
           }
         },
@@ -54,11 +54,11 @@
             },
             "pt": {
               "title": "iCloud e App Store continuam diretos",
-              "description": "Servicos do sistema da Apple tambem ignoram o proxy: sincronia do iCloud, Atualizacao de Software e App Store seguem funcionando."
+              "description": "Serviços do sistema da Apple também ignoram o proxy: sincronia do iCloud, Atualização de Software e App Store seguem funcionando."
             },
             "es": {
               "title": "iCloud y App Store siguen directos",
-              "description": "Los servicios de Apple tambien evitan el proxy: sincronia de iCloud, Actualizacion de Software y App Store siguen funcionando."
+              "description": "Los servicios de Apple también evitan el proxy: sincronía de iCloud, Actualización de Software y App Store siguen funcionando."
             }
           }
         }
@@ -83,11 +83,11 @@
             },
             "pt": {
               "title": "Nova lista de Primeiros Passos",
-              "description": "Uma lista de tres etapas te guia pela configuracao do Xcode, o primeiro boot de simulador e seu primeiro screenshot — sem adivinhar o proximo passo."
+              "description": "Uma lista de três etapas te guia pela configuração do Xcode, o primeiro boot de simulador e seu primeiro screenshot — sem adivinhar o próximo passo."
             },
             "es": {
               "title": "Nueva lista de Primeros Pasos",
-              "description": "Una lista de tres pasos te guia por la configuracion de Xcode, tu primer arranque de simulador y tu primera captura — sin tener que adivinar que hacer."
+              "description": "Una lista de tres pasos te guía por la configuración de Xcode, tu primer arranque de simulador y tu primera captura — sin tener que adivinar qué hacer."
             }
           }
         },
@@ -100,12 +100,12 @@
               "description": "Snap a screenshot of any simulator right from the menu bar without switching windows — keep your flow going."
             },
             "pt": {
-              "title": "Captura rapida na barra de menus",
+              "title": "Captura rápida na barra de menus",
               "description": "Capture a tela de qualquer simulador direto da barra de menus sem trocar de janela — mantenha seu fluxo."
             },
             "es": {
-              "title": "Captura rapida en la barra de menus",
-              "description": "Captura la pantalla de cualquier simulador desde la barra de menus sin cambiar de ventana — no pierdas el hilo."
+              "title": "Captura rápida en la barra de menús",
+              "description": "Captura la pantalla de cualquier simulador desde la barra de menús sin cambiar de ventana — no pierdas el hilo."
             }
           }
         },
@@ -118,12 +118,12 @@
               "description": "Tools now tell you exactly what's missing — Xcode not selected, no simulator booted — instead of a generic error, so you fix it in one tap."
             },
             "pt": {
-              "title": "Orientacao mais inteligente nas ferramentas",
-              "description": "As ferramentas agora dizem exatamente o que esta faltando — Xcode nao selecionado, nenhum simulador ativo — em vez de um erro generico, para resolver com um toque."
+              "title": "Orientação mais inteligente nas ferramentas",
+              "description": "As ferramentas agora dizem exatamente o que está faltando — Xcode não selecionado, nenhum simulador ativo — em vez de um erro genérico, para resolver com um toque."
             },
             "es": {
-              "title": "Orientacion mas inteligente en las herramientas",
-              "description": "Las herramientas ahora te dicen exactamente que falta — Xcode no seleccionado, ningun simulador arrancado — en lugar de un error generico, para resolverlo en un toque."
+              "title": "Orientación más inteligente en las herramientas",
+              "description": "Las herramientas ahora te dicen exactamente qué falta — Xcode no seleccionado, ningún simulador arrancado — en lugar de un error genérico, para resolverlo en un toque."
             }
           }
         }
@@ -147,12 +147,12 @@
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "Uma nova versao do helper (1.0.7) mantem Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correcao.",
+          "body": "Uma nova versão do helper (1.0.7) mantém Slack, ChatGPT, iCloud e App Store funcionando com o proxy ligado. Baixe de novo para aplicar a correção.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "Una nueva version del helper (1.0.7) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descargalo otra vez para aplicar la correccion.",
+          "body": "Una nueva versión del helper (1.0.7) mantiene funcionando Slack, ChatGPT, iCloud y la App Store con el proxy activo. Descárgalo otra vez para aplicar la corrección.",
           "actionLabel": "Descargar"
         }
       },
@@ -172,13 +172,13 @@
           "actionLabel": ""
         },
         "pt": {
-          "title": "Correcao do Proxy a caminho",
-          "body": "O Proxy nao esta funcionando de forma confiavel nesta versao. Ja corrigimos - a atualizacao foi enviada e esta aguardando a revisao da Apple, e sera instalada automaticamente assim que aprovada. Obrigado pela paciencia!",
+          "title": "Correção do Proxy a caminho",
+          "body": "O Proxy não está funcionando de forma confiável nesta versão. Já corrigimos - a atualização foi enviada e está aguardando a revisão da Apple, e será instalada automaticamente assim que aprovada. Obrigado pela paciência!",
           "actionLabel": ""
         },
         "es": {
           "title": "Arreglo del Proxy en camino",
-          "body": "El Proxy no funciona de forma confiable en esta version. Ya lo corregimos - la actualizacion fue enviada y esta esperando la revision de Apple, y se instalara automaticamente una vez aprobada. Gracias por tu paciencia!",
+          "body": "El Proxy no funciona de forma confiable en esta versión. Ya lo corregimos - la actualización fue enviada y está esperando la revisión de Apple, y se instalará automáticamente una vez aprobada. ¡Gracias por tu paciencia!",
           "actionLabel": ""
         }
       }
@@ -198,12 +198,12 @@
         },
         "pt": {
           "title": "Dica: Fixe a janela do simulador",
-          "body": "O CosmoKit pode se anexar a janela do Simulador — clique no pino na barra de ferramentas e ele segue o simulador, para voce capturar telas sem precisar procurar a janela certa.",
+          "body": "O CosmoKit pode se anexar à janela do Simulador — clique no pino na barra de ferramentas e ele segue o simulador, para você capturar telas sem precisar procurar a janela certa.",
           "actionLabel": ""
         },
         "es": {
           "title": "Consejo: Fija la ventana del simulador",
-          "body": "CosmoKit puede acoplarse a la ventana del Simulador — haz clic en el pin de la barra de herramientas y seguira al simulador, para que captures pantallas sin tener que buscar la ventana correcta.",
+          "body": "CosmoKit puede acoplarse a la ventana del Simulador — haz clic en el pin de la barra de herramientas y seguirá al simulador, para que captures pantallas sin tener que buscar la ventana correcta.",
           "actionLabel": ""
         }
       }
@@ -217,8 +217,8 @@
       "httpsMitmBackend": "nio",
       "disabledMessage": {
         "en": "The Proxy feature is temporarily unavailable while we ship a fix. Copy your Device ID below and send it to the team if you need early access.",
-        "pt": "O recurso Proxy esta temporariamente indisponivel enquanto enviamos uma correcao. Copie o seu Device ID abaixo e envie ao time se precisar de acesso antecipado.",
-        "es": "La funcion Proxy esta temporalmente no disponible mientras enviamos una correccion. Copia tu Device ID abajo y envialo al equipo si necesitas acceso anticipado."
+        "pt": "O recurso Proxy está temporariamente indisponível enquanto enviamos uma correção. Copie o seu Device ID abaixo e envie ao time se precisar de acesso antecipado.",
+        "es": "La función Proxy está temporalmente no disponible mientras enviamos una corrección. Copia tu Device ID abajo y envíalo al equipo si necesitas acceso anticipado."
       },
       "notice": {
         "id": "proxy-fix-in-review-2026-06-01",
@@ -226,8 +226,8 @@
         "severity": "info",
         "message": {
           "en": "Heads-up: the Proxy isn't working reliably in this version. We've already fixed it — the update is submitted and waiting on Apple's review, and it'll update automatically once approved. Thanks for your patience.",
-          "pt": "Aviso: o Proxy nao esta funcionando de forma confiavel nesta versao. Ja corrigimos — a atualizacao foi enviada e esta aguardando a revisao da Apple, e sera instalada automaticamente assim que aprovada. Obrigado pela paciencia.",
-          "es": "Aviso: el Proxy no funciona de forma confiable en esta version. Ya lo corregimos — la actualizacion fue enviada y esta esperando la revision de Apple, y se instalara automaticamente una vez aprobada. Gracias por tu paciencia."
+          "pt": "Aviso: o Proxy não está funcionando de forma confiável nesta versão. Já corrigimos — a atualização foi enviada e está aguardando a revisão da Apple, e será instalada automaticamente assim que aprovada. Obrigado pela paciência.",
+          "es": "Aviso: el Proxy no funciona de forma confiable en esta versión. Ya lo corregimos — la actualización fue enviada y está esperando la revisión de Apple, y se instalará automáticamente una vez aprobada. Gracias por tu paciencia."
         }
       }
     }
@@ -240,7 +240,7 @@
     "releaseNotes": {
       "en": "Slack, ChatGPT, iCloud and App Store now bypass the proxy automatically. Adds readVersion XPC so the app can detect outdated helpers.",
       "pt": "Slack, ChatGPT, iCloud e App Store passam fora do proxy automaticamente. Adiciona o XPC readVersion para o app detectar helpers desatualizados.",
-      "es": "Slack, ChatGPT, iCloud y App Store ahora evitan el proxy automaticamente. Agrega el XPC readVersion para que la app detecte helpers desactualizados."
+      "es": "Slack, ChatGPT, iCloud y App Store evitan el proxy automáticamente. Agrega el XPC readVersion para que la app detecte helpers desactualizados."
     }
   }
 }
