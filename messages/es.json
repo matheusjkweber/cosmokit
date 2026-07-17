@@ -23,7 +23,7 @@
     "terminalHint": "Reemplaza {command} con una GUI",
     "ctaDownload": "Descargar para macOS",
     "ctaFeatures": "Explorar Características",
-    "subtext": "Plan gratuito disponible · macOS 14+ · Requiere Xcode",
+    "subtext": "Plan gratuito disponible · macOS 14.7+ · Requiere Xcode",
     "heroImage": "/screenshots/macos-1.png",
     "heroImageAlt": "Visual principal del espacio de trabajo de CosmoKit que muestra el panel de control nativo de macOS, las herramientas del simulador y el panel de productividad definitivo para desarrolladores de iOS"
   },
@@ -71,7 +71,7 @@
       },
       "permissions": {
         "title": "Permisos",
-        "description": "Restablece y gestiona permisos de la app — cámara, ubicación, notificaciones — sin reinstalar."
+        "description": "Restablece y gestiona permisos de la app (cámara, ubicación, notificaciones) sin reinstalar."
       },
       "faceid": {
         "title": "Face ID",
@@ -127,7 +127,7 @@
       "name": "Anual",
       "price": "€22,99",
       "period": "/año",
-      "description": "Mejor valor — ahorra 36%",
+      "description": "Mejor valor: ahorra 36%",
       "cta": "Suscribir Anual",
       "badge": "Ahorra 36%"
     },
@@ -146,7 +146,8 @@
       "f4": "Notificaciones push",
       "f5": "Deep links",
       "f6": "Simulación de ubicación GPS",
-      "f7": "5 entradas guardadas por herramienta"
+      "f7": "5 entradas guardadas por herramienta",
+      "f8": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)"
     },
     "proFeatures": {
       "f1": "Simuladores ilimitados",
@@ -159,7 +160,6 @@
       "f8": "Proporción personalizada",
       "f9": "Proxy de red",
       "f10": "Herramientas de gestión de apps",
-      "f11": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)",
       "f12": "Rutas de ubicación",
       "f13": "Entradas guardadas ilimitadas"
     },
@@ -173,7 +173,7 @@
     "helperCta": "Descargar Proxy Helper",
     "helperTitle": "CosmoKit Proxy Helper opcional",
     "helperDescription": "Instala este helper firmado para que CosmoKit configure el proxy HTTP/HTTPS de macOS en un clic. La suscripción y el acceso Pro siguen dentro de la app de la Mac App Store.",
-    "info1": "macOS 14+",
+    "info1": "macOS 14.7+",
     "info2": "Plan gratuito disponible",
     "info3": "Sin necesidad de cuenta"
   },
@@ -184,23 +184,23 @@
     "items": {
       "q1": {
         "question": "¿Qué es CosmoKit?",
-        "answer": "CosmoKit es una app macOS nativa que proporciona un panel de control unificado para el iOS Simulator. Reemplaza decenas de comandos de terminal (xcrun simctl) con una interfaz gráfica intuitiva — captura de pantalla, grabación de video, notificaciones push, deep links, simulación GPS, proxy de red, gestión de apps y más."
+        "answer": "CosmoKit es una app macOS nativa que proporciona un panel de control unificado para el iOS Simulator. Reemplaza decenas de comandos de terminal (xcrun simctl) con una interfaz gráfica intuitiva: captura de pantalla, grabación de video, notificaciones push, deep links, simulación GPS, proxy de red, gestión de apps y más."
       },
       "q2": {
         "question": "¿Cuáles son los requisitos del sistema?",
-        "answer": "CosmoKit requiere macOS 14 (Sonoma) o posterior y Xcode instalado en tu Mac. Funciona con todos los runtimes del iOS Simulator soportados por tu versión de Xcode."
+        "answer": "CosmoKit requiere macOS 14.7 (Sonoma) o posterior y Xcode instalado en tu Mac. Funciona con todos los runtimes del iOS Simulator soportados por tu versión de Xcode."
       },
       "q3": {
         "question": "¿Qué incluye el plan gratuito?",
-        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS y 5 entradas guardadas por herramienta. Soporta un simulador a la vez."
+        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS, herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain) y 5 entradas guardadas por herramienta. Soporta un simulador a la vez."
       },
       "q4": {
         "question": "¿Qué desbloquea CosmoKit Pro?",
-        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores ilimitados, añade marcos de dispositivo y biseles para capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, controles de apariencia/barra de estado/permisos/Face ID/keychain del simulador, rutas de ubicación y entradas guardadas ilimitadas."
+        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores ilimitados, añade marcos de dispositivo y biseles para capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, rutas de ubicación y entradas guardadas ilimitadas."
       },
       "q5": {
         "question": "¿Cómo funciona la facturación?",
-        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (€2,99/mes — 3 días de prueba gratis), anual (€22,99/año — ahorra 36%), o compra única vitalicia (€79,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID. Los precios varían según la región — el precio final se muestra en la Mac App Store."
+        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (€2,99/mes, 3 días de prueba gratis), anual (€22,99/año, ahorra 36%), o compra única vitalicia (€79,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID. Los precios varían según la región. El precio final se muestra en la Mac App Store."
       },
       "q6": {
         "question": "¿CosmoKit es sandboxed?",
@@ -208,7 +208,7 @@
       },
       "q7": {
         "question": "¿Funciona con dispositivos físicos?",
-        "answer": "CosmoKit está diseñado específicamente para el iOS Simulator. No se conecta a dispositivos iOS físicos — se enfoca en hacer que el desarrollo y las pruebas basadas en simulador sean lo más eficiente posible."
+        "answer": "CosmoKit está diseñado específicamente para el iOS Simulator. No se conecta a dispositivos iOS físicos. Se enfoca en hacer que el desarrollo y las pruebas basadas en simulador sean lo más eficiente posible."
       },
       "q8": {
         "question": "¿Cómo obtengo soporte?",
@@ -226,7 +226,7 @@
     "terms": "Términos de Servicio",
     "macAppStore": "Mac App Store",
     "copyright": "© {year} CosmoHQ. Todos los derechos reservados.",
-    "builtWith": "Hecho con SwiftUI · macOS 14+"
+    "builtWith": "Hecho con SwiftUI · macOS 14.7+"
   },
   "Support": {
     "label": "Soporte",
@@ -247,7 +247,7 @@
     "submit": "Enviar mensaje",
     "sending": "Enviando…",
     "successTitle": "Mensaje enviado",
-    "successBody": "Gracias por escribir — te responderemos al email indicado.",
+    "successBody": "Gracias por escribir. Te responderemos al email indicado.",
     "successAgain": "Enviar otro mensaje"
   },
   "Suggest": {

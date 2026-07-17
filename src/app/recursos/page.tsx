@@ -11,7 +11,7 @@ import {
 // (200) instead of 404. Same content as /features; canonical points there to
 // avoid duplicate-content penalties.
 export const metadata: Metadata = {
-  title: "Recursos — CosmoKit para o Simulador iOS",
+  title: "Recursos | CosmoKit para o Simulador iOS",
   description:
     "Tudo o que o CosmoKit traz para o seu fluxo no Simulador do iOS: controle do simulador, captura e gravação de tela, proxy de rede, notificações push, simulação de GPS e deep links.",
   alternates: { canonical: "https://usecosmoskittool.com/features" },
@@ -24,7 +24,7 @@ export default function RecursosPage() {
         eyebrow="Recursos"
         title="Tudo o que você precisa para"
         highlight="testar simuladores mais rápido"
-        subtitle="O CosmoKit é o companheiro nativo para macOS de quem desenvolve para iOS — controle, capture e inspecione qualquer simulador sem tocar no terminal."
+        subtitle="O CosmoKit é o companheiro nativo para macOS de quem desenvolve para iOS: controle, capture e inspecione qualquer simulador sem tocar no terminal."
       />
 
       <div className="container mx-auto px-4 pb-8">

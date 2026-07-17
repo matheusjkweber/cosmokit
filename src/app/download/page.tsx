@@ -18,12 +18,12 @@ const requirements = [
   "macOS 13 Ventura or later",
   "Xcode with the iOS Simulator installed",
   "Apple Silicon or Intel Mac",
-  "Free to download — upgrade in-app anytime",
+  "Free to download, upgrade in-app anytime",
 ];
 
 const steps = [
   "Download CosmoKit from the Mac App Store.",
-  "Open the app — it detects your installed simulators automatically.",
+  "Open the app and it detects your installed simulators automatically.",
   "Pick a simulator and start capturing, pushing or inspecting traffic.",
 ];
 
@@ -42,7 +42,7 @@ export default function DownloadPage() {
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
           The native companion for iOS developers. Download free on the Mac App
-          Store — no sign-up required.
+          Store, no sign-up required.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <AppStoreButton label="Download on the Mac App Store" />

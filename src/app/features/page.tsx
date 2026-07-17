@@ -8,7 +8,7 @@ import {
 } from "@/components/marketing/marketing";
 
 export const metadata: Metadata = {
-  title: "Features — CosmoKit for iOS Simulator",
+  title: "Features | CosmoKit for iOS Simulator",
   description:
     "Everything CosmoKit brings to your iOS Simulator workflow: simulator control, screen capture & recording, network proxy, push notifications, GPS simulation and deep links.",
   alternates: { canonical: "https://usecosmoskittool.com/features" },
@@ -21,7 +21,7 @@ export default function FeaturesPage() {
         eyebrow="Features"
         title="Everything you need to"
         highlight="test simulators faster"
-        subtitle="CosmoKit is the native macOS companion for iOS developers — control, capture and inspect any simulator without touching the terminal."
+        subtitle="CosmoKit is the native macOS companion for iOS developers: control, capture and inspect any simulator without touching the terminal."
       />
 
       <div className="container mx-auto px-4 pb-8">

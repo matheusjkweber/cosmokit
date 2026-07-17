@@ -41,7 +41,7 @@ export const FEATURES: Feature[] = [
     title: "Simulator control",
     tagline: "Run every iOS Simulator without the terminal",
     description:
-      "Boot, shut down, erase and manage every iOS Simulator from one native macOS app — no more memorizing xcrun simctl commands.",
+      "Boot, shut down, erase and manage every iOS Simulator from one native macOS app. No more memorizing xcrun simctl commands.",
     bullets: [
       "Boot and manage multiple simulators side by side",
       "Erase, reset and reboot in a single click",
@@ -56,7 +56,7 @@ export const FEATURES: Feature[] = [
     title: "Screen capture & recording",
     tagline: "Screenshots and video, ready for QA and marketing",
     description:
-      "Capture pixel-perfect screenshots and record video of any simulator for bug reports, App Store assets and marketing — straight from the menu bar.",
+      "Capture pixel-perfect screenshots and record video of any simulator for bug reports, App Store assets and marketing, straight from the menu bar.",
     bullets: [
       "High-resolution screenshots in one tap",
       "Smooth screen recordings",
@@ -87,7 +87,7 @@ export const FEATURES: Feature[] = [
     title: "Push notifications",
     tagline: "Fire test pushes in one click",
     description:
-      "Send fully custom push notification payloads to the simulator to test deep links, badges and notification UI — without a backend or a physical device.",
+      "Send fully custom push notification payloads to the simulator to test deep links, badges and notification UI, without a backend or a physical device.",
     bullets: [
       "Custom JSON payloads",
       "Test notification taps and deep links",

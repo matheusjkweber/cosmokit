@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://usecosmoskittool.com"),
-  title: "CosmoKit — Simulator Testing Made Easy",
+  title: "CosmoKit | Simulator Testing Made Easy",
   description:
     "The ultimate macOS companion for iOS developers. Take full control of your simulator workflow with screenshot capture, video recording, push notifications, deep links, GPS simulation, network proxy, and more.",
   keywords: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "CosmoHQ" }],
   openGraph: {
-    title: "CosmoKit — Simulator Testing Made Easy",
+    title: "CosmoKit | Simulator Testing Made Easy",
     description:
       "The ultimate macOS companion for iOS developers. Control your simulator workflow with powerful tools.",
     type: "website",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CosmoKit — Simulator Testing Made Easy",
+    title: "CosmoKit | Simulator Testing Made Easy",
     description:
       "The ultimate macOS companion for iOS developers. Control your simulator workflow with powerful tools.",
     images: ["/screenshots/macos-2.png"],

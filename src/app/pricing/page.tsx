@@ -8,9 +8,9 @@ import {
 } from "@/components/marketing/marketing";
 
 export const metadata: Metadata = {
-  title: "Pricing — CosmoKit",
+  title: "Pricing | CosmoKit",
   description:
-    "Start free, upgrade when you need more. CosmoKit plans: Free, Monthly $2.99, Yearly $19.99 (save 44%) and Lifetime $69.99 — all managed through the Mac App Store.",
+    "Start free, upgrade when you need more. CosmoKit plans: Free, Monthly $2.99, Yearly $19.99 (save 44%) and Lifetime $69.99, all managed through the Mac App Store.",
   alternates: { canonical: "https://usecosmoskittool.com/pricing" },
 };
 
@@ -25,6 +25,7 @@ const plans = [
       "Screenshot & video capture (watermarked)",
       "Push notifications & deep links",
       "GPS location simulation",
+      "Simulator tools (appearance, permissions, Face ID)",
     ],
     highlight: false,
     cta: "Download Free",
@@ -37,7 +38,7 @@ const plans = [
     features: [
       "Everything in Free",
       "No watermarks",
-      "Network proxy & app tools",
+      "Network proxy & app management",
       "Unlimited simulators & saved entries",
     ],
     highlight: false,
@@ -47,7 +48,7 @@ const plans = [
     name: "Yearly",
     price: "$19.99",
     period: "/yr",
-    description: "Best value — save 44%",
+    description: "Best value: save 44%",
     features: [
       "Everything in Monthly",
       "Device frames, bezels & touch indicators",
