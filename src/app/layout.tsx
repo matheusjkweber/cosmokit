@@ -58,6 +58,28 @@ export const metadata: Metadata = {
   },
 };
 
+const appJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "CosmoKit Tools",
+  operatingSystem: "macOS 14.7 or later",
+  applicationCategory: "DeveloperApplication",
+  description:
+    "Native macOS toolkit for the iOS Simulator: screenshots, video recording, push notifications, deep links, GPS simulation and network proxy.",
+  url: "https://usecosmoskittool.com",
+  downloadUrl:
+    "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12",
+  image: "https://usecosmoskittool.com/screenshots/macos-1.png",
+  author: { "@type": "Organization", name: "CosmoHQ" },
+  offers: {
+    "@type": "AggregateOffer",
+    lowPrice: "0",
+    highPrice: "69.99",
+    priceCurrency: "USD",
+    offerCount: 4,
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -66,6 +88,10 @@ export default function RootLayout({
   return (
     <html className="dark">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }}
+        />
         <GoogleAds />
         {children}
       </body>

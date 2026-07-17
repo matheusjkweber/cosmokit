@@ -19,7 +19,7 @@
     "badge": "Disponible en la Mac App Store",
     "title1": "Acelera tu",
     "title2": "flujo",
-    "description": "CosmoKit reúne rutas GPS, deep links, payloads push, pruebas de proxy y herramientas de captura en un único workspace nativo en Mac.",
+    "description": "Deja de escribir xcrun simctl. CosmoKit reúne capturas, grabación de video, notificaciones push, deep links, rutas GPS y proxy de red para el Simulador iOS en una sola app nativa para Mac.",
     "terminalHint": "Reemplaza {command} con una GUI",
     "ctaDownload": "Descargar para macOS",
     "ctaFeatures": "Explorar Características",
