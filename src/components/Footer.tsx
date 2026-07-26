@@ -6,7 +6,7 @@ import { Apple } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 
 export function Footer() {
   const t = useTranslations("Footer");

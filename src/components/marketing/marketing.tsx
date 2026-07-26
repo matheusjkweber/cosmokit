@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 export const HOME_URL = "/en/";
 
 export type Feature = {

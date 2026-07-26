@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 
 const freeFeatureKeys = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 const proFeatureKeys = [

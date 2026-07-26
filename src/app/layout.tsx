@@ -68,7 +68,7 @@ const appJsonLd = {
     "Native macOS toolkit for the iOS Simulator: screenshots, video recording, push notifications, deep links, GPS simulation and network proxy.",
   url: "https://usecosmoskittool.com",
   downloadUrl:
-    "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12",
+    "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12",
   image: "https://usecosmoskittool.com/screenshots/macos-1.png",
   author: { "@type": "Organization", name: "CosmoHQ" },
   offers: {
