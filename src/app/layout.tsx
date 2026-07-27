@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { GoogleAds } from "@/components/analytics/GoogleAds";
+import { PostHogAnalytics } from "@/components/analytics/PostHogAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,6 +94,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }}
         />
         <GoogleAds />
+        <PostHogAnalytics />
         {children}
       </body>
     </html>

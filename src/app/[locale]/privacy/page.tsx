@@ -10,7 +10,7 @@ export default function PrivacyPage() {
       <main className="flex-grow container mx-auto px-4 py-20">
         <h1 className="text-5xl font-bold text-foreground mb-8 text-center">Privacy Policy</h1>
         <div className="prose prose-invert lg:prose-xl mx-auto text-muted-foreground">
-          <p>Last updated: July 17, 2026</p>
+          <p>Last updated: July 27, 2026</p>
           <h2>1. Introduction</h2>
           <p>Welcome to CosmoKit. We respect your privacy and are committed to protecting your personal data. This privacy policy covers both the CosmoKit macOS app and this website, and tells you about your privacy rights and how the law protects you.</p>
           <h2>2. Data Collected by the CosmoKit App</h2>
@@ -28,6 +28,7 @@ export default function PrivacyPage() {
             <li><b>Technical Data</b> includes internet protocol (IP) address, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform and other technology on the devices you use to access this website.</li>
             <li><b>Usage Data</b> includes information about how you use our website.</li>
             <li><b>Contact Data</b> includes your email address, if you contact us through the support form.</li>
+            <li><b>Website Analytics</b> (via PostHog): pageviews, referring source, approximate location derived from IP, and interactions such as clicking through to the Mac App Store. This is the same analytics provider used by the app; on the website it is collected under a pseudonymous visitor identifier and is not linked to your name or email.</li>
           </ul>
           <h2>5. How We Use Your Data</h2>
           <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
