@@ -60,6 +60,21 @@ export async function generateMetadata({
       description: meta.description,
       locale: meta.og,
       url: `${SITE}/${params.locale}/`,
+      // Next replaces the root layout's openGraph wholesale rather than merging
+      // into it, so everything the root sets has to be repeated here. Leaving
+      // images out cost every locale its og:image, which is the field Facebook,
+      // Instagram, LinkedIn, WhatsApp, Slack and iMessage read: shares of this
+      // site rendered as a bare text card with no picture.
+      type: "website",
+      siteName: "CosmoKit",
+      images: [
+        {
+          url: "/screenshots/macos-2.png",
+          width: 1200,
+          height: 750,
+          alt: "CosmoKit App Screenshot",
+        },
+      ],
     },
   };
 }
