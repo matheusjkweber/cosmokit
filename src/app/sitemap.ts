@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "pricing",
     "screenshots",
     "recursos",
+    "rocketsim-alternative",
   ];
 
   const entries: MetadataRoute.Sitemap = [];
