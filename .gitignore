@@ -1,2 +1,5 @@
 .next/
 out/
+
+# cosmokit CLI build products
+cli/.build/
