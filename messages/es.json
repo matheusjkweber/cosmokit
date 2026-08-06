@@ -27,6 +27,12 @@
     "heroImage": "/screenshots/macos-1.png",
     "heroImageAlt": "Visual principal del espacio de trabajo de CosmoKit que muestra el panel de control nativo de macOS, las herramientas del simulador y el panel de productividad definitivo para desarrolladores de iOS"
   },
+  "MacOnly": {
+    "body": "CosmoKit es una app para Mac. Necesita macOS 14 o posterior, Xcode y el Simulador de iOS, así que no funcionará en este dispositivo.",
+    "copyLink": "Copiar el enlace para tu Mac",
+    "copied": "Enlace copiado",
+    "copyFallback": "Copia este enlace y ábrelo en tu Mac:"
+  },
   "Features": {
     "label": "Características",
     "title": "Todo lo que necesitas, {highlight}",

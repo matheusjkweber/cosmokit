@@ -5,6 +5,7 @@
 // under `output: export`.
 import Link from "next/link";
 import Image from "next/image";
+import { MacOnlyNotice } from "@/components/MacOnlyNotice";
 import {
   Apple,
   ArrowLeft,
@@ -300,6 +301,8 @@ export function FeaturePage({ featureId }: { featureId: string }) {
           <p className="mt-4 text-xs text-muted-foreground/60">
             Requires macOS 14+, Xcode and the iOS Simulator.
           </p>
+          {/* Non-Mac visitors: the App Store button above is a dead end */}
+          <MacOnlyNotice />
           {f.proQualifier && (
             <p className="mt-2 text-sm text-violet-light/80 font-medium">
               {f.proQualifier}

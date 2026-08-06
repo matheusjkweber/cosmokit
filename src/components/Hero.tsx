@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Apple, ArrowDown, Terminal } from "lucide-react";
+import { MacOnlyNotice } from "@/components/MacOnlyNotice";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
@@ -118,6 +119,9 @@ export function Hero() {
             </Link>
           </Button>
         </motion.div>
+
+        {/* Non-Mac visitors: the App Store button above is a dead end for them */}
+        <MacOnlyNotice />
 
         {/* Subtext */}
         <motion.p

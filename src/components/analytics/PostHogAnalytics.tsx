@@ -82,6 +82,17 @@ export function PostHogAnalytics() {
           capture_pageview: true,
           capture_pageleave: true,
         });
+        // The PostHog project is shared by several products (and by the Mac
+        // app), and every query filters on cosmohq_app. Landing events shipped
+        // without it for the first ten days and were unattributable — register
+        // stamps it on every event, with a marker separating web from app
+        // traffic. Registered (not $set) so anonymous visitors stay anonymous.
+        (posthog as unknown as {
+          register?: (props: Record<string, unknown>) => void;
+        }).register?.({
+          cosmohq_app: "cosmokit",
+          cosmohq_surface: "landing",
+        });
       }}
     />
   );

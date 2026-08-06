@@ -27,6 +27,12 @@
     "heroImage": "/screenshots/macos-1.png",
     "heroImageAlt": "CosmoKit's main workspace visual showing the native macOS control panel, simulator tools, and the ultimate productivity dashboard for iOS developers"
   },
+  "MacOnly": {
+    "body": "CosmoKit is a Mac app. It needs macOS 14 or later, Xcode and the iOS Simulator, so it will not run on this device.",
+    "copyLink": "Copy the link for your Mac",
+    "copied": "Link copied",
+    "copyFallback": "Copy this link and open it on your Mac:"
+  },
   "Features": {
     "label": "Features",
     "title": "Everything you need, {highlight}",
