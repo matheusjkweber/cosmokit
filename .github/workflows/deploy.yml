@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Lets a failed or never-created run be retried without a throwaway commit:
+  #   gh workflow run deploy.yml --repo OWNER/REPO --ref main
+  # Needed because a cancelled Pages deployment is keyed on the commit SHA, so
+  # re-running the same commit can never succeed (see the deploy job below).
+  workflow_dispatch:
 
 permissions:
   contents: read
