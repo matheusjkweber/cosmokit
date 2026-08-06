@@ -89,6 +89,14 @@ export function Footer() {
                   {t("macAppStore")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/cli/"
+                  className="text-sm text-muted-foreground hover:text-violet-light transition-colors duration-200"
+                >
+                  {t("cli")}
+                </Link>
+              </li>
             </ul>
           </div>
 

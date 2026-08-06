@@ -175,6 +175,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               Pricing
             </Link>
             <Link
+              href="/cli/"
+              className="px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-violet-glow transition-colors"
+            >
+              CLI
+            </Link>
+            <Link
               href="/download/"
               className="px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-violet-glow transition-colors"
             >
@@ -199,6 +205,9 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
             <Link href="/features/" className="hover:text-violet-light transition-colors">
               Features
+            </Link>
+            <Link href="/cli/" className="hover:text-violet-light transition-colors">
+              CLI
             </Link>
             <Link href="/download/" className="hover:text-violet-light transition-colors">
               Download

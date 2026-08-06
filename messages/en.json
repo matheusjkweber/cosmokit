@@ -231,6 +231,7 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "macAppStore": "Mac App Store",
+    "cli": "Command line tool",
     "copyright": "© {year} CosmoHQ. All rights reserved.",
     "builtWith": "Built with SwiftUI · macOS 14.7+"
   },

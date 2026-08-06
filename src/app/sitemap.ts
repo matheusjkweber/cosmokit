@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "location",
     "download",
     "pricing",
-    "screenshots",
+    "cli",
     "recursos",
     "rocketsim-alternative",
     "ios-simulator-on-windows",
