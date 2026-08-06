@@ -37,3 +37,9 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Default is 10 minutes. When the Pages queue backs up, the action
+          # gives up and *cancels* the deployment, and that cancelled state
+          # sticks to the commit SHA, so no re-run of the same commit can ever
+          # succeed again. Waiting longer is cheaper than a throwaway commit.
+          timeout: 1800000
