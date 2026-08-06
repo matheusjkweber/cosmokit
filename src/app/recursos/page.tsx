@@ -4,8 +4,8 @@ import {
   PageHero,
   BulletList,
   AppStoreButton,
-  FEATURES,
 } from "@/components/marketing/marketing";
+import { FEATURES_PT_BR } from "@/components/marketing/featuresPtBR";
 
 // Portuguese-named alias of /features so the "Recursos" ad sitelink resolves
 // (200) instead of 404. Same content as /features; canonical points there to
@@ -29,7 +29,7 @@ export default function RecursosPage() {
 
       <div className="container mx-auto px-4 pb-8">
         <div className="max-w-4xl mx-auto divide-y divide-border/40">
-          {FEATURES.map((f, i) => {
+          {FEATURES_PT_BR.map((f, i) => {
             const Icon = f.icon;
             return (
               <section

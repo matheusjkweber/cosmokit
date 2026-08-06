@@ -18,6 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "screenshots",
     "recursos",
     "rocketsim-alternative",
+    "ios-simulator-on-windows",
+    "teams",
+    "students",
   ];
 
   const entries: MetadataRoute.Sitemap = [];
