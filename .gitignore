@@ -3,3 +3,6 @@ out/
 
 # cosmokit CLI build products
 cli/.build/
+
+# Tanya/agent working docs, never shipped
+.planning/
