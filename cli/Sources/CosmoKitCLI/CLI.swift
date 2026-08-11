@@ -259,8 +259,7 @@ public enum CLI {
         do {
             return try Simctl.resolveDevice(query)
         } catch {
-            let code: ErrorCode = error.localizedDescription.contains("no booted simulator") ? .noSimulator : .deviceNotFound
-            throw CLIError(commandError: CommandError(code: code, message: error.localizedDescription))
+            throw CLIError(commandError: CommandError(code: errorCode(for: error), message: error.localizedDescription))
         }
     }
 
@@ -336,12 +335,19 @@ public enum CLI {
         writeJSON(Envelope<EmptyPayload>(ok: false, error: error))
     }
 
-    private static func errorCode(for error: Error) -> ErrorCode {
-        let message = error.localizedDescription.lowercased()
-        if message.hasPrefix("usage:") { return .usage }
-        if message.contains("no simulator matching") { return .deviceNotFound }
-        if message.contains("no booted simulator") || message.contains("no available simulator") {
-            return .noSimulator
+    public static func errorCode(for error: Error) -> ErrorCode {
+        if let commandError = error as? CLIError {
+            return commandError.commandError.code
+        }
+        if let simctlError = error as? SimctlError {
+            switch simctlError.kind {
+            case .noBootedDevice:
+                return .noSimulator
+            case .noMatch:
+                return .deviceNotFound
+            case .commandFailed, .launchFailed:
+                return .simctlFailed
+            }
         }
         return .simctlFailed
     }

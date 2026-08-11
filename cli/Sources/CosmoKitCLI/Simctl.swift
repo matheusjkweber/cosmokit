@@ -10,9 +10,21 @@
 import Foundation
 
 public struct SimctlError: LocalizedError {
+    public enum Kind: Equatable {
+        case noBootedDevice
+        case noMatch
+        case commandFailed
+        case launchFailed
+    }
+
+    public let kind: Kind
     public let message: String
     public var errorDescription: String? { message }
-    public init(message: String) { self.message = message }
+
+    public init(kind: Kind, message: String) {
+        self.kind = kind
+        self.message = message
+    }
 }
 
 public struct Device: Decodable {
@@ -47,7 +59,7 @@ public enum Simctl {
         do {
             try process.run()
         } catch {
-            throw SimctlError(message: "could not run xcrun: \(error.localizedDescription)")
+            throw SimctlError(kind: .launchFailed, message: "could not run xcrun: \(error.localizedDescription)")
         }
 
         // Read before waiting: a large `list` output fills the pipe buffer and
@@ -59,7 +71,7 @@ public enum Simctl {
         guard process.terminationStatus == 0 else {
             let message = String(data: errData, encoding: .utf8)?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? "unknown error"
-            throw SimctlError(message: message)
+            throw SimctlError(kind: .commandFailed, message: message)
         }
         return String(data: outData, encoding: .utf8) ?? ""
     }
@@ -82,7 +94,7 @@ public enum Simctl {
         do {
             try process.run()
         } catch {
-            throw SimctlError(message: "could not run xcrun: \(error.localizedDescription)")
+            throw SimctlError(kind: .launchFailed, message: "could not run xcrun: \(error.localizedDescription)")
         }
 
         Thread.sleep(forTimeInterval: seconds)
@@ -95,7 +107,7 @@ public enum Simctl {
         guard process.terminationStatus == 0 || process.terminationReason == .uncaughtSignal else {
             let message = String(data: errData, encoding: .utf8)?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? "unknown error"
-            throw SimctlError(message: message)
+            throw SimctlError(kind: .commandFailed, message: message)
         }
         return String(data: outData, encoding: .utf8) ?? ""
     }
@@ -115,7 +127,7 @@ public enum Simctl {
         let all = try devices().filter { $0.isAvailable }
         guard let query, query.lowercased() != "booted" else {
             guard let booted = all.first(where: { $0.isBooted }) else {
-                throw SimctlError(message: "no booted simulator (pass a name or UDID, or run `cosmokit boot`)")
+                throw SimctlError(kind: .noBootedDevice, message: "no booted simulator (pass a name or UDID, or run `cosmokit boot`)")
             }
             return booted
         }
@@ -128,6 +140,6 @@ public enum Simctl {
         if let partial = all.first(where: { $0.name.localizedCaseInsensitiveContains(query) }) {
             return partial
         }
-        throw SimctlError(message: "no simulator matching \"\(query)\"")
+        throw SimctlError(kind: .noMatch, message: "no simulator matching \"\(query)\"")
     }
 }
