@@ -187,19 +187,7 @@ public enum MCPServer {
         if let cliError = error as? CLIError {
             commandError = cliError.commandError
         } else {
-            let message = error.localizedDescription
-            let lowercased = message.lowercased()
-            let code: ErrorCode
-            if lowercased.contains("no simulator matching") {
-                code = .deviceNotFound
-            } else if lowercased.contains("no available simulator") || lowercased.contains("no booted simulator") {
-                code = .noSimulator
-            } else if lowercased.hasPrefix("usage:") {
-                code = .usage
-            } else {
-                code = .simctlFailed
-            }
-            commandError = CommandError(code: code, message: message)
+            commandError = CommandError(code: .simctlFailed, message: error.localizedDescription)
         }
         do {
             let encoder = JSONEncoder()
