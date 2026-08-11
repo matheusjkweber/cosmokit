@@ -30,6 +30,13 @@ final class ErrorMappingTests: XCTestCase {
         assertCode({ try CLI.perform(command: "dance", args: [], output: nil) }, code: .unknownCommand)
     }
 
+    func testSimctlKindsDetermineCodesNotMessages() {
+        XCTAssertEqual(CLI.errorCode(for: SimctlError(kind: .noBootedDevice, message: "xyzzy")), .noSimulator)
+        XCTAssertEqual(CLI.errorCode(for: SimctlError(kind: .noMatch, message: "xyzzy")), .deviceNotFound)
+        XCTAssertEqual(CLI.errorCode(for: SimctlError(kind: .commandFailed, message: "xyzzy")), .simctlFailed)
+        XCTAssertEqual(CLI.errorCode(for: SimctlError(kind: .launchFailed, message: "xyzzy")), .simctlFailed)
+    }
+
     private func assertCode(
         _ expression: () throws -> Any,
         code expected: ErrorCode = .usage,
