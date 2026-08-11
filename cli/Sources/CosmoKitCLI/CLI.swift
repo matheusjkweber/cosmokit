@@ -60,11 +60,14 @@ public enum CLI {
 
         OPTIONS
           --output <path>             Where to write a capture (default: ./)
+          --json                      Emit machine-readable JSON on stdout
+          --duration <seconds>        Recording duration (for record)
 
         EXAMPLES
           cosmokit capture --output ./screenshots
           cosmokit location -22.9068 -43.1729
           cosmokit open "myapp://item/42"
+          cosmokit --json list
         """)
     }
 
