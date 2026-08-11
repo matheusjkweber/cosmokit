@@ -6,3 +6,15 @@ cli/.build/
 
 # Tanya/agent working docs, never shipped
 .planning/
+
+# Internal planning and analysis. This repo is PUBLIC and also serves the
+# landing page, so anything here would be world-readable: the conversion notes
+# carry real revenue figures and the roadmap is unreleased.
+COSMOKIT_CONVERSION*.md
+COSMOKIT_FEATURE_ROADMAP*.md
+COSMOKIT_QA_*.md
+COSMOKIT_TANYA_*.md
+TANYA_FIX_*.md
+CosmoKit-Context.md
+MANUAL_QA_SIM_TOOLS.md
+GOOGLE_ADS_TUNING_GUIDE.md
