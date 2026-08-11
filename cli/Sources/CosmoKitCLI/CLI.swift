@@ -26,8 +26,10 @@ public struct CommandOutcome {
     }
 }
 
-public struct CLIError: Error {
+public struct CLIError: LocalizedError {
     public let commandError: CommandError
+
+    public var errorDescription: String? { commandError.message }
 
     public init(commandError: CommandError) {
         self.commandError = commandError
@@ -148,7 +150,7 @@ public enum CLI {
             return CommandOutcome(human: CLI.version, json: VersionPayload(version: CLI.version))
 
         case "list":
-            let devices = try Simctl.devices()
+            let devices = try devices()
                 .filter { $0.isAvailable }
                 .sorted { $0.name < $1.name }
             let human = devices.isEmpty
@@ -162,15 +164,15 @@ public enum CLI {
         case "boot":
             let device: Device
             if let query = args.first {
-                device = try Simctl.resolveDevice(query)
-            } else if let firstShutdown = try Simctl.devices().first(where: { $0.isAvailable && !$0.isBooted }) {
+                device = try resolveDevice(query)
+            } else if let firstShutdown = try devices().first(where: { $0.isAvailable && !$0.isBooted }) {
                 device = firstShutdown
             } else {
-                throw SimctlError(message: "no available simulator to boot")
+                throw CLIError(commandError: CommandError(code: .noSimulator, message: "no available simulator to boot"))
             }
             let alreadyBooted = device.isBooted
             if !alreadyBooted {
-                try Simctl.run(["boot", device.udid])
+                try runSimctl(["boot", device.udid])
             }
             return CommandOutcome(
                 human: alreadyBooted ? "Already booted: \(device.name)" : "Booted \(device.name)",
@@ -178,47 +180,78 @@ public enum CLI {
             )
 
         case "shutdown":
-            let device = try Simctl.resolveDevice(args.first)
-            try Simctl.run(["shutdown", device.udid])
+            let device = try resolveDevice(args.first)
+            try runSimctl(["shutdown", device.udid])
             return CommandOutcome(human: "Shut down \(device.name)", json: ShutdownPayload(udid: device.udid, name: device.name))
 
         case "capture":
-            let device = try Simctl.resolveDevice(args.first)
+            let device = try resolveDevice(args.first)
             let path = timestampedPath(directory: output, prefix: "CosmoKit-Screenshot", ext: "png", deviceName: device.name)
-            try Simctl.run(["io", device.udid, "screenshot", path])
+            try runSimctl(["io", device.udid, "screenshot", path])
             return CommandOutcome(human: path, json: CapturePayload(udid: device.udid, name: device.name, path: path))
 
         case "record":
-            let device = try Simctl.resolveDevice(args.first)
+            let device = try resolveDevice(args.first)
             let path = timestampedPath(directory: output, prefix: "CosmoKit-Recording", ext: "mp4", deviceName: device.name)
             let human = "Recording \(device.name). Press Ctrl-C to stop.\n\(path)"
-            try Simctl.run(["io", device.udid, "recordVideo", path])
+            try runSimctl(["io", device.udid, "recordVideo", path])
             return CommandOutcome(human: human, json: RecordPayload(udid: device.udid, name: device.name, path: path))
 
         case "location":
-            guard args.count >= 2, let lat = Double(args[0]), let lon = Double(args[1]) else {
-                throw SimctlError(message: "usage: cosmokit location <lat> <lon> [name|udid]")
-            }
-            let device = try Simctl.resolveDevice(args.count > 2 ? args[2] : nil)
-            try Simctl.run(["location", device.udid, "set", "\(lat),\(lon)"])
-            return CommandOutcome(human: "Set \(device.name) to \(lat), \(lon)", json: LocationPayload(udid: device.udid, name: device.name, latitude: lat, longitude: lon))
+            let location = try parseLocation(args)
+            let device = try resolveDevice(location.query)
+            try runSimctl(["location", device.udid, "set", "\(location.latitude),\(location.longitude)"])
+            return CommandOutcome(human: "Set \(device.name) to \(location.latitude), \(location.longitude)", json: LocationPayload(udid: device.udid, name: device.name, latitude: location.latitude, longitude: location.longitude))
 
         case "open":
             guard let url = args.first else {
-                throw SimctlError(message: "usage: cosmokit open <url> [name|udid]")
+                throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit open <url> [name|udid]"))
             }
-            let device = try Simctl.resolveDevice(args.count > 1 ? args[1] : nil)
-            try Simctl.run(["openurl", device.udid, url])
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            try runSimctl(["openurl", device.udid, url])
             return CommandOutcome(human: "Opened \(url) on \(device.name)", json: OpenPayload(udid: device.udid, name: device.name, url: url))
 
         case "erase":
-            let device = try Simctl.resolveDevice(args.first)
-            _ = try? Simctl.run(["shutdown", device.udid])
-            try Simctl.run(["erase", device.udid])
+            let device = try resolveDevice(args.first)
+            _ = try? runSimctl(["shutdown", device.udid])
+            try runSimctl(["erase", device.udid])
             return CommandOutcome(human: "Erased \(device.name)", json: ErasePayload(udid: device.udid, name: device.name))
 
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
+        }
+    }
+
+    public static func parseLocation(_ args: [String]) throws -> (latitude: Double, longitude: Double, query: String?) {
+        guard args.count >= 2, let latitude = Double(args[0]), let longitude = Double(args[1]) else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit location <lat> <lon> [name|udid]"))
+        }
+        return (latitude, longitude, args.count > 2 ? args[2] : nil)
+    }
+
+    private static func resolveDevice(_ query: String?) throws -> Device {
+        do {
+            return try Simctl.resolveDevice(query)
+        } catch {
+            let code: ErrorCode = error.localizedDescription.contains("no booted simulator") ? .noSimulator : .deviceNotFound
+            throw CLIError(commandError: CommandError(code: code, message: error.localizedDescription))
+        }
+    }
+
+    private static func devices() throws -> [Device] {
+        do {
+            return try Simctl.devices()
+        } catch {
+            throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription))
+        }
+    }
+
+    @discardableResult
+    private static func runSimctl(_ arguments: [String]) throws -> String {
+        do {
+            return try Simctl.run(arguments)
+        } catch {
+            throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription))
         }
     }
 
