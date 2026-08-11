@@ -101,6 +101,14 @@
         "title": "Dispositivos Pareados",
         "description": "Um painel somente leitura com os iPhones e iPads pareados com o seu Mac, mostrando modelo, versão do iOS e estado de conexão."
       },
+      "menubar": {
+        "title": "Barra de Menus",
+        "description": "Capture o simulador em execução de qualquer app com ⌃⌥⌘S, sem trocar de janela. A barra de menus ainda deixa suas últimas cinco capturas a um clique, inicializa o simulador que você usou por último e reenvia o seu push mais recente."
+      },
+      "generator": {
+        "title": "Capturas para a App Store",
+        "description": "Gere suas capturas nos tamanhos exatos que a App Store exige, para iPhone, iPad e Mac, sem abrir um editor de imagem."
+      },
       "ai": {
         "title": "Funciona com o seu agente de IA",
         "description": "Rode cosmokit mcp e qualquer cliente MCP, como o Claude Code ou o Cursor, descobre oito ferramentas de simulador para chamar com argumentos tipados: inicializar, captura, vídeo, GPS e deep links. Todo comando também aceita --json, então um agente que só roda shell recebe um resultado estruturado para interpretar, em vez de texto corrido."

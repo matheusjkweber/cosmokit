@@ -101,6 +101,14 @@
         "title": "Paired Devices",
         "description": "A read-only panel listing the iPhones and iPads paired with your Mac, with model, iOS version and connection state."
       },
+      "menubar": {
+        "title": "Menu Bar",
+        "description": "Capture the booted simulator from any app with ⌃⌥⌘S, without switching windows. The menu bar also keeps your last five captures one click away, boots the simulator you used last, and re-sends your most recent push payload."
+      },
+      "generator": {
+        "title": "App Store Screenshots",
+        "description": "Render your captures at the exact sizes the App Store requires, for iPhone, iPad and Mac, without opening a design tool."
+      },
       "ai": {
         "title": "Works with your AI agent",
         "description": "Run cosmokit mcp and any MCP client, such as Claude Code or Cursor, discovers eight simulator tools it can call with typed arguments: boot, screenshot, video, GPS and deep links. Every command also takes --json, so an agent that only runs shell still gets a structured result to parse instead of prose."
