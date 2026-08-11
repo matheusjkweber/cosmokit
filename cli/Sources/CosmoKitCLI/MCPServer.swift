@@ -86,6 +86,30 @@ public enum MCPServer {
             }
             return response(id: request["id"] ?? NSNull(), result: ["tools": tools()])
 
+        case "tools/call":
+            guard let params = request["params"] as? [String: Any],
+                  let name = params["name"] as? String, !name.isEmpty else {
+                return response(id: request["id"] ?? NSNull(), error: [-32602, "Invalid params: name is required"])
+            }
+            guard params["arguments"] == nil || params["arguments"] is [String: Any] else {
+                return response(id: request["id"] ?? NSNull(), error: [-32602, "Invalid params: arguments must be an object"])
+            }
+            let arguments = params["arguments"] as? [String: Any] ?? [:]
+            do {
+                let invocation = try commandInvocation(tool: name, arguments: arguments)
+                let outcome = try execute(invocation.command, invocation.args, invocation.output)
+                let text = try String(decoding: outcome.jsonData(), as: UTF8.self)
+                return response(id: request["id"] ?? NSNull(), result: [
+                    "content": [["type": "text", "text": text]]
+                ])
+            } catch {
+                let text = failureText(for: error)
+                return response(id: request["id"] ?? NSNull(), result: [
+                    "content": [["type": "text", "text": text]],
+                    "isError": true
+                ])
+            }
+
         default:
             return response(id: request["id"] ?? NSNull(), error: [-32601, "Method not found"])
         }
@@ -156,6 +180,34 @@ public enum MCPServer {
         }
         guard let number, number > 0 else { throw usageError("argument \(key) must be a positive number") }
         return number.rounded() == number ? String(Int(number)) : String(describing: number)
+    }
+
+    private static func failureText(for error: Error) -> String {
+        let commandError: CommandError
+        if let cliError = error as? CLIError {
+            commandError = cliError.commandError
+        } else {
+            let message = error.localizedDescription
+            let lowercased = message.lowercased()
+            let code: ErrorCode
+            if lowercased.contains("no simulator matching") {
+                code = .deviceNotFound
+            } else if lowercased.contains("no available simulator") || lowercased.contains("no booted simulator") {
+                code = .noSimulator
+            } else if lowercased.hasPrefix("usage:") {
+                code = .usage
+            } else {
+                code = .simctlFailed
+            }
+            commandError = CommandError(code: code, message: message)
+        }
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            return String(decoding: try encoder.encode(Envelope<EmptyPayload>(ok: false, error: commandError)), as: UTF8.self)
+        } catch {
+            return "{\"error\":{\"code\":\"simctlFailed\",\"message\":\"could not encode failure\"},\"ok\":false}"
+        }
     }
 
     private static func tools() -> [[String: Any]] {
