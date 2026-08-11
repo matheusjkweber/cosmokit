@@ -10,6 +10,30 @@
 
 import Foundation
 
+/// What a command produced. `human` is the exact line the CLI has always
+/// printed; `json` is the same result as an encodable payload.
+public struct CommandOutcome {
+    public let human: String
+    public let jsonData: () throws -> Data
+
+    public init<Payload: Encodable>(human: String, json: Payload) {
+        self.human = human
+        self.jsonData = {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            return try encoder.encode(Envelope(ok: true, payload: json))
+        }
+    }
+}
+
+public struct CLIError: Error {
+    public let commandError: CommandError
+
+    public init(commandError: CommandError) {
+        self.commandError = commandError
+    }
+}
+
 public enum CLI {
     public static let version = "0.1.0"
 
@@ -86,41 +110,54 @@ public enum CLI {
             printUsage()
             exit(0)
         }
-        let output = flags.output
-        let json = flags.json
-        let args = Array(flags.rest.dropFirst())
 
-    do {
+        do {
+            let outcome = try perform(
+                command: command,
+                args: Array(flags.rest.dropFirst()),
+                output: flags.output
+            )
+            if flags.json {
+                writeJSONData(try outcome.jsonData())
+            } else {
+                print(outcome.human)
+            }
+        } catch {
+            if flags.json {
+                let commandError = (error as? CLIError)?.commandError
+                    ?? CommandError(code: errorCode(for: error), message: error.localizedDescription)
+                writeFailure(commandError)
+            }
+            if let commandError = (error as? CLIError)?.commandError,
+               commandError.code == .unknownCommand, !flags.json {
+                FileHandle.standardError.write(Data("Unknown command: \(commandError.message.replacingOccurrences(of: "Unknown command: ", with: ""))\n\n".utf8))
+                printUsage()
+            } else {
+                FileHandle.standardError.write(Data("cosmokit: \(error.localizedDescription)\n".utf8))
+            }
+            exit(1)
+        }
+    }
+
+    public static func perform(command: String, args: [String], output: String?) throws -> CommandOutcome {
         switch command {
         case "help", "--help", "-h":
-            printUsage()
+            return CommandOutcome(human: usageText(), json: EmptyPayload())
 
         case "version", "--version":
-            if json {
-                writeJSON(Envelope(ok: true, payload: VersionPayload(version: CLI.version)))
-            } else {
-                print(CLI.version)
-            }
+            return CommandOutcome(human: CLI.version, json: VersionPayload(version: CLI.version))
 
         case "list":
             let devices = try Simctl.devices()
                 .filter { $0.isAvailable }
                 .sorted { $0.name < $1.name }
-            if json {
-                let payload = devices.map {
-                    DevicePayload(udid: $0.udid, name: $0.name, state: $0.state, booted: $0.isBooted, available: $0.isAvailable)
-                }
-                writeJSON(Envelope(ok: true, payload: DevicesPayload(devices: payload)))
-                return
+            let human = devices.isEmpty
+                ? "No available simulators."
+                : devices.map { "\($0.isBooted ? "●" : "○") \($0.name)  \($0.udid)  \($0.state)" }.joined(separator: "\n")
+            let payload = devices.map {
+                DevicePayload(udid: $0.udid, name: $0.name, state: $0.state, booted: $0.isBooted, available: $0.isAvailable)
             }
-            guard !devices.isEmpty else {
-                print("No available simulators.")
-                return
-            }
-            for device in devices {
-                let marker = device.isBooted ? "●" : "○"
-                print("\(marker) \(device.name)  \(device.udid)  \(device.state)")
-            }
+            return CommandOutcome(human: human, json: DevicesPayload(devices: payload))
 
         case "boot":
             let device: Device
@@ -131,36 +168,32 @@ public enum CLI {
             } else {
                 throw SimctlError(message: "no available simulator to boot")
             }
-            if device.isBooted {
-                print("Already booted: \(device.name)")
-            } else {
+            let alreadyBooted = device.isBooted
+            if !alreadyBooted {
                 try Simctl.run(["boot", device.udid])
-                print("Booted \(device.name)")
             }
+            return CommandOutcome(
+                human: alreadyBooted ? "Already booted: \(device.name)" : "Booted \(device.name)",
+                json: EmptyPayload()
+            )
 
         case "shutdown":
             let device = try Simctl.resolveDevice(args.first)
             try Simctl.run(["shutdown", device.udid])
-            print("Shut down \(device.name)")
+            return CommandOutcome(human: "Shut down \(device.name)", json: EmptyPayload())
 
         case "capture":
             let device = try Simctl.resolveDevice(args.first)
-            let path = timestampedPath(
-                directory: output, prefix: "CosmoKit-Screenshot", ext: "png", deviceName: device.name
-            )
+            let path = timestampedPath(directory: output, prefix: "CosmoKit-Screenshot", ext: "png", deviceName: device.name)
             try Simctl.run(["io", device.udid, "screenshot", path])
-            print(path)
+            return CommandOutcome(human: path, json: EmptyPayload())
 
         case "record":
             let device = try Simctl.resolveDevice(args.first)
-            let path = timestampedPath(
-                directory: output, prefix: "CosmoKit-Recording", ext: "mp4", deviceName: device.name
-            )
-            print("Recording \(device.name). Press Ctrl-C to stop.")
-            // simctl writes the file when it receives SIGINT, so hand the
-            // terminal's Ctrl-C straight through to it.
+            let path = timestampedPath(directory: output, prefix: "CosmoKit-Recording", ext: "mp4", deviceName: device.name)
+            let human = "Recording \(device.name). Press Ctrl-C to stop.\n\(path)"
             try Simctl.run(["io", device.udid, "recordVideo", path])
-            print(path)
+            return CommandOutcome(human: human, json: EmptyPayload())
 
         case "location":
             guard args.count >= 2, let lat = Double(args[0]), let lon = Double(args[1]) else {
@@ -168,7 +201,7 @@ public enum CLI {
             }
             let device = try Simctl.resolveDevice(args.count > 2 ? args[2] : nil)
             try Simctl.run(["location", device.udid, "set", "\(lat),\(lon)"])
-            print("Set \(device.name) to \(lat), \(lon)")
+            return CommandOutcome(human: "Set \(device.name) to \(lat), \(lon)", json: EmptyPayload())
 
         case "open":
             guard let url = args.first else {
@@ -176,42 +209,64 @@ public enum CLI {
             }
             let device = try Simctl.resolveDevice(args.count > 1 ? args[1] : nil)
             try Simctl.run(["openurl", device.udid, url])
-            print("Opened \(url) on \(device.name)")
+            return CommandOutcome(human: "Opened \(url) on \(device.name)", json: EmptyPayload())
 
         case "erase":
             let device = try Simctl.resolveDevice(args.first)
-            // simctl refuses to erase a booted device.
             _ = try? Simctl.run(["shutdown", device.udid])
             try Simctl.run(["erase", device.udid])
-            print("Erased \(device.name)")
+            return CommandOutcome(human: "Erased \(device.name)", json: EmptyPayload())
 
         default:
-            if json {
-                writeFailure(CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
-            }
-            FileHandle.standardError.write(Data("Unknown command: \(command)\n\n".utf8))
-            printUsage()
-            exit(1)
+            throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
-    } catch {
-        if json {
-            writeFailure(CommandError(code: errorCode(for: error), message: error.localizedDescription))
-        }
-        FileHandle.standardError.write(Data("cosmokit: \(error.localizedDescription)\n".utf8))
-        exit(1)
     }
+
+    private static func usageText() -> String {
+        """
+        cosmokit \(CLI.version) — drive the iOS Simulator from the command line
+
+        USAGE
+          cosmokit <command> [options]
+
+        COMMANDS
+          list                        List available simulators
+          boot [name|udid]            Boot a simulator (default: first available)
+          shutdown [name|udid]        Shut a simulator down (default: booted)
+          capture [name|udid]         Screenshot to a file
+          record [name|udid]          Record video until you press Ctrl-C
+          location <lat> <lon> [dev]  Set the simulator's GPS position
+          open <url> [name|udid]      Open a deep link
+          erase [name|udid]           Erase a simulator back to a fresh install
+          help                        Show this message
+
+        OPTIONS
+          --output <path>             Where to write a capture (default: ./)
+
+        EXAMPLES
+          cosmokit capture --output ./screenshots
+          cosmokit location -22.9068 -43.1729
+          cosmokit open "myapp://item/42"
+        """
     }
 
     private static func writeJSON<Payload: Encodable>(_ envelope: Envelope<Payload>) {
         do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.sortedKeys]
-            let data = try encoder.encode(envelope)
-            print(String(decoding: data, as: UTF8.self))
+            writeJSONData(try encodeJSON(envelope))
         } catch {
             FileHandle.standardError.write(Data("cosmokit: could not encode JSON: \(error.localizedDescription)\n".utf8))
             exit(1)
         }
+    }
+
+    private static func encodeJSON<Payload: Encodable>(_ envelope: Envelope<Payload>) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        return try encoder.encode(envelope)
+    }
+
+    private static func writeJSONData(_ data: Data) {
+        print(String(decoding: data, as: UTF8.self))
     }
 
     private static func writeFailure(_ error: CommandError) {
