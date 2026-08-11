@@ -41,21 +41,34 @@ public enum CLI {
         """)
     }
 
-/// Pulls `--output <path>` out of the argument list, returning the rest.
-    public static func extractOutput(_ args: [String]) -> (output: String?, rest: [String]) {
+/// Pulls output-related flags out of the argument list, returning the rest.
+    public static func extractFlags(_ args: [String]) -> (json: Bool, output: String?, rest: [String]) {
+        var json = false
         var output: String?
         var rest: [String] = []
         var index = 0
         while index < args.count {
-            if args[index] == "--output", index + 1 < args.count {
+            switch args[index] {
+            case "--json":
+                json = true
+                index += 1
+                continue
+            case "--output" where index + 1 < args.count:
                 output = args[index + 1]
                 index += 2
                 continue
+            default:
+                break
             }
             rest.append(args[index])
             index += 1
         }
-        return (output, rest)
+        return (json, output, rest)
+    }
+
+    public static func extractOutput(_ args: [String]) -> (output: String?, rest: [String]) {
+        let flags = extractFlags(args)
+        return (flags.output, flags.rest)
     }
 
     public static func timestampedPath(directory: String?, prefix: String, ext: String, deviceName: String) -> String {
@@ -68,11 +81,14 @@ public enum CLI {
     }
 
     public static func run(_ rawArgs: [String]) {
-        guard let command = rawArgs.first else {
+        let flags = extractFlags(rawArgs)
+        guard let command = flags.rest.first else {
             printUsage()
             exit(0)
         }
-        let (output, args) = extractOutput(Array(rawArgs.dropFirst()))
+        let output = flags.output
+        let json = flags.json
+        let args = Array(flags.rest.dropFirst())
 
     do {
         switch command {
@@ -159,13 +175,71 @@ public enum CLI {
             print("Erased \(device.name)")
 
         default:
+            if json {
+                writeFailure(CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
+            }
             FileHandle.standardError.write(Data("Unknown command: \(command)\n\n".utf8))
             printUsage()
             exit(1)
         }
     } catch {
+        if json {
+            writeFailure(CommandError(code: errorCode(for: error), message: error.localizedDescription))
+        }
         FileHandle.standardError.write(Data("cosmokit: \(error.localizedDescription)\n".utf8))
         exit(1)
+    }
+    }
+
+    private static func writeJSON<Payload: Encodable>(_ envelope: Envelope<Payload>) {
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            let data = try encoder.encode(envelope)
+            print(String(decoding: data, as: UTF8.self))
+        } catch {
+            FileHandle.standardError.write(Data("cosmokit: could not encode JSON: \(error.localizedDescription)\n".utf8))
+            exit(1)
         }
     }
+
+    private static func writeFailure(_ error: CommandError) {
+        writeJSON(Envelope<EmptyPayload>(ok: false, error: error))
+    }
+
+    private static func errorCode(for error: Error) -> ErrorCode {
+        let message = error.localizedDescription.lowercased()
+        if message.hasPrefix("usage:") { return .usage }
+        if message.contains("no simulator matching") { return .deviceNotFound }
+        if message.contains("no booted simulator") || message.contains("no available simulator") {
+            return .noSimulator
+        }
+        return .simctlFailed
+    }
+}
+
+public struct VersionPayload: Encodable {
+    public let version: String
+    public init(version: String) { self.version = version }
+}
+
+public struct DevicePayload: Encodable {
+    public let udid: String
+    public let name: String
+    public let state: String
+    public let booted: Bool
+    public let available: Bool
+
+    public init(udid: String, name: String, state: String, booted: Bool, available: Bool) {
+        self.udid = udid
+        self.name = name
+        self.state = state
+        self.booted = booted
+        self.available = available
+    }
+}
+
+public struct DevicesPayload: Encodable {
+    public let devices: [DevicePayload]
+    public init(devices: [DevicePayload]) { self.devices = devices }
 }
