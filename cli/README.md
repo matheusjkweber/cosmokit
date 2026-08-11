@@ -82,6 +82,60 @@ cosmokit --json list
 # {"devices":[{"available":true,"booted":false,"name":"iPad mini","state":"Shutdown","udid":"F4A10318-6B19-444B-A55D-A76536BC2196"},{"available":true,"booted":false,"name":"iPhone 15 Pro","state":"Shutdown","udid":"3F6F3AE3-D548-4486-83C7-42FC5604B436"},{"available":true,"booted":true,"name":"iPhone 16","state":"Booted","udid":"535B96FA-19EB-4682-868F-6DD1C53B6474"},{"available":true,"booted":true,"name":"iPhone 16 Pro","state":"Booted","udid":"B5029438-33A9-47E0-ACA4-C7B790A12E64"}],"ok":true}
 ```
 
+## Use from an AI agent
+
+An agent that can run a command can already use this CLI. `cosmokit mcp` goes
+further by letting an MCP client discover the simulator operations and call
+them with typed arguments.
+
+### Register it
+
+Add the following to the configuration file for an MCP client such as Claude
+Code or Cursor:
+
+```json
+{
+  "mcpServers": {
+    "cosmokit": {
+      "command": "cosmokit",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+### What it exposes
+
+| Tool | Purpose |
+| --- | --- |
+| `list_simulators` | List available simulators sorted by name. |
+| `boot_simulator` | Boot a selected simulator, or the first available shutdown simulator. |
+| `shutdown_simulator` | Shut down a selected simulator, or the booted simulator. |
+| `capture_screenshot` | Capture a PNG screenshot into an optional output directory. |
+| `record_video` | Record a video for a required fixed duration into an optional output directory. |
+| `set_location` | Set latitude and longitude on a simulator. |
+| `open_url` | Open a URL or deep link in a simulator. |
+| `erase_simulator` | Erase a selected simulator, or the booted simulator. |
+
+`record_video` requires `duration` because a tool call has no way to send
+Ctrl-C, so every recording has to stop on a timer.
+
+The transport is newline-delimited JSON-RPC 2.0 on stdin and stdout. Stdout is
+reserved for protocol messages; diagnostics go to stderr so they cannot
+corrupt the MCP stream.
+
+To try discovery by hand:
+
+```sh
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | cosmokit mcp
+```
+
+The current response is:
+
+```json
+{"jsonrpc":"2.0","id":1,"result":{"tools":[{"inputSchema":{"required":[],"properties":{},"type":"object"},"name":"list_simulators","description":"List available iOS Simulators, sorted by name. Takes no arguments."},{"name":"boot_simulator","description":"Boot a simulator by UDID, exact name, or partial name; omit device to boot the first available shutdown simulator.","inputSchema":{"required":[],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"type":"object"}},{"description":"Shut down a simulator by UDID, exact name, or partial name; omit device to use the booted simulator.","inputSchema":{"type":"object","required":[],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}}},"name":"shutdown_simulator"},{"inputSchema":{"type":"object","properties":{"output":{"type":"string","description":"Directory where the timestamped PNG should be written"},"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":[]},"description":"Capture a PNG screenshot from a simulator; omit device to use the booted simulator and output to use the current directory.","name":"capture_screenshot"},{"inputSchema":{"required":["duration"],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"},"output":{"description":"Directory where the timestamped MP4 should be written","type":"string"},"duration":{"description":"Number of seconds to record","type":"number"}},"type":"object"},"name":"record_video","description":"Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory."},{"description":"Set a simulator's GPS location using latitude and longitude; omit device to use the booted simulator.","name":"set_location","inputSchema":{"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"},"longitude":{"description":"Longitude in decimal degrees","type":"number"},"latitude":{"description":"Latitude in decimal degrees","type":"number"}},"required":["latitude","longitude"],"type":"object"}},{"description":"Open a deep link or URL in a simulator; omit device to use the booted simulator.","name":"open_url","inputSchema":{"properties":{"url":{"type":"string","description":"URL or deep link to open"},"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":["url"],"type":"object"}},{"name":"erase_simulator","description":"Erase a simulator back to a fresh install by UDID, exact name, or partial name; omit device to use the booted simulator.","inputSchema":{"type":"object","properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":[]}}]}}
+```
+
 ## Examples
 
 ```sh
