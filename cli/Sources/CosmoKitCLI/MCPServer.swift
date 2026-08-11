@@ -11,9 +11,11 @@ public enum MCPServer {
     /// Handles one JSON-RPC message. Notifications receive no response.
     public static func handle(line: String) -> String? {
         guard let data = line.data(using: .utf8),
-              let object = try? JSONSerialization.jsonObject(with: data),
-              let request = object as? [String: Any] else {
+              let object = try? JSONSerialization.jsonObject(with: data) else {
             return response(id: NSNull(), error: [-32700, "Parse error"])
+        }
+        guard let request = object as? [String: Any] else {
+            return response(id: NSNull(), error: [-32600, "Invalid Request"])
         }
 
         guard let method = request["method"] as? String else {
