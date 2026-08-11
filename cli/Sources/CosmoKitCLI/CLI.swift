@@ -174,26 +174,26 @@ public enum CLI {
             }
             return CommandOutcome(
                 human: alreadyBooted ? "Already booted: \(device.name)" : "Booted \(device.name)",
-                json: EmptyPayload()
+                json: BootPayload(udid: device.udid, name: device.name, alreadyBooted: alreadyBooted)
             )
 
         case "shutdown":
             let device = try Simctl.resolveDevice(args.first)
             try Simctl.run(["shutdown", device.udid])
-            return CommandOutcome(human: "Shut down \(device.name)", json: EmptyPayload())
+            return CommandOutcome(human: "Shut down \(device.name)", json: ShutdownPayload(udid: device.udid, name: device.name))
 
         case "capture":
             let device = try Simctl.resolveDevice(args.first)
             let path = timestampedPath(directory: output, prefix: "CosmoKit-Screenshot", ext: "png", deviceName: device.name)
             try Simctl.run(["io", device.udid, "screenshot", path])
-            return CommandOutcome(human: path, json: EmptyPayload())
+            return CommandOutcome(human: path, json: CapturePayload(udid: device.udid, name: device.name, path: path))
 
         case "record":
             let device = try Simctl.resolveDevice(args.first)
             let path = timestampedPath(directory: output, prefix: "CosmoKit-Recording", ext: "mp4", deviceName: device.name)
             let human = "Recording \(device.name). Press Ctrl-C to stop.\n\(path)"
             try Simctl.run(["io", device.udid, "recordVideo", path])
-            return CommandOutcome(human: human, json: EmptyPayload())
+            return CommandOutcome(human: human, json: RecordPayload(udid: device.udid, name: device.name, path: path))
 
         case "location":
             guard args.count >= 2, let lat = Double(args[0]), let lon = Double(args[1]) else {
@@ -201,7 +201,7 @@ public enum CLI {
             }
             let device = try Simctl.resolveDevice(args.count > 2 ? args[2] : nil)
             try Simctl.run(["location", device.udid, "set", "\(lat),\(lon)"])
-            return CommandOutcome(human: "Set \(device.name) to \(lat), \(lon)", json: EmptyPayload())
+            return CommandOutcome(human: "Set \(device.name) to \(lat), \(lon)", json: LocationPayload(udid: device.udid, name: device.name, latitude: lat, longitude: lon))
 
         case "open":
             guard let url = args.first else {
@@ -209,13 +209,13 @@ public enum CLI {
             }
             let device = try Simctl.resolveDevice(args.count > 1 ? args[1] : nil)
             try Simctl.run(["openurl", device.udid, url])
-            return CommandOutcome(human: "Opened \(url) on \(device.name)", json: EmptyPayload())
+            return CommandOutcome(human: "Opened \(url) on \(device.name)", json: OpenPayload(udid: device.udid, name: device.name, url: url))
 
         case "erase":
             let device = try Simctl.resolveDevice(args.first)
             _ = try? Simctl.run(["shutdown", device.udid])
             try Simctl.run(["erase", device.udid])
-            return CommandOutcome(human: "Erased \(device.name)", json: EmptyPayload())
+            return CommandOutcome(human: "Erased \(device.name)", json: ErasePayload(udid: device.udid, name: device.name))
 
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))

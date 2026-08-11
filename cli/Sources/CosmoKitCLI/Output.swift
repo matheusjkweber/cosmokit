@@ -32,6 +32,88 @@ public struct EmptyPayload: Encodable {
     public init() {}
 }
 
+public struct BootPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let alreadyBooted: Bool
+
+    public init(udid: String, name: String, alreadyBooted: Bool) {
+        self.udid = udid
+        self.name = name
+        self.alreadyBooted = alreadyBooted
+    }
+}
+
+public struct ShutdownPayload: Codable {
+    public let udid: String
+    public let name: String
+
+    public init(udid: String, name: String) {
+        self.udid = udid
+        self.name = name
+    }
+}
+
+public struct CapturePayload: Codable {
+    public let udid: String
+    public let name: String
+    public let path: String
+
+    public init(udid: String, name: String, path: String) {
+        self.udid = udid
+        self.name = name
+        self.path = path
+    }
+}
+
+public struct RecordPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let path: String
+
+    public init(udid: String, name: String, path: String) {
+        self.udid = udid
+        self.name = name
+        self.path = path
+    }
+}
+
+public struct LocationPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let latitude: Double
+    public let longitude: Double
+
+    public init(udid: String, name: String, latitude: Double, longitude: Double) {
+        self.udid = udid
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+}
+
+public struct OpenPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let url: String
+
+    public init(udid: String, name: String, url: String) {
+        self.udid = udid
+        self.name = name
+        self.url = url
+    }
+}
+
+public struct ErasePayload: Codable {
+    public let udid: String
+    public let name: String
+
+    public init(udid: String, name: String) {
+        self.udid = udid
+        self.name = name
+    }
+}
+
 public struct Envelope<Payload: Encodable>: Encodable {
     public let ok: Bool
     public let payload: Payload?
