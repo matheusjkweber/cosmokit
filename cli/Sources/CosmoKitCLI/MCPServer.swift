@@ -14,6 +14,39 @@ public enum MCPServer {
         try CLI.perform(command: $0, args: $1, output: $2)
     }
 
+    public static func commandInvocation(tool: String, arguments: [String: Any]) throws -> (command: String, args: [String], output: String?) {
+        switch tool {
+        case "list_simulators":
+            return ("list", [], nil)
+        case "boot_simulator":
+            return ("boot", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "shutdown_simulator":
+            return ("shutdown", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "erase_simulator":
+            return ("erase", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "capture_screenshot":
+            return ("capture", try optionalString(arguments, key: "device").map { [$0] } ?? [], try optionalString(arguments, key: "output"))
+        case "record_video":
+            let duration = try requiredDuration(arguments, key: "duration")
+            var args = try optionalString(arguments, key: "device").map { [$0] } ?? []
+            args += ["--duration", duration]
+            return ("record", args, try optionalString(arguments, key: "output"))
+        case "set_location":
+            let latitude = try requiredCoordinate(arguments, key: "latitude")
+            let longitude = try requiredCoordinate(arguments, key: "longitude")
+            var args = [latitude, longitude]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("location", args, nil)
+        case "open_url":
+            let url = try requiredString(arguments, key: "url")
+            var args = [url]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("open", args, nil)
+        default:
+            throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
+        }
+    }
+
     /// Handles one JSON-RPC message. Notifications receive no response.
     public static func handle(line: String) -> String? {
         guard let data = line.data(using: .utf8),
@@ -79,6 +112,50 @@ public enum MCPServer {
             return "{\"jsonrpc\":\"2.0\",\"id\":null,\"error\":{\"code\":-32603,\"message\":\"Internal error\"}}"
         }
         return String(decoding: data, as: UTF8.self)
+    }
+
+    private static func usageError(_ message: String) -> CLIError {
+        CLIError(commandError: CommandError(code: .usage, message: message))
+    }
+
+    private static func requiredString(_ arguments: [String: Any], key: String) throws -> String {
+        guard let value = arguments[key] else { throw usageError("missing required argument: \(key)") }
+        guard let string = value as? String, !string.isEmpty else { throw usageError("argument \(key) must be a non-empty string") }
+        return string
+    }
+
+    private static func optionalString(_ arguments: [String: Any], key: String) throws -> String? {
+        guard let value = arguments[key] else { return nil }
+        guard let string = value as? String, !string.isEmpty else { throw usageError("argument \(key) must be a non-empty string") }
+        return string
+    }
+
+    private static func requiredCoordinate(_ arguments: [String: Any], key: String) throws -> String {
+        guard let value = arguments[key] else { throw usageError("missing required argument: \(key)") }
+        let number: Double?
+        if let string = value as? String {
+            number = Double(string)
+        } else if let numberValue = value as? NSNumber, !(value is Bool) {
+            number = numberValue.doubleValue
+        } else {
+            number = nil
+        }
+        guard let number else { throw usageError("argument \(key) must be a number") }
+        return String(describing: number)
+    }
+
+    private static func requiredDuration(_ arguments: [String: Any], key: String) throws -> String {
+        guard let value = arguments[key] else { throw usageError("missing required argument: \(key)") }
+        let number: Double?
+        if let numberValue = value as? NSNumber, !(value is Bool) {
+            number = numberValue.doubleValue
+        } else if let string = value as? String {
+            number = Double(string)
+        } else {
+            number = nil
+        }
+        guard let number, number > 0 else { throw usageError("argument \(key) must be a positive number") }
+        return number.rounded() == number ? String(Int(number)) : String(describing: number)
     }
 
     private static func tools() -> [[String: Any]] {
