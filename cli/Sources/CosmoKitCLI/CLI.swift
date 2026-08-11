@@ -55,6 +55,7 @@ public enum CLI {
           location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
           erase [name|udid]           Erase a simulator back to a fresh install
+          mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
         OPTIONS
@@ -119,6 +120,10 @@ public enum CLI {
         }
 
         do {
+            if command == "mcp" {
+                MCPServer.serve()
+                return
+            }
             let outcome = try perform(
                 command: command,
                 args: Array(flags.rest.dropFirst()),
