@@ -70,7 +70,7 @@ const appJsonLd = {
   url: "https://usecosmoskittool.com",
   downloadUrl:
     "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12",
-  image: "https://usecosmoskittool.com/screenshots/macos-1.png",
+  image: "https://usecosmoskittool.com/screenshots/og.jpg",
   author: { "@type": "Organization", name: "CosmoHQ" },
   offers: {
     "@type": "AggregateOffer",

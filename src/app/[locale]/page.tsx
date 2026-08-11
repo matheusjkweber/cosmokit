@@ -69,7 +69,7 @@ export async function generateMetadata({
       siteName: "CosmoKit",
       images: [
         {
-          url: "/screenshots/macos-2.png",
+          url: "/screenshots/og.jpg",
           width: 1200,
           height: 750,
           alt: "CosmoKit App Screenshot",
