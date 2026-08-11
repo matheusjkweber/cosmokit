@@ -133,11 +133,40 @@ To try discovery by hand:
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | cosmokit mcp
 ```
 
-The current response is:
+The command prints one JSON object per line. JSON object key order carries no
+meaning, so a reader's output may order fields differently.
+
+The `set_location` tool schema looks like this when pretty-printed:
 
 ```json
-{"jsonrpc":"2.0","id":1,"result":{"tools":[{"inputSchema":{"required":[],"properties":{},"type":"object"},"name":"list_simulators","description":"List available iOS Simulators, sorted by name. Takes no arguments."},{"name":"boot_simulator","description":"Boot a simulator by UDID, exact name, or partial name; omit device to boot the first available shutdown simulator.","inputSchema":{"required":[],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"type":"object"}},{"description":"Shut down a simulator by UDID, exact name, or partial name; omit device to use the booted simulator.","inputSchema":{"type":"object","required":[],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}}},"name":"shutdown_simulator"},{"inputSchema":{"type":"object","properties":{"output":{"type":"string","description":"Directory where the timestamped PNG should be written"},"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":[]},"description":"Capture a PNG screenshot from a simulator; omit device to use the booted simulator and output to use the current directory.","name":"capture_screenshot"},{"inputSchema":{"required":["duration"],"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"},"output":{"description":"Directory where the timestamped MP4 should be written","type":"string"},"duration":{"description":"Number of seconds to record","type":"number"}},"type":"object"},"name":"record_video","description":"Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory."},{"description":"Set a simulator's GPS location using latitude and longitude; omit device to use the booted simulator.","name":"set_location","inputSchema":{"properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"},"longitude":{"description":"Longitude in decimal degrees","type":"number"},"latitude":{"description":"Latitude in decimal degrees","type":"number"}},"required":["latitude","longitude"],"type":"object"}},{"description":"Open a deep link or URL in a simulator; omit device to use the booted simulator.","name":"open_url","inputSchema":{"properties":{"url":{"type":"string","description":"URL or deep link to open"},"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":["url"],"type":"object"}},{"name":"erase_simulator","description":"Erase a simulator back to a fresh install by UDID, exact name, or partial name; omit device to use the booted simulator.","inputSchema":{"type":"object","properties":{"device":{"type":"string","description":"UDID, exact name, or partial name; omit to use the booted simulator"}},"required":[]}}]}}
+{
+  "name": "set_location",
+  "inputSchema": {
+    "required": [
+      "latitude",
+      "longitude"
+    ],
+    "type": "object",
+    "properties": {
+      "longitude": {
+        "description": "Longitude in decimal degrees",
+        "type": "number"
+      },
+      "device": {
+        "type": "string",
+        "description": "UDID, exact name, or partial name; omit to use the booted simulator"
+      },
+      "latitude": {
+        "type": "number",
+        "description": "Latitude in decimal degrees"
+      }
+    }
+  },
+  "description": "Set a simulator's GPS location using latitude and longitude; omit device to use the booted simulator."
+}
 ```
+
+The full response lists all eight tools.
 
 ## Examples
 
