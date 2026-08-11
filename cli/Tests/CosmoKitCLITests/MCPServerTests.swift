@@ -7,6 +7,131 @@ final class MCPServerTests: XCTestCase {
         "record_video", "set_location", "open_url", "erase_simulator"
     ]
 
+    override func tearDown() {
+        MCPServer.execute = { try CLI.perform(command: $0, args: $1, output: $2) }
+        super.tearDown()
+    }
+
+    func testBootCallMapsDeviceArgument() throws {
+        var received: (String, [String], String?)?
+        MCPServer.execute = { command, args, output in
+            received = (command, args, output)
+            return CommandOutcome(human: "Booted", json: BootPayload(udid: "U", name: "iPhone 16", alreadyBooted: false))
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"boot_simulator","arguments":{"device":"iPhone 16"}}}"#)
+        XCTAssertEqual(received?.0, "boot")
+        XCTAssertEqual(received?.1, ["iPhone 16"])
+    }
+
+    func testBootCallWithoutArgumentsUsesEmptyArgs() throws {
+        var received: [String] = ["unexpected"]
+        MCPServer.execute = { _, args, _ in
+            received = args
+            return CommandOutcome(human: "Booted", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"boot_simulator"}}"#)
+        XCTAssertEqual(received, [])
+    }
+
+    func testLocationCallCoercesNumbersAndStrings() throws {
+        var calls: [[String]] = []
+        MCPServer.execute = { _, args, _ in
+            calls.append(args)
+            return CommandOutcome(human: "Set", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_location","arguments":{"latitude":-22.9068,"longitude":-43.1729}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"set_location","arguments":{"latitude":"-22.9068","longitude":"-43.1729"}}}"#)
+        XCTAssertEqual(calls, [["-22.9068", "-43.1729"], ["-22.9068", "-43.1729"]])
+    }
+
+    func testLocationMissingLongitudeIsUsage() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_location","arguments":{"latitude":1}}}"#)
+        let text = try toolText(response)
+        let failure = try jsonObject(text)
+        XCTAssertEqual((failure["error"] as? [String: Any])?["code"] as? String, "usage")
+        XCTAssertTrue(((failure["error"] as? [String: Any])?["message"] as? String)?.contains("longitude") == true)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+    }
+
+    func testRecordCallFormatsIntegerDurationWithoutDecimal() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in
+            received = args
+            return CommandOutcome(human: "Recorded", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"record_video","arguments":{"duration":5}}}"#)
+        XCTAssertEqual(received, ["--duration", "5"])
+    }
+
+    func testRecordCallRequiresDuration() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"record_video","arguments":{}}}"#)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+        XCTAssertEqual(try toolErrorCode(response), "usage")
+    }
+
+    func testCaptureCallPassesOutputAndNoDeviceArgs() throws {
+        var received: (args: [String], output: String?)?
+        MCPServer.execute = { _, args, output in
+            received = (args, output)
+            return CommandOutcome(human: "capture", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"capture_screenshot","arguments":{"output":"./shots"}}}"#)
+        XCTAssertEqual(received?.args, [])
+        XCTAssertEqual(received?.output, "./shots")
+    }
+
+    func testOpenCallOrdersURLBeforeDevice() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in
+            received = args
+            return CommandOutcome(human: "opened", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"open_url","arguments":{"url":"myapp://item/42","device":"iPhone 16"}}}"#)
+        XCTAssertEqual(received, ["myapp://item/42", "iPhone 16"])
+    }
+
+    func testSuccessfulCallReturnsSuccessEnvelopeText() throws {
+        MCPServer.execute = { _, _, _ in
+            CommandOutcome(human: "Booted", json: BootPayload(udid: "U", name: "iPhone", alreadyBooted: false))
+        }
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"boot_simulator"}}"#)
+        XCTAssertNil(response["isError"])
+        let text = try toolText(response)
+        XCTAssertEqual(try jsonObject(text)["ok"] as? Bool, true)
+    }
+
+    func testExecutorFailureIsToolErrorWithFailureEnvelope() throws {
+        MCPServer.execute = { _, _, _ in
+            throw CLIError(commandError: CommandError(code: .deviceNotFound, message: "not found"))
+        }
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"boot_simulator","arguments":{"device":"ignored"}}}"#)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+        XCTAssertEqual(try toolErrorCode(response), "deviceNotFound")
+        XCTAssertEqual(try jsonObject(try toolText(response))["ok"] as? Bool, false)
+    }
+
+    func testCallWithoutNameIsJSONRPCInvalidParams() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{}}"#)
+        XCTAssertEqual(errorCode(response), -32602)
+    }
+
+    func testUnknownToolIsToolError() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"nope"}}"#)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+        XCTAssertEqual(try toolErrorCode(response), "unknownCommand")
+    }
+
+    func testUnexpectedArgumentIsIgnored() throws {
+        var called = false
+        MCPServer.execute = { _, args, _ in
+            called = args.isEmpty
+            return CommandOutcome(human: "listed", json: EmptyPayload())
+        }
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_simulators","arguments":{"extra":"ignored"}}}"#)
+        XCTAssertTrue(called)
+        XCTAssertNil(response["isError"])
+    }
+
     func testInitializeNegotiatesCurrentVersionAndServerInfo() throws {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}"#)
         XCTAssertEqual(protocolVersion(response), "2025-06-18")
@@ -87,6 +212,26 @@ final class MCPServerTests: XCTestCase {
             throw NSError(domain: "MCPServerTests", code: 1)
         }
         return object
+    }
+
+    private func jsonObject(_ text: String) throws -> [String: Any] {
+        guard let data = text.data(using: .utf8), let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw NSError(domain: "MCPServerTests", code: 3)
+        }
+        return object
+    }
+
+    private func toolText(_ response: [String: Any]) throws -> String {
+        guard let result = response["result"] as? [String: Any],
+              let content = result["content"] as? [[String: Any]],
+              let text = content.first?["text"] as? String else {
+            throw NSError(domain: "MCPServerTests", code: 4)
+        }
+        return text
+    }
+
+    private func toolErrorCode(_ response: [String: Any]) throws -> String? {
+        try (jsonObject(toolText(response))["error"] as? [String: Any])?["code"] as? String
     }
 
     private func protocolVersion(_ response: [String: Any]) -> String? {

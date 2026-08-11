@@ -159,7 +159,7 @@ public enum MCPServer {
         let number: Double?
         if let string = value as? String {
             number = Double(string)
-        } else if let numberValue = value as? NSNumber, !(value is Bool) {
+        } else if let numberValue = value as? NSNumber {
             number = numberValue.doubleValue
         } else {
             number = nil
@@ -171,7 +171,7 @@ public enum MCPServer {
     private static func requiredDuration(_ arguments: [String: Any], key: String) throws -> String {
         guard let value = arguments[key] else { throw usageError("missing required argument: \(key)") }
         let number: Double?
-        if let numberValue = value as? NSNumber, !(value is Bool) {
+        if let numberValue = value as? NSNumber {
             number = numberValue.doubleValue
         } else if let string = value as? String {
             number = Double(string)
