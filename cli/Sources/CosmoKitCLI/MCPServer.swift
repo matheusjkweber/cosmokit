@@ -8,6 +8,12 @@
 import Foundation
 
 public enum MCPServer {
+    /// How a tool call reaches the simulator. Tests substitute a stub so the
+    /// mapping can be proven without a simulator.
+    public static var execute: (_ command: String, _ args: [String], _ output: String?) throws -> CommandOutcome = {
+        try CLI.perform(command: $0, args: $1, output: $2)
+    }
+
     /// Handles one JSON-RPC message. Notifications receive no response.
     public static func handle(line: String) -> String? {
         guard let data = line.data(using: .utf8),
