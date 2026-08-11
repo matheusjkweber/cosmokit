@@ -100,6 +100,14 @@
       "devices": {
         "title": "Dispositivos Emparejados",
         "description": "Un panel de solo lectura con los iPhone y iPad emparejados con tu Mac, con modelo, versión de iOS y estado de conexión."
+      },
+      "ai": {
+        "title": "Funciona con tu agente de IA",
+        "description": "El CLI cosmokit es shell puro, así que cualquier agente de IA que ejecute comandos puede arrancar un simulador, tomar una captura, fijar el GPS o abrir un deep link. Cada comando sale con código distinto de cero si falla, así el agente sabe cuándo un paso no funcionó."
+      },
+      "cli": {
+        "title": "CLI cosmokit",
+        "description": "Las mismas operaciones de simulador desde la terminal, para Makefiles, git hooks y CI. Gratis, open source y funciona sin la app."
       }
     }
   },
@@ -197,7 +205,10 @@
     "helperDescription": "Instala este helper firmado para que CosmoKit configure el proxy HTTP/HTTPS de macOS en un clic. La suscripción y el acceso Pro siguen dentro de la app de la Mac App Store.",
     "info1": "macOS 14+",
     "info2": "Plan gratuito disponible",
-    "info3": "Sin necesidad de cuenta"
+    "info3": "Sin necesidad de cuenta",
+    "cliTitle": "CLI cosmokit",
+    "cliDescription": "Acceso scriptable a las mismas operaciones de simulador, para Makefiles, git hooks, CI y agentes de IA. Gratis, licencia MIT, requiere macOS 13 o posterior y funciona sin la app.",
+    "cliCta": "Ver en GitHub"
   },
   "FAQ": {
     "label": "FAQ",

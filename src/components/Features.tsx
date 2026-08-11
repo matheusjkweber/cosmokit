@@ -20,6 +20,8 @@ import {
   Wand2,
   HardDrive,
   Smartphone,
+  Bot,
+  TerminalSquare,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
@@ -47,7 +49,11 @@ const featureDefs: FeatureDef[] = [
   // Row 4: large + small = 3
   { icon: Globe, key: "proxy", screenshot: "/screenshots/macos-12.png", span: "lg" },
   { icon: MapPin, key: "gps", span: "sm" },
-  // Rows 5-7: 9 small cards = 3 full rows. Keep this a multiple of three or
+  // Row 5: large + small = 3. The CLI pair sits last among the wide cards so
+  // the app's own panels lead and this reads as "and beyond the app".
+  { icon: Bot, key: "ai", span: "lg" },
+  { icon: TerminalSquare, key: "cli", span: "sm" },
+  // Rows 6-8: 9 small cards = 3 full rows. Keep this a multiple of three or
   // the last row renders short.
   { icon: AppWindow, key: "apps", span: "sm" },
   { icon: Palette, key: "appearance", span: "sm" },

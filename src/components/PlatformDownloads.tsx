@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Apple, ArrowDownToLine, ArrowRight, ShieldCheck } from "lucide-react";
+import { Apple, ArrowDownToLine, ArrowRight, ShieldCheck, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import { useTranslations } from "@/lib/i18n";
 const APP_STORE_URL =
   "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
 const PROXY_HELPER_URL = "/downloads/CosmoKitProxyHelper.pkg";
+const CLI_REPO_URL = "https://github.com/maththedev42/cosmokit-cli";
 
 export function PlatformDownloads() {
   const t = useTranslations("Downloads");
@@ -83,6 +84,31 @@ export function PlatformDownloads() {
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   {t("helperDescription")}
                 </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 mx-auto max-w-2xl rounded-2xl border border-violet-DEFAULT/20 bg-card/60 p-4 text-left shadow-sm shadow-violet-DEFAULT/10 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-DEFAULT/10 text-violet-light">
+                <Terminal className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {t("cliTitle")}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("cliDescription")}
+                </p>
+                <Link
+                  href={CLI_REPO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-violet-light hover:text-violet-DEFAULT transition-colors"
+                >
+                  {t("cliCta")}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>
