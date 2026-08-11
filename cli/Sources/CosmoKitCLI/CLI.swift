@@ -96,12 +96,23 @@ public enum CLI {
             printUsage()
 
         case "version", "--version":
-            print(CLI.version)
+            if json {
+                writeJSON(Envelope(ok: true, payload: VersionPayload(version: CLI.version)))
+            } else {
+                print(CLI.version)
+            }
 
         case "list":
             let devices = try Simctl.devices()
                 .filter { $0.isAvailable }
                 .sorted { $0.name < $1.name }
+            if json {
+                let payload = devices.map {
+                    DevicePayload(udid: $0.udid, name: $0.name, state: $0.state, booted: $0.isBooted, available: $0.isAvailable)
+                }
+                writeJSON(Envelope(ok: true, payload: DevicesPayload(devices: payload)))
+                return
+            }
             guard !devices.isEmpty else {
                 print("No available simulators.")
                 return
