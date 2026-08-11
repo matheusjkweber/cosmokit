@@ -55,6 +55,33 @@ use the booted simulator.
 
 Commands exit non-zero on failure, so they are safe to use under `set -e`.
 
+## JSON output
+
+Pass `--json` to make any command print one machine-readable JSON object.
+Successful results use `{"ok":true,...}` with the command's fields at the top
+level; failures use `{"ok":false,"error":{"code":"...","message":"..."}}`.
+
+The stable error codes are:
+
+| Code | Meaning |
+| --- | --- |
+| `usage` | The arguments did not make sense. |
+| `deviceNotFound` | No simulator matched the device query. |
+| `noSimulator` | No simulator was available for the operation. |
+| `simctlFailed` | `xcrun simctl` returned a failure. |
+| `unknownCommand` | The command or tool name is not recognised. |
+
+Exit codes are unchanged, so a script can branch on either the process exit
+status or the JSON `ok` field.
+
+```sh
+cosmokit --json version
+# {"ok":true,"version":"0.1.0"}
+
+cosmokit --json list
+# {"devices":[{"available":true,"booted":false,"name":"iPad mini","state":"Shutdown","udid":"F4A10318-6B19-444B-A55D-A76536BC2196"},{"available":true,"booted":false,"name":"iPhone 15 Pro","state":"Shutdown","udid":"3F6F3AE3-D548-4486-83C7-42FC5604B436"},{"available":true,"booted":true,"name":"iPhone 16","state":"Booted","udid":"535B96FA-19EB-4682-868F-6DD1C53B6474"},{"available":true,"booted":true,"name":"iPhone 16 Pro","state":"Booted","udid":"B5029438-33A9-47E0-ACA4-C7B790A12E64"}],"ok":true}
+```
+
 ## Examples
 
 ```sh
