@@ -9,24 +9,32 @@
 
 import Foundation
 
-struct SimctlError: LocalizedError {
-    let message: String
-    var errorDescription: String? { message }
+public struct SimctlError: LocalizedError {
+    public let message: String
+    public var errorDescription: String? { message }
+    public init(message: String) { self.message = message }
 }
 
-struct Device: Decodable {
-    let udid: String
-    let name: String
-    let state: String
-    let isAvailable: Bool
+public struct Device: Decodable {
+    public let udid: String
+    public let name: String
+    public let state: String
+    public let isAvailable: Bool
 
-    var isBooted: Bool { state == "Booted" }
+    public var isBooted: Bool { state == "Booted" }
+
+    public init(udid: String, name: String, state: String, isAvailable: Bool) {
+        self.udid = udid
+        self.name = name
+        self.state = state
+        self.isAvailable = isAvailable
+    }
 }
 
-enum Simctl {
+public enum Simctl {
 
     @discardableResult
-    static func run(_ arguments: [String]) throws -> String {
+    public static func run(_ arguments: [String]) throws -> String {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
         process.arguments = ["simctl"] + arguments
@@ -57,7 +65,7 @@ enum Simctl {
     }
 
     /// Every simulator, newest runtimes first as simctl reports them.
-    static func devices() throws -> [Device] {
+    public static func devices() throws -> [Device] {
         let json = try run(["list", "devices", "--json"])
         guard let data = json.data(using: .utf8) else { return [] }
 
@@ -67,7 +75,7 @@ enum Simctl {
     }
 
     /// Resolves a user-supplied name, UDID or the special value "booted".
-    static func resolveDevice(_ query: String?) throws -> Device {
+    public static func resolveDevice(_ query: String?) throws -> Device {
         let all = try devices().filter { $0.isAvailable }
         guard let query, query.lowercased() != "booted" else {
             guard let booted = all.first(where: { $0.isBooted }) else {
