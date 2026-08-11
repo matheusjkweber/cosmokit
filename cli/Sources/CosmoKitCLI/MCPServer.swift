@@ -25,6 +25,26 @@ public enum MCPServer {
         }
 
         switch method {
+        case "initialize":
+            guard request["params"] == nil || request["params"] is [String: Any] else {
+                return response(id: request["id"] ?? NSNull(), error: [-32602, "Invalid params"])
+            }
+            let params = request["params"] as? [String: Any]
+            let requestedVersion = params?["protocolVersion"] as? String
+            let supportedVersions = ["2024-11-05", "2025-03-26", "2025-06-18"]
+            let protocolVersion = supportedVersions.contains(requestedVersion ?? "") ? requestedVersion! : "2025-06-18"
+            return response(id: request["id"] ?? NSNull(), result: [
+                "protocolVersion": protocolVersion,
+                "capabilities": ["tools": [:]],
+                "serverInfo": ["name": "cosmokit", "version": CLI.version]
+            ])
+
+        case "tools/list":
+            guard request["params"] == nil || request["params"] is [String: Any] else {
+                return response(id: request["id"] ?? NSNull(), error: [-32602, "Invalid params"])
+            }
+            return response(id: request["id"] ?? NSNull(), result: ["tools": tools()])
+
         default:
             return response(id: request["id"] ?? NSNull(), error: [-32601, "Method not found"])
         }
@@ -51,5 +71,34 @@ public enum MCPServer {
             return "{\"jsonrpc\":\"2.0\",\"id\":null,\"error\":{\"code\":-32603,\"message\":\"Internal error\"}}"
         }
         return String(decoding: data, as: UTF8.self)
+    }
+
+    private static func tools() -> [[String: Any]] {
+        let device = [
+            "type": "string",
+            "description": "UDID, exact name, or partial name; omit to use the booted simulator"
+        ]
+        return [
+            tool("list_simulators", "List available iOS Simulators, sorted by name. Takes no arguments.", properties: [:], required: []),
+            tool("boot_simulator", "Boot a simulator by UDID, exact name, or partial name; omit device to boot the first available shutdown simulator.", properties: ["device": device], required: []),
+            tool("shutdown_simulator", "Shut down a simulator by UDID, exact name, or partial name; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("capture_screenshot", "Capture a PNG screenshot from a simulator; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": "Directory where the timestamped PNG should be written"]], required: []),
+            tool("record_video", "Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": "Directory where the timestamped MP4 should be written"], "duration": ["type": "number", "description": "Number of seconds to record"]], required: ["duration"]),
+            tool("set_location", "Set a simulator's GPS location using latitude and longitude; omit device to use the booted simulator.", properties: ["device": device, "latitude": ["type": "number", "description": "Latitude in decimal degrees"], "longitude": ["type": "number", "description": "Longitude in decimal degrees"]], required: ["latitude", "longitude"]),
+            tool("open_url", "Open a deep link or URL in a simulator; omit device to use the booted simulator.", properties: ["device": device, "url": ["type": "string", "description": "URL or deep link to open"]], required: ["url"]),
+            tool("erase_simulator", "Erase a simulator back to a fresh install by UDID, exact name, or partial name; omit device to use the booted simulator.", properties: ["device": device], required: [])
+        ]
+    }
+
+    private static func tool(_ name: String, _ description: String, properties: [String: Any], required: [String]) -> [String: Any] {
+        [
+            "name": name,
+            "description": description,
+            "inputSchema": [
+                "type": "object",
+                "properties": properties,
+                "required": required
+            ]
+        ]
     }
 }
