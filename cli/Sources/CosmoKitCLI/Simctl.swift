@@ -64,6 +64,42 @@ public enum Simctl {
         return String(data: outData, encoding: .utf8) ?? ""
     }
 
+    @discardableResult
+    public static func runInterruptible(_ arguments: [String], stopAfter seconds: Double?) throws -> String {
+        guard let seconds else {
+            return try run(arguments)
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")
+        process.arguments = ["simctl"] + arguments
+
+        let stdout = Pipe()
+        let stderr = Pipe()
+        process.standardOutput = stdout
+        process.standardError = stderr
+
+        do {
+            try process.run()
+        } catch {
+            throw SimctlError(message: "could not run xcrun: \(error.localizedDescription)")
+        }
+
+        Thread.sleep(forTimeInterval: seconds)
+        process.interrupt()
+
+        let outData = stdout.fileHandleForReading.readDataToEndOfFile()
+        let errData = stderr.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+
+        guard process.terminationStatus == 0 || process.terminationReason == .uncaughtSignal else {
+            let message = String(data: errData, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? "unknown error"
+            throw SimctlError(message: message)
+        }
+        return String(data: outData, encoding: .utf8) ?? ""
+    }
+
     /// Every simulator, newest runtimes first as simctl reports them.
     public static func devices() throws -> [Device] {
         let json = try run(["list", "devices", "--json"])

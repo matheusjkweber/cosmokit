@@ -68,9 +68,10 @@ public enum CLI {
     }
 
 /// Pulls output-related flags out of the argument list, returning the rest.
-    public static func extractFlags(_ args: [String]) -> (json: Bool, output: String?, rest: [String]) {
+    public static func extractFlags(_ args: [String]) -> (json: Bool, output: String?, duration: String?, rest: [String]) {
         var json = false
         var output: String?
+        var duration: String?
         var rest: [String] = []
         var index = 0
         while index < args.count {
@@ -83,13 +84,17 @@ public enum CLI {
                 output = args[index + 1]
                 index += 2
                 continue
+            case "--duration":
+                duration = index + 1 < args.count ? args[index + 1] : ""
+                index += index + 1 < args.count ? 2 : 1
+                continue
             default:
                 break
             }
             rest.append(args[index])
             index += 1
         }
-        return (json, output, rest)
+        return (json, output, duration, rest)
     }
 
     public static func extractOutput(_ args: [String]) -> (output: String?, rest: [String]) {
@@ -117,7 +122,8 @@ public enum CLI {
             let outcome = try perform(
                 command: command,
                 args: Array(flags.rest.dropFirst()),
-                output: flags.output
+                output: flags.output,
+                duration: try parseDuration(flags.duration)
             )
             if flags.json {
                 writeJSONData(try outcome.jsonData())
@@ -142,6 +148,10 @@ public enum CLI {
     }
 
     public static func perform(command: String, args: [String], output: String?) throws -> CommandOutcome {
+        try perform(command: command, args: args, output: output, duration: nil)
+    }
+
+    public static func perform(command: String, args: [String], output: String?, duration: Double?) throws -> CommandOutcome {
         switch command {
         case "help", "--help", "-h":
             return CommandOutcome(human: usageText(), json: EmptyPayload())
@@ -194,7 +204,7 @@ public enum CLI {
             let device = try resolveDevice(args.first)
             let path = timestampedPath(directory: output, prefix: "CosmoKit-Recording", ext: "mp4", deviceName: device.name)
             let human = "Recording \(device.name). Press Ctrl-C to stop.\n\(path)"
-            try runSimctl(["io", device.udid, "recordVideo", path])
+            try Simctl.runInterruptible(["io", device.udid, "recordVideo", path], stopAfter: duration)
             return CommandOutcome(human: human, json: RecordPayload(udid: device.udid, name: device.name, path: path))
 
         case "location":
@@ -227,6 +237,14 @@ public enum CLI {
             throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit location <lat> <lon> [name|udid]"))
         }
         return (latitude, longitude, args.count > 2 ? args[2] : nil)
+    }
+
+    public static func parseDuration(_ raw: String?) throws -> Double? {
+        guard let raw else { return nil }
+        guard let duration = Double(raw), duration > 0 else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit record --duration <seconds>"))
+        }
+        return duration
     }
 
     private static func resolveDevice(_ query: String?) throws -> Device {
