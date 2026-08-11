@@ -42,13 +42,16 @@ cosmokit list                        List available simulators
 cosmokit boot [name|udid]            Boot a simulator (default: first available)
 cosmokit shutdown [name|udid]        Shut a simulator down (default: booted)
 cosmokit capture [name|udid]         Screenshot to a file
-cosmokit record [name|udid]          Record video until Ctrl-C
+cosmokit record [name|udid]          Record video until Ctrl-C or --duration
 cosmokit location <lat> <lon> [dev]  Set the simulator's GPS position
 cosmokit open <url> [name|udid]      Open a deep link
 cosmokit erase [name|udid]           Erase a simulator back to a fresh install
+cosmokit mcp                         Run as an MCP server over stdio (for AI agents)
 ```
 
-`--output <path>` sets the directory for `capture` and `record`.
+`--output <path>` sets the directory for `capture` and `record`. Use
+`--duration <seconds>` with `record` when an agent or script cannot send
+Ctrl-C.
 
 Device arguments accept a UDID, an exact name, or a partial name. Omit them to
 use the booted simulator.

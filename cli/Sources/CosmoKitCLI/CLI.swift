@@ -297,15 +297,19 @@ public enum CLI {
           location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
           erase [name|udid]           Erase a simulator back to a fresh install
+          mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
         OPTIONS
           --output <path>             Where to write a capture (default: ./)
+          --json                      Emit machine-readable JSON on stdout
+          --duration <seconds>        Recording duration (for record)
 
         EXAMPLES
           cosmokit capture --output ./screenshots
           cosmokit location -22.9068 -43.1729
           cosmokit open "myapp://item/42"
+          cosmokit --json list
         """
     }
 
