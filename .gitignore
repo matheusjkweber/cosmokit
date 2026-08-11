@@ -1,5 +1,6 @@
 .next/
 out/
+node_modules/
 
 # cosmokit CLI build products
 cli/.build/

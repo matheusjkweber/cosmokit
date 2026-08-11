@@ -19,13 +19,19 @@
     "badge": "Disponible en la Mac App Store",
     "title1": "Acelera tu",
     "title2": "flujo",
-    "description": "CosmoKit reúne perfiles de app, rutas GPS, deep links, payloads de push, pruebas de proxy y herramientas de captura en un único workspace nativo en el Mac.",
+    "description": "Deja de escribir xcrun simctl. CosmoKit reúne capturas, grabación de video, notificaciones push, deep links, rutas GPS y proxy de red para el Simulador iOS en una sola app nativa para Mac.",
     "terminalHint": "Reemplaza {command} con una GUI",
     "ctaDownload": "Descargar para macOS",
     "ctaFeatures": "Explorar Características",
-    "subtext": "Plan gratuito disponible · macOS 14+ · Requiere Xcode",
+    "subtext": "Plan gratuito disponible · macOS 14.7+ · Requiere Xcode",
     "heroImage": "/screenshots/store/es/overview.webp",
     "heroImageAlt": "Visual principal del espacio de trabajo de CosmoKit que muestra el panel de control nativo de macOS, las herramientas del simulador y el panel de productividad definitivo para desarrolladores de iOS"
+  },
+  "MacOnly": {
+    "body": "CosmoKit es una app para Mac. Necesita macOS 14 o posterior, Xcode y el Simulador de iOS, así que no funcionará en este dispositivo.",
+    "copyLink": "Copiar el enlace para tu Mac",
+    "copied": "Enlace copiado",
+    "copyFallback": "Copia este enlace y ábrelo en tu Mac:"
   },
   "Features": {
     "label": "Características",
@@ -71,7 +77,7 @@
       },
       "permissions": {
         "title": "Permisos",
-        "description": "Restablece y gestiona permisos de la app — cámara, ubicación, notificaciones — sin reinstalar."
+        "description": "Restablece y gestiona permisos de la app (cámara, ubicación, notificaciones) sin reinstalar."
       },
       "faceid": {
         "title": "Face ID",
@@ -156,14 +162,14 @@
       "name": "Mensual",
       "price": "€2,99",
       "period": "/mes",
-      "description": "Acceso total, cancela cuando quieras",
+      "description": "Prueba gratuita de 3 días, luego €2,99/mes",
       "cta": "Suscribir Mensual"
     },
     "yearly": {
       "name": "Anual",
       "price": "€22,99",
       "period": "/año",
-      "description": "Mejor valor — ahorra 36%",
+      "description": "Mejor valor: ahorra 36%",
       "cta": "Suscribir Anual",
       "badge": "Ahorra 36%"
     },
@@ -196,7 +202,6 @@
       "f8": "Proporción personalizada",
       "f9": "Proxy de red",
       "f10": "Herramientas de gestión de apps",
-      "f11": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)",
       "f12": "Rutas de ubicación",
       "f13": "Entradas guardadas ilimitadas",
       "f14": "Perfiles de app ilimitados"
@@ -211,7 +216,7 @@
     "helperCta": "Descargar Proxy Helper",
     "helperTitle": "CosmoKit Proxy Helper opcional",
     "helperDescription": "Instala este helper firmado para que CosmoKit configure el proxy HTTP/HTTPS de macOS en un clic. La suscripción y el acceso Pro siguen dentro de la app de la Mac App Store.",
-    "info1": "macOS 14+",
+    "info1": "macOS 14.7+",
     "info2": "Plan gratuito disponible",
     "info3": "Sin necesidad de cuenta",
     "cliTitle": "CLI cosmokit",
@@ -225,11 +230,11 @@
     "items": {
       "q1": {
         "question": "¿Qué es CosmoKit?",
-        "answer": "CosmoKit es una app macOS nativa que proporciona un panel de control unificado para el iOS Simulator. Reemplaza decenas de comandos de terminal (xcrun simctl) con una interfaz gráfica intuitiva — captura de pantalla, grabación de video, notificaciones push, deep links, simulación GPS, proxy de red, gestión de apps y más."
+        "answer": "CosmoKit es una app macOS nativa que proporciona un panel de control unificado para el iOS Simulator. Reemplaza decenas de comandos de terminal (xcrun simctl) con una interfaz gráfica intuitiva: captura de pantalla, grabación de video, notificaciones push, deep links, simulación GPS, proxy de red, gestión de apps y más."
       },
       "q2": {
         "question": "¿Cuáles son los requisitos del sistema?",
-        "answer": "CosmoKit requiere macOS 14 (Sonoma) o posterior y Xcode instalado en tu Mac. Funciona con todos los runtimes del iOS Simulator soportados por tu versión de Xcode."
+        "answer": "CosmoKit requiere macOS 14.7 (Sonoma) o posterior y Xcode instalado en tu Mac. Funciona con todos los runtimes del iOS Simulator soportados por tu versión de Xcode."
       },
       "q3": {
         "question": "¿Qué incluye el plan gratuito?",
@@ -241,7 +246,7 @@
       },
       "q5": {
         "question": "¿Cómo funciona la facturación?",
-        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (R$ 2,99/mes), anual (R$ 19,99/año — ahorra 44%), o compra única vitalicia (R$ 69,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID."
+        "answer": "Todas las suscripciones se gestionan a través de la Mac App Store. Puedes elegir mensual (€2,99/mes, 3 días de prueba gratis), anual (€22,99/año, ahorra 36%), o compra única vitalicia (€79,99). Puedes cancelar o cambiar de plan en cualquier momento desde la configuración de tu Apple ID. Los precios varían según la región. El precio final se muestra en la Mac App Store."
       },
       "q6": {
         "question": "¿CosmoKit es sandboxed?",
@@ -266,8 +271,9 @@
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
     "macAppStore": "Mac App Store",
+    "cli": "Herramienta de línea de comandos",
     "copyright": "© {year} CosmoHQ. Todos los derechos reservados.",
-    "builtWith": "Hecho con SwiftUI · macOS 14+"
+    "builtWith": "Hecho con SwiftUI · macOS 14.7+"
   },
   "Support": {
     "label": "Soporte",
@@ -288,7 +294,7 @@
     "submit": "Enviar mensaje",
     "sending": "Enviando…",
     "successTitle": "Mensaje enviado",
-    "successBody": "Gracias por escribir — te responderemos al email indicado.",
+    "successBody": "Gracias por escribir. Te responderemos al email indicado.",
     "successAgain": "Enviar otro mensaje"
   },
   "Suggest": {

@@ -19,13 +19,19 @@
     "badge": "Available on the Mac App Store",
     "title1": "Supercharge your",
     "title2": "workflow",
-    "description": "CosmoKit brings app profiles, GPS routes, deep links, push payloads, proxy testing, and capture tools into one native Mac workspace.",
+    "description": "Stop typing xcrun simctl. CosmoKit puts screenshots, video recording, push notifications, deep links, GPS routes and a network proxy for the iOS Simulator in one native Mac app.",
     "terminalHint": "Replace {command} with a GUI",
     "ctaDownload": "Download for macOS",
     "ctaFeatures": "Explore Features",
-    "subtext": "Free tier available · macOS 14+ · Requires Xcode",
+    "subtext": "Free tier available · macOS 14.7+ · Requires Xcode",
     "heroImage": "/screenshots/store/en/overview.webp",
     "heroImageAlt": "CosmoKit's main workspace visual showing the native macOS control panel, simulator tools, and the ultimate productivity dashboard for iOS developers"
+  },
+  "MacOnly": {
+    "body": "CosmoKit is a Mac app. It needs macOS 14 or later, Xcode and the iOS Simulator, so it will not run on this device.",
+    "copyLink": "Copy the link for your Mac",
+    "copied": "Link copied",
+    "copyFallback": "Copy this link and open it on your Mac:"
   },
   "Features": {
     "label": "Features",
@@ -71,7 +77,7 @@
       },
       "permissions": {
         "title": "Permissions",
-        "description": "Reset and manage app permissions — camera, location, notifications — without reinstalling."
+        "description": "Reset and manage app permissions (camera, location, notifications) without reinstalling."
       },
       "faceid": {
         "title": "Face ID",
@@ -156,14 +162,14 @@
       "name": "Monthly",
       "price": "$2.99",
       "period": "/mo",
-      "description": "Full access, cancel anytime",
+      "description": "3-day free trial, then $2.99/mo",
       "cta": "Start Monthly"
     },
     "yearly": {
       "name": "Yearly",
       "price": "$19.99",
       "period": "/yr",
-      "description": "Best value — save 44%",
+      "description": "Best value: save 44%",
       "cta": "Start Yearly",
       "badge": "Save 44%"
     },
@@ -196,7 +202,6 @@
       "f8": "Custom aspect ratio",
       "f9": "Network proxy",
       "f10": "App management tools",
-      "f11": "Simulator tools (appearance, status bar, permissions, Face ID, keychain)",
       "f12": "Location routes",
       "f13": "Unlimited saved entries",
       "f14": "Unlimited app profiles"
@@ -211,7 +216,7 @@
     "helperCta": "Download Proxy Helper",
     "helperTitle": "Optional CosmoKit Proxy Helper",
     "helperDescription": "Install this signed helper to let CosmoKit configure macOS HTTP/HTTPS proxy settings in one click. Subscriptions and Pro access stay inside the Mac App Store app.",
-    "info1": "macOS 14+",
+    "info1": "macOS 14.7+",
     "info2": "Free tier available",
     "info3": "No account required",
     "cliTitle": "cosmokit CLI",
@@ -225,11 +230,11 @@
     "items": {
       "q1": {
         "question": "What is CosmoKit?",
-        "answer": "CosmoKit is a native macOS app that provides a unified control panel for the iOS Simulator. It replaces dozens of terminal commands (xcrun simctl) with an intuitive graphical interface — screenshot capture, video recording, push notifications, deep links, GPS simulation, network proxy, app management, and more."
+        "answer": "CosmoKit is a native macOS app that provides a unified control panel for the iOS Simulator. It replaces dozens of terminal commands (xcrun simctl) with an intuitive graphical interface: screenshot capture, video recording, push notifications, deep links, GPS simulation, network proxy, app management, and more."
       },
       "q2": {
         "question": "What are the system requirements?",
-        "answer": "CosmoKit requires macOS 14 (Sonoma) or later and Xcode installed on your Mac. It works with all iOS Simulator runtimes supported by your Xcode version."
+        "answer": "CosmoKit requires macOS 14.7 (Sonoma) or later and Xcode installed on your Mac. It works with all iOS Simulator runtimes supported by your Xcode version."
       },
       "q3": {
         "question": "What's included in the free tier?",
@@ -241,7 +246,7 @@
       },
       "q5": {
         "question": "How does billing work?",
-        "answer": "All subscriptions are managed through the Mac App Store. You can choose monthly (R$ 2,99/mo), yearly (R$ 19,99/yr — save 44%), or a one-time lifetime purchase (R$ 69,99). You can cancel or switch plans anytime through your Apple ID settings."
+        "answer": "All subscriptions are managed through the Mac App Store. You can choose monthly ($2.99/mo, 3-day free trial), yearly ($19.99/yr, save 44%), or a one-time lifetime purchase ($69.99). You can cancel or switch plans anytime through your Apple ID settings. Prices vary by region. The final price is shown in the Mac App Store."
       },
       "q6": {
         "question": "Is CosmoKit sandboxed?",
@@ -266,8 +271,9 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "macAppStore": "Mac App Store",
+    "cli": "Command line tool",
     "copyright": "© {year} CosmoHQ. All rights reserved.",
-    "builtWith": "Built with SwiftUI · macOS 14+"
+    "builtWith": "Built with SwiftUI · macOS 14.7+"
   },
   "Support": {
     "label": "Support",
@@ -288,7 +294,7 @@
     "submit": "Send message",
     "sending": "Sending…",
     "successTitle": "Message sent",
-    "successBody": "Thanks for reaching out — we'll reply to the email you provided.",
+    "successBody": "Thanks for reaching out. We'll reply to the email you provided.",
     "successAgain": "Send another message"
   },
   "Suggest": {

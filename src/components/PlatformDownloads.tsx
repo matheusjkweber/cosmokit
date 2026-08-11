@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 const PROXY_HELPER_URL = "/downloads/CosmoKitProxyHelper.pkg";
 const CLI_REPO_URL = "https://github.com/maththedev42/cosmokit-cli";
 

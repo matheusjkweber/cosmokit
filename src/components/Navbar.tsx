@@ -10,7 +10,7 @@ import { useTranslations, useLocale } from "@/lib/i18n";
 import { usePathname, useRouter } from "next/navigation";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 
 const locales = [
   { code: "en", label: "English", flag: "🇺🇸" },

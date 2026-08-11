@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Lets a failed or never-created run be retried without a throwaway commit:
+  #   gh workflow run deploy.yml --repo OWNER/REPO --ref main
+  # Needed because a cancelled Pages deployment is keyed on the commit SHA, so
+  # re-running the same commit can never succeed (see the deploy job below).
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -35,5 +40,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # If this job fails with "Timeout reached, aborting!" the Pages queue is
+      # backed up, not the build. The action waits 10 minutes then *cancels*
+      # the deployment, and that cancelled state is keyed on the commit SHA:
+      # re-running the same commit then fails instantly with "Deployment
+      # cancelled", and the dead deployment still holds the lock, so the next
+      # commit gets "400 ... due to in progress deployment".
+      # Raising the `timeout` input does not help - it is capped at 600000.
+      # Recover with:
+      #   gh api -X POST repos/OWNER/REPO/pages/deployments/<stuck-sha>/cancel
+      # then push a new commit. The artifact sometimes publishes server-side
+      # anyway, so check the live site before assuming a red run means no deploy.
       - id: deployment
         uses: actions/deploy-pages@v4

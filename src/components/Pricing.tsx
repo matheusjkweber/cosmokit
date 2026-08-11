@@ -8,11 +8,14 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 
 const freeFeatureKeys = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 const proFeatureKeys = [
-  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14",
+  // No f11: it was retired when simulator tools moved into the Pro bullet
+  // list. Keys here must exist in every locale's Pricing.proFeatures or the
+  // row renders the raw key.
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f12", "f13", "f14",
 ] as const;
 
 const planKeys = ["free", "monthly", "yearly", "lifetime"] as const;

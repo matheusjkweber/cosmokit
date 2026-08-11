@@ -235,7 +235,7 @@
   "helper": {
     "latestVersion": "1.0.9",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
-    "blockProxy": true,
+    "blockProxy": false,
     "minRequiredVersion": null,
     "releaseNotes": {
       "en": "Reliable per-simulator traffic attribution (rolling socket snapshot) — Safari and short-lived connections now land under the right simulator. Includes all 1.0.7 bypass fixes.",

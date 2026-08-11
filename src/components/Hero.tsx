@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Apple, ArrowDown, Terminal } from "lucide-react";
+import { MacOnlyNotice } from "@/components/MacOnlyNotice";
 import { useTranslations } from "@/lib/i18n";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/br/app/cosmokit-tools/id6756494471?mt=12";
+  "https://apps.apple.com/app/cosmokit-tools/id6756494471?mt=12";
 
 export function Hero() {
   const t = useTranslations("Hero");
@@ -118,6 +119,9 @@ export function Hero() {
             </Link>
           </Button>
         </motion.div>
+
+        {/* Non-Mac visitors: the App Store button above is a dead end for them */}
+        <MacOnlyNotice />
 
         {/* Subtext */}
         <motion.p
