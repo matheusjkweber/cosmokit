@@ -103,7 +103,7 @@
       },
       "ai": {
         "title": "Funciona com o seu agente de IA",
-        "description": "O CLI cosmokit é shell puro, então qualquer agente de IA que rode comandos consegue inicializar um simulador, tirar uma captura, definir o GPS ou abrir um deep link. Todo comando sai com código diferente de zero em caso de falha, então o agente sabe quando um passo não funcionou."
+        "description": "Rode cosmokit mcp e qualquer cliente MCP, como o Claude Code ou o Cursor, descobre oito ferramentas de simulador para chamar com argumentos tipados: inicializar, captura, vídeo, GPS e deep links. Todo comando também aceita --json, então um agente que só roda shell recebe um resultado estruturado para interpretar, em vez de texto corrido."
       },
       "cli": {
         "title": "CLI cosmokit",
@@ -207,7 +207,7 @@
     "info2": "Plano gratuito disponível",
     "info3": "Sem necessidade de conta",
     "cliTitle": "CLI cosmokit",
-    "cliDescription": "Acesso scriptável às mesmas operações de simulador, para Makefiles, git hooks, CI e agentes de IA. Gratuito, licença MIT, requer macOS 13 ou posterior e roda sem o app.",
+    "cliDescription": "Acesso scriptável às mesmas operações de simulador, para Makefiles, git hooks e CI, mais um servidor MCP embutido para um agente de IA descobrir e chamar essas operações direto. Gratuito, licença MIT, requer macOS 13 ou posterior e roda sem o app.",
     "cliCta": "Ver no GitHub"
   },
   "FAQ": {

@@ -103,7 +103,7 @@
       },
       "ai": {
         "title": "Works with your AI agent",
-        "description": "The cosmokit CLI is plain shell, so any AI coding agent that can run commands can boot a simulator, capture a screenshot, set GPS or open a deep link. Every command exits non-zero on failure, so the agent knows when a step did not work."
+        "description": "Run cosmokit mcp and any MCP client, such as Claude Code or Cursor, discovers eight simulator tools it can call with typed arguments: boot, screenshot, video, GPS and deep links. Every command also takes --json, so an agent that only runs shell still gets a structured result to parse instead of prose."
       },
       "cli": {
         "title": "cosmokit CLI",
@@ -207,7 +207,7 @@
     "info2": "Free tier available",
     "info3": "No account required",
     "cliTitle": "cosmokit CLI",
-    "cliDescription": "Scriptable access to the same simulator operations, for Makefiles, git hooks, CI and AI coding agents. Free and MIT licensed, requires macOS 13 or later, and runs without the app.",
+    "cliDescription": "Scriptable access to the same simulator operations, for Makefiles, git hooks and CI, plus a built-in MCP server so an AI coding agent can discover and call them directly. Free and MIT licensed, requires macOS 13 or later, and runs without the app.",
     "cliCta": "View on GitHub"
   },
   "FAQ": {
