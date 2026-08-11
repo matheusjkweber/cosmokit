@@ -24,7 +24,7 @@
     "ctaDownload": "Descargar para macOS",
     "ctaFeatures": "Explorar Características",
     "subtext": "Plan gratuito disponible · macOS 14+ · Requiere Xcode",
-    "heroImage": "/screenshots/macos-1.png",
+    "heroImage": "/screenshots/store/es/overview.webp",
     "heroImageAlt": "Visual principal del espacio de trabajo de CosmoKit que muestra el panel de control nativo de macOS, las herramientas del simulador y el panel de productividad definitivo para desarrolladores de iOS"
   },
   "Features": {
@@ -132,12 +132,12 @@
       "more": "Y Mucho Más"
     },
     "images": {
-      "workspace": "/screenshots/macos-1.png",
-      "location": "/screenshots/macos-13.png",
-      "tools": "/screenshots/macos-14.png",
-      "push": "/screenshots/macos-15.png",
-      "proxy": "/screenshots/macos-12.png",
-      "more": "/screenshots/macos-2.png"
+      "workspace": "/screenshots/store/es/overview.webp",
+      "location": "/screenshots/store/es/location.webp",
+      "tools": "/screenshots/store/es/multisim.webp",
+      "push": "/screenshots/store/es/push.webp",
+      "proxy": "/screenshots/store/es/proxy.webp",
+      "more": "/screenshots/store/es/defaults.webp"
     }
   },
   "Pricing": {

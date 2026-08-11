@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: "CosmoKit",
     images: [
       {
-        url: "/screenshots/macos-2.png",
+        url: "/screenshots/og.jpg",
         width: 1200,
         height: 750,
         alt: "CosmoKit App Screenshot",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     title: "CosmoKit — Simulator Testing Made Easy",
     description:
       "The ultimate macOS companion for iOS developers. Control your simulator workflow with powerful tools.",
-    images: ["/screenshots/macos-2.png"],
+    images: ["/screenshots/og.jpg"],
   },
 };
 

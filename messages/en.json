@@ -24,7 +24,7 @@
     "ctaDownload": "Download for macOS",
     "ctaFeatures": "Explore Features",
     "subtext": "Free tier available · macOS 14+ · Requires Xcode",
-    "heroImage": "/screenshots/macos-1.png",
+    "heroImage": "/screenshots/store/en/overview.webp",
     "heroImageAlt": "CosmoKit's main workspace visual showing the native macOS control panel, simulator tools, and the ultimate productivity dashboard for iOS developers"
   },
   "Features": {
@@ -132,12 +132,12 @@
       "more": "And Much More"
     },
     "images": {
-      "workspace": "/screenshots/macos-1.png",
-      "location": "/screenshots/macos-2.png",
-      "tools": "/screenshots/macos-3.png",
-      "push": "/screenshots/macos-4.png",
-      "proxy": "/screenshots/macos-5.png",
-      "more": "/screenshots/macos-6.png"
+      "workspace": "/screenshots/store/en/overview.webp",
+      "location": "/screenshots/store/en/location.webp",
+      "tools": "/screenshots/store/en/multisim.webp",
+      "push": "/screenshots/store/en/push.webp",
+      "proxy": "/screenshots/store/en/proxy.webp",
+      "more": "/screenshots/store/en/defaults.webp"
     }
   },
   "Pricing": {

@@ -26,30 +26,45 @@ import {
   ImagePlus,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
-import { useTranslations } from "@/lib/i18n";
+import { useLocale, useTranslations } from "@/lib/i18n";
+
+/**
+ * Slots under /public/screenshots/store/<locale>/. These come from the Mac App
+ * Store image sets, so the headline is burned into the pixels and each locale
+ * needs its own file. Anything added here needs all three locales or the card
+ * renders a broken image.
+ */
+type ShotSlot = "profiles" | "capture" | "proxy";
+
+const SHOT_LOCALES = ["en", "pt-BR", "es"] as const;
+
+function shotSrc(slot: ShotSlot, locale: string): string {
+  const dir = (SHOT_LOCALES as readonly string[]).includes(locale) ? locale : "en";
+  return `/screenshots/store/${dir}/${slot}.webp`;
+}
 
 interface FeatureDef {
   icon: LucideIcon;
   key: string;
-  screenshot?: string;
+  shot?: ShotSlot;
   span: "lg" | "sm";
 }
 
 const featureDefs: FeatureDef[] = [
   // Row 1: large (2 cols) + small (1 col) = 3. Profiles leads because it is
   // the 4.6 headline and the thing every other tool now hangs off.
-  // No screenshot yet: every capture in /public/screenshots predates 4.6 and
-  // shows the old flat tool strip, so pairing one here would misrepresent it.
-  { icon: Layers, key: "profiles", span: "lg" },
+  { icon: Layers, key: "profiles", shot: "profiles", span: "lg" },
   { icon: Database, key: "userdefaults", span: "sm" },
   // Row 2: large + small = 3
-  { icon: Camera, key: "screenshot", screenshot: "/screenshots/macos-3.png", span: "lg" },
+  { icon: Camera, key: "screenshot", shot: "capture", span: "lg" },
   { icon: Bell, key: "push", span: "sm" },
-  // Row 3: large + small = 3
-  { icon: Video, key: "video", screenshot: "/screenshots/macos-11.png", span: "lg" },
+  // Row 3: large + small = 3. No shot: the store set covers stills and video in
+  // one image, which is already on the capture card above, and the old
+  // /screenshots/macos-11.png predates 4.6 and shows the retired tool strip.
+  { icon: Video, key: "video", span: "lg" },
   { icon: Link2, key: "deeplinks", span: "sm" },
   // Row 4: large + small = 3
-  { icon: Globe, key: "proxy", screenshot: "/screenshots/macos-12.png", span: "lg" },
+  { icon: Globe, key: "proxy", shot: "proxy", span: "lg" },
   { icon: MapPin, key: "gps", span: "sm" },
   // Row 5: large + small = 3
   { icon: PanelTop, key: "menubar", span: "lg" },
@@ -91,6 +106,7 @@ const itemVariants = {
 
 export function Features() {
   const t = useTranslations("Features");
+  const locale = useLocale();
 
   return (
     <section id="features" className="py-24 md:py-32 relative">
@@ -166,13 +182,13 @@ export function Features() {
                         </p>
                       </div>
 
-                      {feature.screenshot && (
+                      {feature.shot && (
                         <div className="flex-1 min-w-0 rounded-xl overflow-hidden border border-border/30 group-hover:border-violet-DEFAULT/20 transition-colors duration-500">
                           <Image
-                            src={feature.screenshot}
+                            src={shotSrc(feature.shot, locale)}
                             alt={title}
-                            width={800}
-                            height={500}
+                            width={1400}
+                            height={875}
                             className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.03]"
                           />
                         </div>
