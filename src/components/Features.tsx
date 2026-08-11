@@ -15,6 +15,11 @@ import {
   Palette,
   ScanFace,
   KeyRound,
+  Layers,
+  Database,
+  Wand2,
+  HardDrive,
+  Smartphone,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
@@ -27,22 +32,32 @@ interface FeatureDef {
 }
 
 const featureDefs: FeatureDef[] = [
-  // Row 1: large (2 cols) + small (1 col) = 3
+  // Row 1: large (2 cols) + small (1 col) = 3. Profiles leads because it is
+  // the 4.6 headline and the thing every other tool now hangs off.
+  // No screenshot yet: every capture in /public/screenshots predates 4.6 and
+  // shows the old flat tool strip, so pairing one here would misrepresent it.
+  { icon: Layers, key: "profiles", span: "lg" },
+  { icon: Database, key: "userdefaults", span: "sm" },
+  // Row 2: large + small = 3
   { icon: Camera, key: "screenshot", screenshot: "/screenshots/macos-3.png", span: "lg" },
   { icon: Bell, key: "push", span: "sm" },
-  // Row 2: large + small = 3
+  // Row 3: large + small = 3
   { icon: Video, key: "video", screenshot: "/screenshots/macos-11.png", span: "lg" },
   { icon: Link2, key: "deeplinks", span: "sm" },
-  // Row 3: large + small = 3
+  // Row 4: large + small = 3
   { icon: Globe, key: "proxy", screenshot: "/screenshots/macos-12.png", span: "lg" },
   { icon: MapPin, key: "gps", span: "sm" },
-  // Row 4-5: 6 small cards = 2 rows of 3
+  // Rows 5-7: 9 small cards = 3 full rows. Keep this a multiple of three or
+  // the last row renders short.
   { icon: AppWindow, key: "apps", span: "sm" },
   { icon: Palette, key: "appearance", span: "sm" },
   { icon: Settings2, key: "statusbar", span: "sm" },
   { icon: Shield, key: "permissions", span: "sm" },
   { icon: ScanFace, key: "faceid", span: "sm" },
   { icon: KeyRound, key: "keychain", span: "sm" },
+  { icon: Wand2, key: "presets", span: "sm" },
+  { icon: HardDrive, key: "diskdoctor", span: "sm" },
+  { icon: Smartphone, key: "devices", span: "sm" },
 ];
 
 const containerVariants = {

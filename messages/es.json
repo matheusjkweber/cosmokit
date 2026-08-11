@@ -19,7 +19,7 @@
     "badge": "Disponible en la Mac App Store",
     "title1": "Acelera tu",
     "title2": "flujo",
-    "description": "CosmoKit reúne rutas GPS, deep links, payloads push, pruebas de proxy y herramientas de captura en un único workspace nativo en Mac.",
+    "description": "CosmoKit reúne perfiles de app, rutas GPS, deep links, payloads de push, pruebas de proxy y herramientas de captura en un único workspace nativo en el Mac.",
     "terminalHint": "Reemplaza {command} con una GUI",
     "ctaDownload": "Descargar para macOS",
     "ctaFeatures": "Explorar Características",
@@ -80,6 +80,26 @@
       "keychain": {
         "title": "Keychain",
         "description": "Navega y gestiona elementos del keychain almacenados por tu app en el simulador."
+      },
+      "profiles": {
+        "title": "Perfiles de App",
+        "description": "Cada app con su propia configuración: el bundle ID, los simuladores y los deep links, pushes y ubicaciones de esa app. Cambias de app y cambia todo."
+      },
+      "userdefaults": {
+        "title": "Editor de UserDefaults",
+        "description": "Lee los defaults de la app en vivo, cambia una flag, reescribe un array o borra una clave y reinicia la app desde el panel."
+      },
+      "presets": {
+        "title": "Dev Presets",
+        "description": "Restaura todo un entorno de trabajo en un clic, en lugar de rehacerlo a mano cada mañana."
+      },
+      "diskdoctor": {
+        "title": "Disk Doctor",
+        "description": "Mira exactamente a dónde se fue el espacio del simulador y recupera las decenas de gigabytes que dejan los runtimes antiguos."
+      },
+      "devices": {
+        "title": "Dispositivos Emparejados",
+        "description": "Un panel de solo lectura con los iPhone y iPad emparejados con tu Mac, con modelo, versión de iOS y estado de conexión."
       }
     }
   },
@@ -146,7 +166,8 @@
       "f4": "Notificaciones push",
       "f5": "Deep links",
       "f6": "Simulación de ubicación GPS",
-      "f7": "5 entradas guardadas por herramienta"
+      "f7": "5 entradas guardadas por herramienta",
+      "f8": "1 perfil de app"
     },
     "proFeatures": {
       "f1": "Simuladores ilimitados",
@@ -161,7 +182,8 @@
       "f10": "Herramientas de gestión de apps",
       "f11": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)",
       "f12": "Rutas de ubicación",
-      "f13": "Entradas guardadas ilimitadas"
+      "f13": "Entradas guardadas ilimitadas",
+      "f14": "Perfiles de app ilimitados"
     },
     "footnote": "Todos los planes se gestionan a través de la Mac App Store. Cancela o cambia en cualquier momento."
   },
@@ -192,11 +214,11 @@
       },
       "q3": {
         "question": "¿Qué incluye el plan gratuito?",
-        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS y 5 entradas guardadas por herramienta. Soporta un simulador a la vez."
+        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS, 1 perfil de app y 5 entradas guardadas por herramienta. Admite un simulador a la vez."
       },
       "q4": {
         "question": "¿Qué desbloquea CosmoKit Pro?",
-        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores ilimitados, añade marcos de dispositivo y biseles para capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, controles de apariencia/barra de estado/permisos/Face ID/keychain del simulador, rutas de ubicación y entradas guardadas ilimitadas."
+        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores y perfiles de app ilimitados, añade marcos y biseles de dispositivo en las capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, el editor de UserDefaults, controles de apariencia/barra de estado/permisos/Face ID/llavero del simulador, rutas de ubicación y entradas guardadas ilimitadas."
       },
       "q5": {
         "question": "¿Cómo funciona la facturación?",
@@ -208,7 +230,7 @@
       },
       "q7": {
         "question": "¿Funciona con dispositivos físicos?",
-        "answer": "CosmoKit está diseñado específicamente para el iOS Simulator. No se conecta a dispositivos iOS físicos — se enfoca en hacer que el desarrollo y las pruebas basadas en simulador sean lo más eficiente posible."
+        "answer": "Las herramientas de CosmoKit están hechas para el iOS Simulator. Desde la 4.6 también muestra un panel Devices de solo lectura con los iPhone y iPad emparejados con tu Mac, con modelo, versión de iOS y estado de conexión. La captura, el GPS, los push y el resto de herramientas siguen siendo solo del simulador."
       },
       "q8": {
         "question": "¿Cómo obtengo soporte?",

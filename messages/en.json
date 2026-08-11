@@ -19,7 +19,7 @@
     "badge": "Available on the Mac App Store",
     "title1": "Supercharge your",
     "title2": "workflow",
-    "description": "CosmoKit brings GPS routes, deep links, push payloads, proxy testing, and capture tools into one native Mac workspace.",
+    "description": "CosmoKit brings app profiles, GPS routes, deep links, push payloads, proxy testing, and capture tools into one native Mac workspace.",
     "terminalHint": "Replace {command} with a GUI",
     "ctaDownload": "Download for macOS",
     "ctaFeatures": "Explore Features",
@@ -80,6 +80,26 @@
       "keychain": {
         "title": "Keychain",
         "description": "Browse and manage keychain items stored by your app in the simulator."
+      },
+      "profiles": {
+        "title": "App Profiles",
+        "description": "Every app keeps its own setup: its bundle ID, its simulators, and the deep links, pushes and locations that belong to it. Switch app, switch everything."
+      },
+      "userdefaults": {
+        "title": "UserDefaults Editor",
+        "description": "Read the app's live defaults, flip a flag, rewrite an array or delete a key, then restart the app from the panel."
+      },
+      "presets": {
+        "title": "Dev Presets",
+        "description": "Restore a whole working setup in one click instead of rebuilding it by hand every morning."
+      },
+      "diskdoctor": {
+        "title": "Disk Doctor",
+        "description": "See exactly where your simulator storage went and reclaim the tens of gigabytes old runtimes leave behind."
+      },
+      "devices": {
+        "title": "Paired Devices",
+        "description": "A read-only panel listing the iPhones and iPads paired with your Mac, with model, iOS version and connection state."
       }
     }
   },
@@ -146,7 +166,8 @@
       "f4": "Push notifications",
       "f5": "Deep links",
       "f6": "GPS location simulation",
-      "f7": "5 saved entries per tool"
+      "f7": "5 saved entries per tool",
+      "f8": "1 app profile"
     },
     "proFeatures": {
       "f1": "Unlimited simulators",
@@ -161,7 +182,8 @@
       "f10": "App management tools",
       "f11": "Simulator tools (appearance, status bar, permissions, Face ID, keychain)",
       "f12": "Location routes",
-      "f13": "Unlimited saved entries"
+      "f13": "Unlimited saved entries",
+      "f14": "Unlimited app profiles"
     },
     "footnote": "All plans are managed through the Mac App Store. Cancel or switch anytime."
   },
@@ -192,11 +214,11 @@
       },
       "q3": {
         "question": "What's included in the free tier?",
-        "answer": "The free tier includes screenshot and video capture (with watermark), push notifications, deep link testing, GPS location simulation, and 5 saved entries per tool. It supports one simulator at a time."
+        "answer": "The free tier includes screenshot and video capture (with watermark), push notifications, deep link testing, GPS location simulation, 1 app profile, and 5 saved entries per tool. It supports one simulator at a time."
       },
       "q4": {
         "question": "What does CosmoKit Pro unlock?",
-        "answer": "Pro removes all watermarks, unlocks unlimited simulators, adds device frames and bezels for screenshots, audio recording, touch indicators, custom aspect ratios, network proxy, full app management tools, simulator appearance/status bar/permissions/Face ID/keychain controls, location routes, and unlimited saved entries."
+        "answer": "Pro removes all watermarks, unlocks unlimited simulators and app profiles, adds device frames and bezels for screenshots, audio recording, touch indicators, custom aspect ratios, network proxy, full app management tools, the UserDefaults editor, simulator appearance/status bar/permissions/Face ID/keychain controls, location routes, and unlimited saved entries."
       },
       "q5": {
         "question": "How does billing work?",
@@ -208,7 +230,7 @@
       },
       "q7": {
         "question": "Does it work with physical devices?",
-        "answer": "CosmoKit is specifically designed for the iOS Simulator. It does not connect to physical iOS devices — it focuses on making simulator-based development and testing as efficient as possible."
+        "answer": "CosmoKit's tools target the iOS Simulator. Since 4.6 it also shows a read-only Devices panel listing the iPhones and iPads paired with your Mac, with model, iOS version and connection state. Capture, GPS, push and the other tools remain simulator-only."
       },
       "q8": {
         "question": "How do I get support?",
