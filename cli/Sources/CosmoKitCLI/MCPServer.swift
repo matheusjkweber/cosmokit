@@ -73,6 +73,50 @@ public enum MCPServer {
             var args = [bundleID, kind]
             if let device = try optionalString(arguments, key: "device") { args.append(device) }
             return ("container", args, nil)
+        case "set_appearance":
+            let appearance = try optionalString(arguments, key: "appearance")
+            if let appearance, !["light", "dark"].contains(appearance) { throw usageError("appearance must be one of: light, dark") }
+            var args = appearance.map { [$0] } ?? []
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("appearance", args, nil)
+        case "set_status_bar":
+            var args: [String] = []
+            let flags: [(String, String)] = [("time", "time"), ("battery_level", "batteryLevel"), ("battery_state", "batteryState"), ("wifi_bars", "wifiBars"), ("cellular_bars", "cellularBars"), ("cellular_mode", "cellularMode"), ("data_network", "dataNetwork"), ("operator_name", "operatorName")]
+            for (key, flag) in flags {
+                if let value = arguments[key] {
+                    let rendered = ["battery_level", "wifi_bars", "cellular_bars"].contains(key)
+                        ? try integerString(value, key: key, battery: key == "battery_level")
+                        : try scalarString(value, key: key)
+                    args += ["--\(flag)", rendered]
+                }
+            }
+            if args.isEmpty { throw usageError("statusbar requires at least one override") }
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("statusbar", args, nil)
+        case "clear_status_bar":
+            return ("statusbar-clear", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "set_permission":
+            let action = try requiredString(arguments, key: "action")
+            let services = ["all", "calendar", "contacts-limited", "contacts", "location", "location-always", "photos-add", "photos", "media-library", "microphone", "motion", "reminders", "siri"]
+            guard ["grant", "revoke", "reset"].contains(action) else { throw usageError("action must be one of: grant, revoke, reset") }
+            let service = try requiredString(arguments, key: "service")
+            guard services.contains(service) else { throw usageError("service must be one of: \(services.joined(separator: ", "))") }
+            var args = [action, service]
+            if let bundle = try optionalString(arguments, key: "bundle_id") { args.append(bundle) }
+            if action != "reset", arguments["bundle_id"] == nil { throw usageError("grant and revoke require a bundle id") }
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("permission", args, nil)
+        case "set_biometric_enrollment":
+            let enrolled = try boolString(arguments, key: "enrolled")
+            var args = [enrolled == "true" ? "on" : "off"]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("biometric-enroll", args, nil)
+        case "match_biometric":
+            let result = try optionalString(arguments, key: "result") ?? "match"
+            guard ["match", "nomatch"].contains(result) else { throw usageError("result must be one of: match, nomatch") }
+            var args = [result]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("biometric-match", args, nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -213,6 +257,30 @@ public enum MCPServer {
         return number.rounded() == number ? String(Int(number)) : String(describing: number)
     }
 
+    private static func scalarString(_ value: Any, key: String) throws -> String {
+        if let string = value as? String, !string.isEmpty { return string }
+        if let number = value as? NSNumber {
+            return number.doubleValue.rounded() == number.doubleValue ? String(Int(number.doubleValue)) : String(describing: number.doubleValue)
+        }
+        throw usageError("argument \(key) must be a string or number")
+    }
+
+    private static func integerString(_ value: Any, key: String, battery: Bool) throws -> String {
+        guard let number = value as? NSNumber, number.doubleValue.rounded() == number.doubleValue else {
+            throw usageError("argument \(key) must be an integer")
+        }
+        let integer = Int(number.doubleValue)
+        if battery && !(0...100).contains(integer) { throw usageError("battery_level must be between 0 and 100") }
+        return String(integer)
+    }
+
+    private static func boolString(_ arguments: [String: Any], key: String) throws -> String {
+        guard let value = arguments[key] else { throw usageError("missing required argument: \(key)") }
+        if let value = value as? Bool { return value ? "true" : "false" }
+        if let value = value as? String, ["true", "false"].contains(value.lowercased()) { return value.lowercased() }
+        throw usageError("argument \(key) must be a boolean")
+    }
+
     private static func failureText(for error: Error) -> String {
         let commandError: CommandError
         if let cliError = error as? CLIError {
@@ -248,7 +316,13 @@ public enum MCPServer {
             tool("uninstall_app", "Uninstall an app by bundle identifier; optionally provide a device, otherwise the booted simulator is used.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
             tool("launch_app", "Launch an installed app by bundle identifier and return its child PID when simctl reports one; optionally provide a device.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
             tool("terminate_app", "Terminate an installed app by bundle identifier; optionally provide a device, otherwise the booted simulator is used.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
-            tool("app_container", "Return the path to an app, data, or shared-app-groups container by bundle identifier; omit kind for the app container and omit device for the booted simulator.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "kind": ["type": "string", "enum": ["app", "data", "groups"], "description": "Container kind; defaults to app"], "device": device], required: ["bundle_id"])
+            tool("app_container", "Return the path to an app, data, or shared-app-groups container by bundle identifier; omit kind for the app container and omit device for the booted simulator.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "kind": ["type": "string", "enum": ["app", "data", "groups"], "description": "Container kind; defaults to app"], "device": device], required: ["bundle_id"]),
+            tool("set_appearance", "Set or read a simulator's light or dark appearance; omit appearance to read the current value and omit device to use the booted simulator.", properties: ["appearance": ["type": "string", "enum": ["light", "dark"]], "device": device], required: []),
+            tool("set_status_bar", "Override simulator status bar values for a screenshot; provide at least one override and omit device to use the booted simulator.", properties: ["time": ["type": "string"], "battery_level": ["type": "number"], "battery_state": ["type": "string"], "wifi_bars": ["type": "number"], "cellular_bars": ["type": "number"], "cellular_mode": ["type": "string"], "data_network": ["type": "string"], "operator_name": ["type": "string"], "device": device], required: []),
+            tool("clear_status_bar", "Clear all simulator status bar overrides; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("set_permission", "Grant, revoke, or reset a simulator privacy permission; some changes terminate the running app, and omit device to use the booted simulator.", properties: ["action": ["type": "string", "enum": ["grant", "revoke", "reset"]], "service": ["type": "string", "enum": ["all", "calendar", "contacts-limited", "contacts", "location", "location-always", "photos-add", "photos", "media-library", "microphone", "motion", "reminders", "siri"]], "bundle_id": ["type": "string"], "device": device], required: ["action", "service"]),
+            tool("set_biometric_enrollment", "Set biometric enrollment on or off; enrollment must be on before a biometric match can affect an app prompt, and omit device to use the booted simulator.", properties: ["enrolled": ["type": "boolean"], "device": device], required: ["enrolled"]),
+            tool("match_biometric", "Post a Face ID or Touch ID match result while an app is showing its biometric prompt; enrollment must be on first, and omit device to use the booted simulator.", properties: ["result": ["type": "string", "enum": ["match", "nomatch"]], "device": device], required: [])
         ]
     }
 
