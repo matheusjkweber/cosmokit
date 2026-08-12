@@ -117,6 +117,43 @@ public enum MCPServer {
             var args = [result]
             if let device = try optionalString(arguments, key: "device") { args.append(device) }
             return ("biometric-match", args, nil)
+        case "send_push":
+            let payloadValue = arguments["payload"] ?? NSNull()
+            let payloadData: Data
+            if let string = payloadValue as? String { payloadData = Data(string.utf8) }
+            else { guard JSONSerialization.isValidJSONObject(payloadValue) else { throw usageError("payload must be a JSON object") }; payloadData = try JSONSerialization.data(withJSONObject: payloadValue, options: []) }
+            guard let payloadObject = try? JSONSerialization.jsonObject(with: payloadData), let payload = payloadObject as? [String: Any] else { throw usageError("payload is not valid JSON") }
+            guard payload["aps"] != nil else { throw usageError("payload must contain aps") }
+            guard payloadData.count <= 4096 else { throw usageError("payload is \(payloadData.count) bytes; maximum is 4096") }
+            let bundle = try optionalString(arguments, key: "bundle_id") ?? (payload["Simulator Target Bundle"] as? String)
+            guard let bundle else { throw usageError("bundle_id is required unless payload contains Simulator Target Bundle") }
+            var args = [bundle, "--payload", String(decoding: payloadData, as: UTF8.self)]
+            if let device = try optionalString(arguments, key: "device") { args += ["--device", device] }
+            return ("push", args, nil)
+        case "list_location_scenarios":
+            return ("scenarios", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "run_location_scenario":
+            var args = [try requiredString(arguments, key: "scenario")]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("route", args, nil)
+        case "clear_location":
+            return ("location-clear", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "add_media":
+            let paths: [String]
+            if let array = arguments["paths"] as? [String] { paths = array }
+            else if let string = arguments["paths"] as? String { paths = [string] }
+            else { throw usageError("paths must be a string array") }
+            guard !paths.isEmpty else { throw usageError("paths must not be empty") }
+            var args = paths
+            if let device = try optionalString(arguments, key: "device") { args += ["--device", device] }
+            return ("addmedia", args, nil)
+        case "get_pasteboard":
+            return ("pasteboard", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "set_pasteboard":
+            let text = try requiredString(arguments, key: "text")
+            var args = ["--set", text]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("pasteboard", args, nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -322,7 +359,14 @@ public enum MCPServer {
             tool("clear_status_bar", "Clear all simulator status bar overrides; omit device to use the booted simulator.", properties: ["device": device], required: []),
             tool("set_permission", "Grant, revoke, or reset a simulator privacy permission; some changes terminate the running app, and omit device to use the booted simulator.", properties: ["action": ["type": "string", "enum": ["grant", "revoke", "reset"]], "service": ["type": "string", "enum": ["all", "calendar", "contacts-limited", "contacts", "location", "location-always", "photos-add", "photos", "media-library", "microphone", "motion", "reminders", "siri"]], "bundle_id": ["type": "string"], "device": device], required: ["action", "service"]),
             tool("set_biometric_enrollment", "Set biometric enrollment on or off; enrollment must be on before a biometric match can affect an app prompt, and omit device to use the booted simulator.", properties: ["enrolled": ["type": "boolean"], "device": device], required: ["enrolled"]),
-            tool("match_biometric", "Post a Face ID or Touch ID match result while an app is showing its biometric prompt; enrollment must be on first, and omit device to use the booted simulator.", properties: ["result": ["type": "string", "enum": ["match", "nomatch"]], "device": device], required: [])
+            tool("match_biometric", "Post a Face ID or Touch ID match result while an app is showing its biometric prompt; enrollment must be on first, and omit device to use the booted simulator.", properties: ["result": ["type": "string", "enum": ["match", "nomatch"]], "device": device], required: []),
+            tool("send_push", "Send a validated APNs push payload to an app; payload must be a JSON object with aps and may include Simulator Target Bundle, otherwise provide bundle_id.", properties: ["payload": ["type": "object", "description": "JSON push payload containing aps"], "bundle_id": ["type": "string"], "device": device], required: ["payload"]),
+            tool("list_location_scenarios", "List built-in simulated location scenarios; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("run_location_scenario", "Run a simulated location route until clear_location is called; unlike set_location this keeps moving, and omit device to use the booted simulator.", properties: ["scenario": ["type": "string", "description": "Scenario name, preserving spaces"], "device": device], required: ["scenario"]),
+            tool("clear_location", "Stop a running location scenario and clear the fixed location; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("add_media", "Add one or more photo or video files to a simulator's library; omit device to use the booted simulator.", properties: ["paths": ["type": "array", "items": ["type": "string"]], "device": device], required: ["paths"]),
+            tool("get_pasteboard", "Read the simulator pasteboard as text; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("set_pasteboard", "Set simulator pasteboard text, replacing its current contents; omit device to use the booted simulator.", properties: ["text": ["type": "string"], "device": device], required: ["text"])
         ]
     }
 
