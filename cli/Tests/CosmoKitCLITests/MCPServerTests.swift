@@ -266,6 +266,10 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(try toolErrorCode(missingAPS), "usage")
         let array = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":[1,2],"bundle_id":"x"}}}"#)
         XCTAssertEqual(try toolErrorCode(array), "usage")
+        XCTAssertTrue(try toolErrorMessage(array).contains("JSON object at the top level"))
+        let malformed = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":"{\"aps\":" ,"bundle_id":"x"}}}"#)
+        XCTAssertTrue(try toolErrorMessage(malformed).contains("payload is not valid JSON:"))
+        XCTAssertFalse(try toolErrorMessage(malformed).contains("JSON object at the top level"))
         let target = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":{"aps":{},"Simulator Target Bundle":"com.target"}}}}"#)
         XCTAssertNil(target["error"])
     }
@@ -284,7 +288,17 @@ final class MCPServerTests: XCTestCase {
         MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
         _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"run_location_scenario","arguments":{"scenario":"City Run"}}}"#)
         XCTAssertEqual(received, ["City Run"])
-        XCTAssertEqual(CLI.parseScenarios("Header\n\n City Run \nOcean Drive  \n"), ["City Run", "Ocean Drive"])
+        let table = """
+        Name                 Description
+        ========================================================
+        City Run             City Run
+        City Bicycle Ride    City Bicycle Ride
+        Freeway Drive        Freeway Drive
+        Apple                Apple
+        """
+        XCTAssertEqual(CLI.parseScenarios(table), ["Apple", "City Bicycle Ride", "City Run", "Freeway Drive"])
+        XCTAssertEqual(CLI.parseScenarios("Name                 Description\n====================\n"), [])
+        XCTAssertEqual(CLI.parseScenarios("Name                 Description\nCity Run             City Run   \n"), ["City Run"])
     }
 
     func testMediaAndPasteboardMappings() throws {
@@ -339,6 +353,10 @@ final class MCPServerTests: XCTestCase {
             let schema = tool["inputSchema"] as! [String: Any]
             XCTAssertEqual(schema["type"] as? String, "object")
             let properties = schema["properties"] as? [String: Any] ?? [:]
+            for (propertyName, propertyValue) in properties {
+                let property = propertyValue as! [String: Any]
+                XCTAssertTrue(property["type"] is String || property["type"] is [String], "property \(propertyName) in \(tool["name"] ?? "?") has no type")
+            }
             for required in schema["required"] as? [String] ?? [] {
                 XCTAssertNotNil(properties[required], "required key \(required) missing from properties")
             }

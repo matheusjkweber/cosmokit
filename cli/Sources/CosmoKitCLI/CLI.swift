@@ -497,12 +497,40 @@ public enum CLI {
     }
 
     public static func parseScenarios(_ raw: String) -> [String] {
-        var lines = raw.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-        if let first = lines.first,
-           first.lowercased().contains("scenario") || first.lowercased() == "header" || first.hasSuffix(":") {
-            lines.removeFirst()
+        let names = raw.split(separator: "\n").compactMap { line -> String? in
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty, trimmed.allSatisfy({ $0 == "=" }) == false else { return nil }
+            let firstColumn = trimmed.split(separator: " ", maxSplits: 1, omittingEmptySubsequences: true).first.map(String.init) ?? trimmed
+            if firstColumn == "Name" { return nil }
+            let parts = trimmed.split(whereSeparator: { $0 == " " || $0 == "\t" })
+            var name = trimmed
+            if let range = trimmed.range(of: " {2,}", options: .regularExpression) {
+                name = String(trimmed[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            return name.isEmpty ? nil : (parts.isEmpty ? firstColumn : name)
         }
-        return lines
+        return Array(Set(names)).sorted()
+    }
+
+    /// The push payload rules, in one place. Both surfaces call this so the
+    /// message an agent sees and the message a terminal user sees stay identical.
+    public static func validatePushPayload(_ data: Data, bundleID: String?) throws -> (bundle: String, byteCount: Int) {
+        let object: Any
+        do {
+            object = try JSONSerialization.jsonObject(with: data)
+        } catch {
+            throw CLIError(commandError: CommandError(code: .usage, message: "payload is not valid JSON: \(error.localizedDescription)"))
+        }
+        guard let dictionary = object as? [String: Any] else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "payload must be a JSON object at the top level"))
+        }
+        guard dictionary["aps"] != nil else { throw CLIError(commandError: CommandError(code: .usage, message: "payload must contain aps")) }
+        guard data.count <= 4096 else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is \(data.count) bytes; maximum is 4096")) }
+        let targetBundle = dictionary["Simulator Target Bundle"] as? String ?? ""
+        guard let bundle = bundleID ?? (targetBundle.isEmpty ? nil : targetBundle) else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "bundle id is required unless payload contains Simulator Target Bundle"))
+        }
+        return (bundle, data.count)
     }
 
     public static func parseDefaultsEntries(_ raw: String) throws -> [DefaultsEntry] {
@@ -552,12 +580,10 @@ public enum CLI {
         if let payload { data = Data(payload.utf8) }
         else if let payloadFile { guard let fileData = FileManager.default.contents(atPath: payloadFile) else { throw CLIError(commandError: CommandError(code: .usage, message: "payload file does not exist: \(payloadFile)")) }; data = fileData }
         else { data = FileHandle.standardInput.readDataToEndOfFile() }
-        guard let object = try? JSONSerialization.jsonObject(with: data), let dictionary = object as? [String: Any] else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is not valid JSON: parse failed")) }
-        guard dictionary["aps"] != nil else { throw CLIError(commandError: CommandError(code: .usage, message: "payload must contain aps")) }
-        guard data.count <= 4096 else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is \(data.count) bytes; maximum is 4096")) }
-        let targetBundle = dictionary["Simulator Target Bundle"] as? String ?? ""
-        guard bundleID != nil || !targetBundle.isEmpty else { throw CLIError(commandError: CommandError(code: .usage, message: "bundle id is required unless payload contains Simulator Target Bundle")) }
-        return (data, bundleID, targetBundle, device)
+        let validation = try validatePushPayload(data, bundleID: bundleID)
+        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let targetBundle = object?["Simulator Target Bundle"] as? String ?? ""
+        return (data, bundleID, targetBundle.isEmpty ? validation.bundle : targetBundle, device)
     }
 
     private static func parseMediaArgs(_ args: [String]) throws -> ([String], String?) {
