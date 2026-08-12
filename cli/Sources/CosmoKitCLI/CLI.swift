@@ -69,6 +69,12 @@ public enum CLI {
           permission <action> <service> [bundle] [name|udid] Set privacy permission
           biometric-enroll <on|off> [name|udid] Set biometric enrollment
           biometric-match [match|nomatch] [name|udid] Trigger biometric result
+          push [bundle]                 Send a push notification payload
+          scenarios [name|udid]         List built-in location scenarios
+          route <scenario> [name|udid]  Run a location scenario
+          location-clear [name|udid]    Clear a location scenario
+          addmedia <path> [path ...]    Add media to the photo library
+          pasteboard [--set <text>]     Read or set the device pasteboard
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -76,6 +82,9 @@ public enum CLI {
           --output <path>             Where to write a capture (default: ./)
           --json                      Emit machine-readable JSON on stdout
           --duration <seconds>        Recording duration (for record)
+          --payload <json>            Push payload (takes precedence over file/stdin)
+          --payload-file <path>       Read a push payload from a file
+          Push input precedence: --payload, then --payload-file, then stdin.
 
         EXAMPLES
           cosmokit capture --output ./screenshots
@@ -351,6 +360,50 @@ public enum CLI {
             try runSimctl(["spawn", device.udid, "notifyutil", "-p", notification])
             return CommandOutcome(human: "Biometric \(result) on \(device.name)", json: BiometricMatchPayload(udid: device.udid, name: device.name, result: result))
 
+        case "push":
+            let parsed = try parsePush(args)
+            let device = try resolveDevice(parsed.device)
+            let bundle = parsed.bundleID ?? parsed.targetBundle
+            _ = try runSimctlInput(["push", device.udid, bundle, "-"], input: parsed.data)
+            return CommandOutcome(human: "Sent push to \(device.name)", json: PushPayload(udid: device.udid, name: device.name, bundleID: parsed.bundleID ?? parsed.targetBundle, payloadBytes: parsed.data.count))
+
+        case "scenarios":
+            let device = try resolveDevice(args.first)
+            let scenarios = parseScenarios(try runSimctl(["location", device.udid, "list"])).sorted()
+            return CommandOutcome(human: scenarios.joined(separator: "\n"), json: ScenariosPayload(udid: device.udid, name: device.name, scenarios: scenarios))
+
+        case "route":
+            guard let scenario = args.first, !scenario.isEmpty else { throw CLIError(commandError: CommandError(code: .usage, message: "route requires a scenario")) }
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            try runSimctl(["location", device.udid, "run", scenario])
+            return CommandOutcome(human: "Running route \(scenario) on \(device.name)", json: RoutePayload(udid: device.udid, name: device.name, scenario: scenario))
+
+        case "location-clear":
+            let device = try resolveDevice(args.first)
+            try runSimctl(["location", device.udid, "clear"])
+            return CommandOutcome(human: "Cleared location on \(device.name)", json: LocationClearPayload(udid: device.udid, name: device.name))
+
+        case "addmedia":
+            let (paths, deviceQuery) = try parseMediaArgs(args)
+            let device = try resolveDevice(deviceQuery)
+            for path in paths where !FileManager.default.fileExists(atPath: path) { throw CLIError(commandError: CommandError(code: .usage, message: "media path does not exist: \(path)")) }
+            try runSimctl(["addmedia", device.udid] + paths)
+            return CommandOutcome(human: "Added \(paths.count) media file(s) to \(device.name)", json: AddMediaPayload(udid: device.udid, name: device.name, paths: paths, count: paths.count))
+
+        case "pasteboard":
+            let (text, deviceQuery, readsStdin) = parsePasteboardArgs(args)
+            let device = try resolveDevice(deviceQuery)
+            if readsStdin {
+                let text = String(data: FileHandle.standardInput.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                _ = try runSimctlInput(["pbcopy", device.udid], input: Data(text.utf8))
+                return CommandOutcome(human: "Set pasteboard on \(device.name)", json: PasteboardPayload(udid: device.udid, name: device.name, contents: text, didSet: true))
+            } else if let text {
+                _ = try runSimctlInput(["pbcopy", device.udid], input: Data(text.utf8))
+                return CommandOutcome(human: "Set pasteboard on \(device.name)", json: PasteboardPayload(udid: device.udid, name: device.name, contents: text, didSet: true))
+            }
+            let contents = try runSimctl(["pbpaste", device.udid])
+            return CommandOutcome(human: contents, json: PasteboardPayload(udid: device.udid, name: device.name, contents: contents, didSet: false))
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
@@ -382,6 +435,69 @@ public enum CLI {
             let type = (entry["ApplicationType"] as? String) ?? ""
             return InstalledApp(bundleID: bundleID, name: name, path: path, type: type)
         }.sorted { $0.bundleID < $1.bundleID }
+    }
+
+    public static func parseScenarios(_ raw: String) -> [String] {
+        var lines = raw.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        if let first = lines.first,
+           first.lowercased().contains("scenario") || first.lowercased() == "header" || first.hasSuffix(":") {
+            lines.removeFirst()
+        }
+        return lines
+    }
+
+    private static func parsePush(_ args: [String]) throws -> (data: Data, bundleID: String?, targetBundle: String, device: String?) {
+        var bundleID: String?
+        var payload: String?
+        var payloadFile: String?
+        var device: String?
+        var index = 0
+        while index < args.count {
+            switch args[index] {
+            case "--payload":
+                guard index + 1 < args.count else { throw CLIError(commandError: CommandError(code: .usage, message: "--payload requires JSON")) }
+                payload = args[index + 1]; index += 2
+            case "--payload-file":
+                guard index + 1 < args.count else { throw CLIError(commandError: CommandError(code: .usage, message: "--payload-file requires a path")) }
+                payloadFile = args[index + 1]; index += 2
+            case "--device":
+                guard index + 1 < args.count else { throw CLIError(commandError: CommandError(code: .usage, message: "--device requires a value")) }
+                device = args[index + 1]; index += 2
+            default:
+                if bundleID == nil { bundleID = args[index] } else if device == nil { device = args[index] }
+                index += 1
+            }
+        }
+        let data: Data
+        if let payload { data = Data(payload.utf8) }
+        else if let payloadFile { guard let fileData = FileManager.default.contents(atPath: payloadFile) else { throw CLIError(commandError: CommandError(code: .usage, message: "payload file does not exist: \(payloadFile)")) }; data = fileData }
+        else { data = FileHandle.standardInput.readDataToEndOfFile() }
+        guard let object = try? JSONSerialization.jsonObject(with: data), let dictionary = object as? [String: Any] else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is not valid JSON: parse failed")) }
+        guard dictionary["aps"] != nil else { throw CLIError(commandError: CommandError(code: .usage, message: "payload must contain aps")) }
+        guard data.count <= 4096 else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is \(data.count) bytes; maximum is 4096")) }
+        let targetBundle = dictionary["Simulator Target Bundle"] as? String ?? ""
+        guard bundleID != nil || !targetBundle.isEmpty else { throw CLIError(commandError: CommandError(code: .usage, message: "bundle id is required unless payload contains Simulator Target Bundle")) }
+        return (data, bundleID, targetBundle, device)
+    }
+
+    private static func parseMediaArgs(_ args: [String]) throws -> ([String], String?) {
+        var paths = args
+        var device: String?
+        if let index = paths.firstIndex(of: "--device") {
+            guard index + 1 < paths.count else { throw CLIError(commandError: CommandError(code: .usage, message: "--device requires a value")) }
+            device = paths[index + 1]
+            paths.removeSubrange(index...index + 1)
+        }
+        guard !paths.isEmpty else { throw CLIError(commandError: CommandError(code: .usage, message: "addmedia requires at least one path")) }
+        return (paths, device)
+    }
+
+    private static func parsePasteboardArgs(_ args: [String]) -> (String?, String?, Bool) {
+        guard let index = args.firstIndex(of: "--set") else { return (nil, args.first, false) }
+        let readsStdin = index + 1 >= args.count
+        let text = readsStdin ? nil : args[index + 1]
+        let device = index + 2 < args.count ? args[index + 2] : nil
+        return (text, device, readsStdin)
     }
 
     private static func parseStatusBar(_ args: [String]) throws -> (overrides: [String: String], device: String?) {
@@ -447,6 +563,11 @@ public enum CLI {
         }
     }
 
+    private static func runSimctlInput(_ arguments: [String], input: Data) throws -> String {
+        do { return try Simctl.run(arguments, input: input) }
+        catch { throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription)) }
+    }
+
     private static func usageText() -> String {
         """
         cosmokit \(CLI.version) — drive the iOS Simulator from the command line
@@ -470,6 +591,9 @@ public enum CLI {
           --output <path>             Where to write a capture (default: ./)
           --json                      Emit machine-readable JSON on stdout
           --duration <seconds>        Recording duration (for record)
+          --payload <json>            Push payload (takes precedence over file/stdin)
+          --payload-file <path>       Read a push payload from a file
+          Push input precedence: --payload, then --payload-file, then stdin.
 
         EXAMPLES
           cosmokit capture --output ./screenshots
@@ -620,4 +744,34 @@ public struct BiometricEnrollPayload: Codable {
 public struct BiometricMatchPayload: Codable {
     public let udid: String; public let name: String; public let result: String
     public init(udid: String, name: String, result: String) { self.udid = udid; self.name = name; self.result = result }
+}
+
+public struct PushPayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String; public let payloadBytes: Int
+    public init(udid: String, name: String, bundleID: String, payloadBytes: Int) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.payloadBytes = payloadBytes }
+}
+
+public struct ScenariosPayload: Codable {
+    public let udid: String; public let name: String; public let scenarios: [String]
+    public init(udid: String, name: String, scenarios: [String]) { self.udid = udid; self.name = name; self.scenarios = scenarios }
+}
+
+public struct RoutePayload: Codable {
+    public let udid: String; public let name: String; public let scenario: String
+    public init(udid: String, name: String, scenario: String) { self.udid = udid; self.name = name; self.scenario = scenario }
+}
+
+public struct LocationClearPayload: Codable {
+    public let udid: String; public let name: String
+    public init(udid: String, name: String) { self.udid = udid; self.name = name }
+}
+
+public struct AddMediaPayload: Codable {
+    public let udid: String; public let name: String; public let paths: [String]; public let count: Int
+    public init(udid: String, name: String, paths: [String], count: Int) { self.udid = udid; self.name = name; self.paths = paths; self.count = count }
+}
+
+public struct PasteboardPayload: Codable {
+    public let udid: String; public let name: String; public let contents: String; public let didSet: Bool
+    public init(udid: String, name: String, contents: String, didSet: Bool) { self.udid = udid; self.name = name; self.contents = contents; self.didSet = didSet }
 }
