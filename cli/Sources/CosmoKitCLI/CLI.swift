@@ -49,37 +49,45 @@ public enum CLI {
           cosmokit <command> [options]
 
         COMMANDS
+          DISCOVERY
           list                        List available simulators
+          runtimes                    List runtimes and device types
+          LIFECYCLE
           boot [name|udid]            Boot a simulator (default: first available)
           shutdown [name|udid]        Shut a simulator down (default: booted)
-          capture [name|udid]         Screenshot to a file
-          record [name|udid]          Record video until you press Ctrl-C
-          location <lat> <lon> [dev]  Set the simulator's GPS position
-          open <url> [name|udid]      Open a deep link
           erase [name|udid]           Erase a simulator back to a fresh install
+          APPS
           apps [name|udid]            List installed apps
           install <path> [name|udid]  Install an app bundle
           uninstall <bundle> [name|udid] Uninstall an app
           launch <bundle> [name|udid] Launch an app
           terminate <bundle> [name|udid] Terminate an app
           container <bundle> [kind] [name|udid] Get an app container path
+          CAPTURE
+          capture [name|udid]         Screenshot to a file
+          record [name|udid]          Record video until you press Ctrl-C
+          STATE
           appearance [light|dark] [name|udid] Set or read appearance
           statusbar [flags] [name|udid] Set status bar overrides
-          statusbar-clear [name|udid]   Clear status bar overrides
+          statusbar-clear [name|udid] Clear status bar overrides
           permission <action> <service> [bundle] [name|udid] Set privacy permission
           biometric-enroll <on|off> [name|udid] Set biometric enrollment
           biometric-match [match|nomatch] [name|udid] Trigger biometric result
+          CONTENT AND INPUT
+          location <lat> <lon> [dev]  Set the simulator's GPS position
+          open <url> [name|udid]      Open a deep link
           push [bundle]                 Send a push notification payload
+          addmedia <path> [path ...]    Add media to the photo library
+          pasteboard [--set <text>]     Read or set the device pasteboard
+          LOCATION
           scenarios [name|udid]         List built-in location scenarios
           route <scenario> [name|udid]  Run a location scenario
           location-clear [name|udid]    Clear a location scenario
-          addmedia <path> [path ...]    Add media to the photo library
-          pasteboard [--set <text>]     Read or set the device pasteboard
+          INSPECTION
           defaults <bundle>              Read app UserDefaults
           defaults-write <bundle> <key> <value> Write an app UserDefaults value
           defaults-delete <bundle> <key> Delete an app UserDefaults value
           logs [--last <duration>]       Read a bounded simulator log window
-          runtimes                       List runtimes and device types
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -89,6 +97,14 @@ public enum CLI {
           --duration <seconds>        Recording duration (for record)
           --payload <json>            Push payload (takes precedence over file/stdin)
           --payload-file <path>       Read a push payload from a file
+          --type <type>               Defaults type: string, bool, int, float, array, dict
+          --last <duration>           Log window: 30s, 5m, or 1h (default: 1m)
+          --predicate <text>          Predicate for logs
+          --bundle <bundle-id>        Logs convenience subsystem predicate
+          --set <text>                Set pasteboard contents
+          statusbar flags             time, dataNetwork, wifiMode, wifiBars,
+                                      cellularMode, cellularBars, operatorName,
+                                      batteryState, batteryLevel
           Push input precedence: --payload, then --payload-file, then stdin.
 
         EXAMPLES
@@ -780,14 +796,45 @@ public enum CLI {
           cosmokit <command> [options]
 
         COMMANDS
+          DISCOVERY
           list                        List available simulators
+          runtimes                    List runtimes and device types
+          LIFECYCLE
           boot [name|udid]            Boot a simulator (default: first available)
           shutdown [name|udid]        Shut a simulator down (default: booted)
+          erase [name|udid]           Erase a simulator back to a fresh install
+          APPS
+          apps [name|udid]            List installed apps
+          install <path> [name|udid]  Install an app bundle
+          uninstall <bundle> [name|udid] Uninstall an app
+          launch <bundle> [name|udid] Launch an app
+          terminate <bundle> [name|udid] Terminate an app
+          container <bundle> [kind] [name|udid] Get an app container path
+          CAPTURE
           capture [name|udid]         Screenshot to a file
           record [name|udid]          Record video until you press Ctrl-C
+          STATE
+          appearance [light|dark] [name|udid] Set or read appearance
+          statusbar [flags] [name|udid] Set status bar overrides
+          statusbar-clear [name|udid] Clear status bar overrides
+          permission <action> <service> [bundle] [name|udid] Set privacy permission
+          biometric-enroll <on|off> [name|udid] Set biometric enrollment
+          biometric-match [match|nomatch] [name|udid] Trigger biometric result
+          CONTENT AND INPUT
           location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
-          erase [name|udid]           Erase a simulator back to a fresh install
+          push [bundle]               Send a push notification payload
+          addmedia <path> [path ...]  Add media to the photo library
+          pasteboard [--set <text>]   Read or set the device pasteboard
+          LOCATION
+          scenarios [name|udid]       List built-in location scenarios
+          route <scenario> [name|udid] Run a location scenario
+          location-clear [name|udid] Clear a location scenario
+          INSPECTION
+          defaults <bundle>           Read app UserDefaults
+          defaults-write <bundle> <key> <value> Write an app UserDefaults value
+          defaults-delete <bundle> <key> Delete an app UserDefaults value
+          logs [--last <duration>]    Read a bounded simulator log window
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -797,6 +844,14 @@ public enum CLI {
           --duration <seconds>        Recording duration (for record)
           --payload <json>            Push payload (takes precedence over file/stdin)
           --payload-file <path>       Read a push payload from a file
+          --type <type>               Defaults type: string, bool, int, float, array, dict
+          --last <duration>           Log window: 30s, 5m, or 1h (default: 1m)
+          --predicate <text>          Predicate for logs
+          --bundle <bundle-id>        Logs convenience subsystem predicate
+          --set <text>                Set pasteboard contents
+          statusbar flags             time, dataNetwork, wifiMode, wifiBars,
+                                      cellularMode, cellularBars, operatorName,
+                                      batteryState, batteryLevel
           Push input precedence: --payload, then --payload-file, then stdin.
 
         EXAMPLES
