@@ -74,12 +74,12 @@ public enum CLI {
           biometric-enroll <on|off> [name|udid] Set biometric enrollment
           biometric-match [match|nomatch] [name|udid] Trigger biometric result
           CONTENT AND INPUT
-          location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
           push [bundle]                 Send a push notification payload
           addmedia <path> [path ...]    Add media to the photo library
           pasteboard [--set <text>]     Read or set the device pasteboard
           LOCATION
+          location <lat> <lon> [dev]  Set the simulator's GPS position
           scenarios [name|udid]         List built-in location scenarios
           route <scenario> [name|udid]  Run a location scenario
           location-clear [name|udid]    Clear a location scenario
@@ -821,12 +821,12 @@ public enum CLI {
           biometric-enroll <on|off> [name|udid] Set biometric enrollment
           biometric-match [match|nomatch] [name|udid] Trigger biometric result
           CONTENT AND INPUT
-          location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
           push [bundle]               Send a push notification payload
           addmedia <path> [path ...]  Add media to the photo library
           pasteboard [--set <text>]   Read or set the device pasteboard
           LOCATION
+          location <lat> <lon> [dev]  Set the simulator's GPS position
           scenarios [name|udid]       List built-in location scenarios
           route <scenario> [name|udid] Run a location scenario
           location-clear [name|udid] Clear a location scenario
