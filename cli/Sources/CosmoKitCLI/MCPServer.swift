@@ -121,13 +121,10 @@ public enum MCPServer {
             let payloadValue = arguments["payload"] ?? NSNull()
             let payloadData: Data
             if let string = payloadValue as? String { payloadData = Data(string.utf8) }
-            else { guard JSONSerialization.isValidJSONObject(payloadValue) else { throw usageError("payload must be a JSON object") }; payloadData = try JSONSerialization.data(withJSONObject: payloadValue, options: []) }
-            guard let payloadObject = try? JSONSerialization.jsonObject(with: payloadData), let payload = payloadObject as? [String: Any] else { throw usageError("payload is not valid JSON") }
-            guard payload["aps"] != nil else { throw usageError("payload must contain aps") }
-            guard payloadData.count <= 4096 else { throw usageError("payload is \(payloadData.count) bytes; maximum is 4096") }
-            let bundle = try optionalString(arguments, key: "bundle_id") ?? (payload["Simulator Target Bundle"] as? String)
-            guard let bundle else { throw usageError("bundle_id is required unless payload contains Simulator Target Bundle") }
-            var args = [bundle, "--payload", String(decoding: payloadData, as: UTF8.self)]
+            else { guard JSONSerialization.isValidJSONObject(payloadValue) else { throw usageError("payload must be JSON-serializable") }; payloadData = try JSONSerialization.data(withJSONObject: payloadValue, options: []) }
+            let bundleID = try optionalString(arguments, key: "bundle_id")
+            let validation = try CLI.validatePushPayload(payloadData, bundleID: bundleID)
+            var args = [validation.bundle, "--payload", String(decoding: payloadData, as: UTF8.self)]
             if let device = try optionalString(arguments, key: "device") { args += ["--device", device] }
             return ("push", args, nil)
         case "list_location_scenarios":
@@ -427,7 +424,7 @@ public enum MCPServer {
             tool("run_location_scenario", "Run a simulated location route until clear_location is called; unlike set_location this keeps moving, and omit device to use the booted simulator.", properties: ["scenario": ["type": "string", "description": "Scenario name, preserving spaces"], "device": device], required: ["scenario"]),
             tool("clear_location", "Stop a running location scenario and clear the fixed location; omit device to use the booted simulator.", properties: ["device": device], required: []),
             tool("read_defaults", "Read an app's UserDefaults by resolving its data container path; an empty result means the app has not written defaults yet.", properties: ["bundle_id": ["type": "string"], "device": device], required: ["bundle_id"]),
-            tool("write_default", "Write an app UserDefaults value. Restart the app for the changed default to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "value": ["description": "String, number, boolean, array, or dictionary"], "type": ["type": "string", "enum": ["string", "bool", "int", "float", "array", "dict"]], "device": device], required: ["bundle_id", "key", "value"]),
+            tool("write_default", "Write an app UserDefaults value. Restart the app for the changed default to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "value": ["type": ["string", "number", "boolean", "array", "object"], "description": "String, number, boolean, array, or dictionary"], "type": ["type": "string", "enum": ["string", "bool", "int", "float", "array", "dict"]], "device": device], required: ["bundle_id", "key", "value"]),
             tool("delete_default", "Delete an app UserDefaults value. Restart the app for the change to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "device": device], required: ["bundle_id", "key"]),
             tool("get_logs", "Read the last bounded simulator log window, keeping at most the last 500 lines.", properties: ["last": ["type": "string", "description": "30s, 5m, or 1h; defaults to 1m"], "predicate": ["type": "string"], "bundle_id": ["type": "string", "description": "Convenience subsystem predicate when predicate is omitted"], "device": device], required: [])
         ]
