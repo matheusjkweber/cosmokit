@@ -274,6 +274,22 @@ final class MCPServerTests: XCTestCase {
         XCTAssertNil(target["error"])
     }
 
+    func testSharedPushValidatorDistinguishesJSONShapes() throws {
+        XCTAssertThrowsError(try CLI.validatePushPayload(Data("[1,2]".utf8), bundleID: "x")) { error in
+            XCTAssertTrue(error.localizedDescription.contains("JSON object at the top level"))
+        }
+        XCTAssertThrowsError(try CLI.validatePushPayload(Data("{\"aps\":".utf8), bundleID: "x")) { error in
+            XCTAssertTrue(error.localizedDescription.contains("payload is not valid JSON:"))
+        }
+        let result = try CLI.validatePushPayload(Data("{\"aps\":{}}".utf8), bundleID: "com.example.app")
+        XCTAssertEqual(result.bundle, "com.example.app")
+        XCTAssertEqual(result.byteCount, 10)
+    }
+
+    func testScenarioParserRemovesDuplicateRowsAndSorts() {
+        XCTAssertEqual(CLI.parseScenarios("Name                 Description\nApple                Apple\nApple                Apple\n"), ["Apple"])
+    }
+
     func testOversizedPushReportsPayloadSize() throws {
         let payload = String(repeating: "x", count: 5000)
         let arguments: [String: Any] = ["payload": ["aps": ["alert": payload]], "bundle_id": "x"]
