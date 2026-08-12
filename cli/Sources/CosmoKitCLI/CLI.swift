@@ -55,6 +55,12 @@ public enum CLI {
           location <lat> <lon> [dev]  Set the simulator's GPS position
           open <url> [name|udid]      Open a deep link
           erase [name|udid]           Erase a simulator back to a fresh install
+          apps [name|udid]            List installed apps
+          install <path> [name|udid]  Install an app bundle
+          uninstall <bundle> [name|udid] Uninstall an app
+          launch <bundle> [name|udid] Launch an app
+          terminate <bundle> [name|udid] Terminate an app
+          container <bundle> [kind] [name|udid] Get an app container path
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -235,6 +241,54 @@ public enum CLI {
             try runSimctl(["erase", device.udid])
             return CommandOutcome(human: "Erased \(device.name)", json: ErasePayload(udid: device.udid, name: device.name))
 
+        case "apps":
+            let device = try resolveDevice(args.first)
+            let apps = try parseInstalledApps(runSimctl(["listapps", device.udid]))
+            let human = apps.map { "\($0.bundleID)  \($0.name)  \($0.path)" }.joined(separator: "\n")
+            return CommandOutcome(human: human, json: AppsPayload(udid: device.udid, name: device.name, apps: apps))
+
+        case "install":
+            guard let path = args.first, !path.isEmpty else {
+                throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit install <path> [name|udid] (missing path)"))
+            }
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            try runSimctl(["install", device.udid, path])
+            return CommandOutcome(human: "Installed \(path) on \(device.name)", json: InstallPayload(udid: device.udid, name: device.name, path: path))
+
+        case "uninstall":
+            let bundleID = try requiredBundle(args, command: "uninstall")
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            try runSimctl(["uninstall", device.udid, bundleID])
+            return CommandOutcome(human: "Uninstalled \(bundleID) from \(device.name)", json: UninstallPayload(udid: device.udid, name: device.name, bundleID: bundleID))
+
+        case "launch":
+            let bundleID = try requiredBundle(args, command: "launch")
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            let simctlOutput = try runSimctl(["launch", device.udid, bundleID])
+            let pid = simctlOutput.split(whereSeparator: { $0 == ":" || $0 == " " || $0 == "\n" }).compactMap { Int($0) }.first
+            return CommandOutcome(human: simctlOutput.trimmingCharacters(in: .whitespacesAndNewlines), json: LaunchPayload(udid: device.udid, name: device.name, bundleID: bundleID, pid: pid))
+
+        case "terminate":
+            let bundleID = try requiredBundle(args, command: "terminate")
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            try runSimctl(["terminate", device.udid, bundleID])
+            return CommandOutcome(human: "Terminated \(bundleID) on \(device.name)", json: TerminatePayload(udid: device.udid, name: device.name, bundleID: bundleID))
+
+        case "container":
+            let bundleID = try requiredBundle(args, command: "container")
+            let kind: String
+            if args.count < 2 {
+                kind = "app"
+            } else if ["app", "data", "groups"].contains(args[1]) {
+                kind = args[1]
+            } else {
+                throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit container <bundle> [app|data|groups] [name|udid]"))
+            }
+            let device = try resolveDevice(args.count > 2 ? args[2] : nil)
+            let simctlArgs = kind == "app" ? ["get_app_container", device.udid, bundleID] : ["get_app_container", device.udid, bundleID, kind]
+            let path = try runSimctl(simctlArgs).trimmingCharacters(in: .whitespacesAndNewlines)
+            return CommandOutcome(human: path, json: ContainerPayload(udid: device.udid, name: device.name, bundleID: bundleID, kind: kind, path: path))
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
@@ -253,6 +307,26 @@ public enum CLI {
             throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit record --duration <seconds>"))
         }
         return duration
+    }
+
+    public static func parseInstalledApps(_ raw: String) throws -> [InstalledApp] {
+        let object = try PropertyListSerialization.propertyList(from: Data(raw.utf8), format: nil)
+        guard let dictionary = object as? [String: Any] else { return [] }
+        return dictionary.values.compactMap { $0 as? [String: Any] }.compactMap { entry in
+            let bundleID = (entry["CFBundleIdentifier"] as? String) ?? ""
+            guard !bundleID.isEmpty else { return nil }
+            let name = (entry["CFBundleDisplayName"] as? String) ?? (entry["CFBundleName"] as? String) ?? bundleID
+            let path = (entry["Bundle"] as? String) ?? (entry["Path"] as? String) ?? ""
+            let type = (entry["ApplicationType"] as? String) ?? ""
+            return InstalledApp(bundleID: bundleID, name: name, path: path, type: type)
+        }.sorted { $0.bundleID < $1.bundleID }
+    }
+
+    private static func requiredBundle(_ args: [String], command: String) throws -> String {
+        guard let bundle = args.first, !bundle.isEmpty else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit \(command) <bundle_id> [name|udid] (missing bundle_id)"))
+        }
+        return bundle
     }
 
     private static func resolveDevice(_ query: String?) throws -> Device {
@@ -377,4 +451,50 @@ public struct DevicePayload: Encodable {
 public struct DevicesPayload: Encodable {
     public let devices: [DevicePayload]
     public init(devices: [DevicePayload]) { self.devices = devices }
+}
+
+public struct InstalledApp: Codable {
+    public let bundleID: String
+    public let name: String
+    public let path: String
+    public let type: String
+
+    public init(bundleID: String, name: String, path: String, type: String) {
+        self.bundleID = bundleID
+        self.name = name
+        self.path = path
+        self.type = type
+    }
+}
+
+public struct AppsPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let apps: [InstalledApp]
+    public init(udid: String, name: String, apps: [InstalledApp]) { self.udid = udid; self.name = name; self.apps = apps }
+}
+
+public struct InstallPayload: Codable {
+    public let udid: String; public let name: String; public let path: String
+    public init(udid: String, name: String, path: String) { self.udid = udid; self.name = name; self.path = path }
+}
+
+public struct UninstallPayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String
+    public init(udid: String, name: String, bundleID: String) { self.udid = udid; self.name = name; self.bundleID = bundleID }
+}
+
+public struct LaunchPayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String; public let pid: Int?
+    public init(udid: String, name: String, bundleID: String, pid: Int?) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.pid = pid }
+}
+
+public struct TerminatePayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String
+    public init(udid: String, name: String, bundleID: String) { self.udid = udid; self.name = name; self.bundleID = bundleID }
+}
+
+public struct ContainerPayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String; public let kind: String; public let path: String
+    public init(udid: String, name: String, bundleID: String, kind: String, path: String) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.kind = kind; self.path = path }
 }
