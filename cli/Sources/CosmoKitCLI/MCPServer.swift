@@ -154,6 +154,34 @@ public enum MCPServer {
             var args = ["--set", text]
             if let device = try optionalString(arguments, key: "device") { args.append(device) }
             return ("pasteboard", args, nil)
+        case "read_defaults":
+            let bundle = try requiredString(arguments, key: "bundle_id")
+            let device = try optionalString(arguments, key: "device")
+            return ("defaults", [bundle] + (device.map { [$0] } ?? []), nil)
+        case "write_default":
+            let bundle = try requiredString(arguments, key: "bundle_id")
+            let key = try requiredString(arguments, key: "key")
+            guard let value = arguments["value"] else { throw usageError("missing required argument: value") }
+            let explicitType = try optionalString(arguments, key: "type")
+            let (rendered, type) = try defaultValue(value, explicitType: explicitType)
+            var args = [bundle, key, rendered, "--type", type]
+            if let device = try optionalString(arguments, key: "device") { args += ["--device", device] }
+            return ("defaults-write", args, nil)
+        case "delete_default":
+            let bundle = try requiredString(arguments, key: "bundle_id")
+            let key = try requiredString(arguments, key: "key")
+            var args = [bundle, key]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("defaults-delete", args, nil)
+        case "get_logs":
+            var args: [String] = []
+            if let last = try optionalString(arguments, key: "last") { args += ["--last", try CLI.validateLogWindow(last)] }
+            if let predicate = try optionalString(arguments, key: "predicate") { args += ["--predicate", predicate] }
+            if let bundle = try optionalString(arguments, key: "bundle_id") { args += ["--bundle", bundle] }
+            if let device = try optionalString(arguments, key: "device") { args += ["--device", device] }
+            return ("logs", args, nil)
+        case "list_runtimes":
+            return ("runtimes", [], nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -318,6 +346,36 @@ public enum MCPServer {
         throw usageError("argument \(key) must be a boolean")
     }
 
+    private static func defaultValue(_ value: Any, explicitType: String?) throws -> (String, String) {
+        let allowed = ["string", "bool", "int", "float", "array", "dict"]
+        let inferred: String
+        let rendered: String
+        if let string = value as? String { inferred = "string"; rendered = string }
+        else if let bool = value as? Bool { inferred = "bool"; rendered = bool ? "true" : "false" }
+        else if let number = value as? NSNumber {
+            inferred = number.doubleValue.rounded() == number.doubleValue ? "int" : "float"
+            rendered = inferred == "int" ? String(number.intValue) : String(describing: number.doubleValue)
+        } else if JSONSerialization.isValidJSONObject(value), let data = try? JSONSerialization.data(withJSONObject: value, options: []) {
+            inferred = value is [Any] ? "array" : "dict"
+            rendered = String(decoding: data, as: UTF8.self)
+        } else { throw usageError("argument value must be a string, number, boolean, array, or dictionary") }
+        let type = explicitType ?? inferred
+        guard allowed.contains(type) else { throw usageError("type must be one of: \(allowed.joined(separator: ", "))") }
+        if type == "bool" {
+            guard let normalized = (rendered.lowercased() == "true" || rendered == "1") ? "true" : (rendered.lowercased() == "false" || rendered == "0" ? "false" : nil) else { throw usageError("bool value must be true or false") }
+            return (normalized, type)
+        }
+        if type == "int" {
+            guard let integer = Int(rendered) else { throw usageError("int value must be an integer") }
+            return (String(integer), type)
+        }
+        if type == "float" {
+            guard let number = Double(rendered) else { throw usageError("float value must be a number") }
+            return (String(describing: number), type)
+        }
+        return (rendered, type)
+    }
+
     private static func failureText(for error: Error) -> String {
         let commandError: CommandError
         if let cliError = error as? CLIError {
@@ -367,6 +425,11 @@ public enum MCPServer {
             tool("add_media", "Add one or more photo or video files to a simulator's library; omit device to use the booted simulator.", properties: ["paths": ["type": "array", "items": ["type": "string"]], "device": device], required: ["paths"]),
             tool("get_pasteboard", "Read the simulator pasteboard as text; omit device to use the booted simulator.", properties: ["device": device], required: []),
             tool("set_pasteboard", "Set simulator pasteboard text, replacing its current contents; omit device to use the booted simulator.", properties: ["text": ["type": "string"], "device": device], required: ["text"])
+            ,tool("read_defaults", "Read an app's UserDefaults by resolving its data container path; an empty result means the app has not written defaults yet.", properties: ["bundle_id": ["type": "string"], "device": device], required: ["bundle_id"])
+            ,tool("write_default", "Write an app UserDefaults value. Restart the app for the changed default to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "value": ["description": "String, number, boolean, array, or dictionary"], "type": ["type": "string", "enum": ["string", "bool", "int", "float", "array", "dict"]], "device": device], required: ["bundle_id", "key", "value"])
+            ,tool("delete_default", "Delete an app UserDefaults value. Restart the app for the change to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "device": device], required: ["bundle_id", "key"])
+            ,tool("get_logs", "Read the last bounded simulator log window, keeping at most the last 500 lines.", properties: ["last": ["type": "string", "description": "30s, 5m, or 1h; defaults to 1m"], "predicate": ["type": "string"], "bundle_id": ["type": "string", "description": "Convenience subsystem predicate when predicate is omitted"], "device": device], required: [])
+            ,tool("list_runtimes", "List installed simulator runtimes and device types; does not require a simulator.", properties: [:], required: [])
         ]
     }
 
