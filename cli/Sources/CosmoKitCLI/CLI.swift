@@ -75,6 +75,11 @@ public enum CLI {
           location-clear [name|udid]    Clear a location scenario
           addmedia <path> [path ...]    Add media to the photo library
           pasteboard [--set <text>]     Read or set the device pasteboard
+          defaults <bundle>              Read app UserDefaults
+          defaults-write <bundle> <key> <value> Write an app UserDefaults value
+          defaults-delete <bundle> <key> Delete an app UserDefaults value
+          logs [--last <duration>]       Read a bounded simulator log window
+          runtimes                       List runtimes and device types
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -404,6 +409,44 @@ public enum CLI {
             let contents = try runSimctl(["pbpaste", device.udid])
             return CommandOutcome(human: contents, json: PasteboardPayload(udid: device.udid, name: device.name, contents: contents, didSet: false))
 
+        case "defaults":
+            let parsed = try parseDefaultsReadArgs(args)
+            let device = try resolveDevice(parsed.device)
+            let (entries, note) = try readDefaults(device: device, bundleID: parsed.bundleID)
+            let human = entries.map { "\($0.key) = \($0.value) (\($0.type))" }.joined(separator: "\n")
+            return CommandOutcome(human: human.isEmpty ? (note ?? "") : human, json: DefaultsPayload(udid: device.udid, name: device.name, bundleID: parsed.bundleID, entries: entries, note: note))
+
+        case "defaults-write":
+            let parsed = try parseDefaultsWriteArgs(args)
+            let device = try resolveDevice(parsed.device)
+            let path = try defaultsPath(device: device, bundleID: parsed.bundleID)
+            try runSimctl(["spawn", device.udid, "defaults", "write", path, parsed.key, parsed.flag, parsed.value])
+            return CommandOutcome(human: "Wrote default \(parsed.key) for \(parsed.bundleID) on \(device.name); restart the app for the change to take effect", json: DefaultsWritePayload(udid: device.udid, name: device.name, bundleID: parsed.bundleID, key: parsed.key, value: parsed.value, type: parsed.type))
+
+        case "defaults-delete":
+            let parsed = try parseDefaultsDeleteArgs(args)
+            let device = try resolveDevice(parsed.device)
+            let path = try defaultsPath(device: device, bundleID: parsed.bundleID)
+            try runSimctl(["spawn", device.udid, "defaults", "delete", path, parsed.key])
+            return CommandOutcome(human: "Deleted default \(parsed.key) for \(parsed.bundleID) on \(device.name); restart the app for the change to take effect", json: DefaultsDeletePayload(udid: device.udid, name: device.name, bundleID: parsed.bundleID, key: parsed.key))
+
+        case "logs":
+            let parsed = try parseLogsArgs(args)
+            let device = try resolveDevice(parsed.device)
+            var simctlArgs = ["spawn", device.udid, "log", "show", "--last", parsed.window, "--style", "compact"]
+            if let predicate = parsed.predicate { simctlArgs += ["--predicate", predicate] }
+            let output = try runSimctl(simctlArgs)
+            let parsedLines = parseLogLines(output)
+            let lines = Array(parsedLines.suffix(500))
+            let payload = LogsPayload(udid: device.udid, name: device.name, lines: lines, totalLines: parsedLines.count, truncated: parsedLines.count > 500, predicate: parsed.predicate, window: parsed.window)
+            return CommandOutcome(human: lines.joined(separator: "\n"), json: payload)
+
+        case "runtimes":
+            let runtimes = try parseRuntimes(try runSimctl(["list", "runtimes", "--json"]))
+            let deviceTypes = try parseDeviceTypes(try runSimctl(["list", "devicetypes", "--json"]))
+            let payload = RuntimesPayload(runtimes: runtimes, deviceTypes: deviceTypes)
+            return CommandOutcome(human: runtimes.map { "\($0.name)  \($0.identifier)" }.joined(separator: "\n"), json: payload)
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
@@ -444,6 +487,27 @@ public enum CLI {
             lines.removeFirst()
         }
         return lines
+    }
+
+    public static func parseDefaultsEntries(_ raw: String) throws -> [DefaultsEntry] {
+        guard !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return [] }
+        let object = try PropertyListSerialization.propertyList(from: Data(raw.utf8), format: nil)
+        guard let dictionary = object as? [String: Any] else { return [] }
+        return dictionary.keys.sorted().map { key in
+            let value = dictionary[key]!
+            return DefaultsEntry(key: key, value: String(describing: value), type: defaultsType(value))
+        }
+    }
+
+    public static func parseLogLines(_ raw: String) -> [String] {
+        raw.split(separator: "\n", omittingEmptySubsequences: true).map(String.init)
+    }
+
+    public static func validateLogWindow(_ raw: String) throws -> String {
+        guard raw.range(of: "^[1-9][0-9]*[smh]$", options: .regularExpression) != nil else {
+            throw CLIError(commandError: CommandError(code: .usage, message: "--last must be a duration such as 30s, 5m, or 1h"))
+        }
+        return raw
     }
 
     private static func parsePush(_ args: [String]) throws -> (data: Data, bundleID: String?, targetBundle: String, device: String?) {
@@ -498,6 +562,146 @@ public enum CLI {
         let text = readsStdin ? nil : args[index + 1]
         let device = index + 2 < args.count ? args[index + 2] : nil
         return (text, device, readsStdin)
+    }
+
+    private static func parseDefaultsReadArgs(_ args: [String]) throws -> (bundleID: String, device: String?) {
+        guard let bundleID = args.first, !bundleID.isEmpty else { throw usage("defaults requires a bundle id") }
+        return (bundleID, args.count > 1 ? args[1] : nil)
+    }
+
+    private static func parseDefaultsWriteArgs(_ args: [String]) throws -> (bundleID: String, key: String, value: String, type: String, flag: String, device: String?) {
+        var positional: [String] = []
+        var type = "string"
+        var device: String?
+        var index = 0
+        while index < args.count {
+            if args[index] == "--type" {
+                guard index + 1 < args.count else { throw usage("--type requires one of: string, bool, int, float, array, dict") }
+                type = args[index + 1]; index += 2
+            } else if args[index] == "--device" {
+                guard index + 1 < args.count else { throw usage("--device requires a value") }
+                device = args[index + 1]; index += 2
+            } else {
+                positional.append(args[index]); index += 1
+            }
+        }
+        guard positional.count >= 3 else { throw usage("defaults-write requires <bundle> <key> <value>") }
+        if device == nil, positional.count > 3 { device = positional[3] }
+        let flags = ["string": "-string", "bool": "-bool", "int": "-int", "float": "-float", "array": "-array", "dict": "-dict"]
+        guard let flag = flags[type] else { throw usage("type must be one of: \(flags.keys.sorted().joined(separator: ", "))") }
+        var value = positional[2]
+        switch type {
+        case "bool":
+            guard let normalized = normalizeBool(value) else { throw usage("bool value must be true, false, YES, NO, 1, or 0") }
+            value = normalized
+        case "int":
+            guard let integer = Int(value) else { throw usage("int value must be an integer") }
+            value = String(integer)
+        case "float":
+            guard let number = Double(value) else { throw usage("float value must be a number") }
+            value = String(describing: number)
+        default: break
+        }
+        return (positional[0], positional[1], value, type, flag, device)
+    }
+
+    private static func parseDefaultsDeleteArgs(_ args: [String]) throws -> (bundleID: String, key: String, device: String?) {
+        guard args.count >= 2, !args[0].isEmpty, !args[1].isEmpty else { throw usage("defaults-delete requires <bundle> <key>") }
+        return (args[0], args[1], args.count > 2 ? args[2] : nil)
+    }
+
+    private static func parseLogsArgs(_ args: [String]) throws -> (window: String, predicate: String?, device: String?) {
+        var window = "1m"
+        var predicate: String?
+        var bundle: String?
+        var device: String?
+        var index = 0
+        while index < args.count {
+            switch args[index] {
+            case "--last", "--predicate", "--bundle", "--device":
+                guard index + 1 < args.count else { throw usage("(args[index]) requires a value") }
+                let value = args[index + 1]
+                switch args[index] {
+                case "--last": window = try validateLogWindow(value)
+                case "--predicate": predicate = value
+                case "--bundle": bundle = value
+                default: device = value
+                }
+                index += 2
+            default:
+                guard device == nil else { throw usage("logs accepts only one device") }
+                device = args[index]; index += 1
+            }
+        }
+        if predicate == nil, let bundle { predicate = "subsystem == \"\(bundle)\"" }
+        return (window, predicate, device)
+    }
+
+    private static func usage(_ message: String) -> CLIError {
+        CLIError(commandError: CommandError(code: .usage, message: message))
+    }
+
+    private static func normalizeBool(_ value: String) -> String? {
+        switch value.lowercased() {
+        case "true", "yes", "1": return "true"
+        case "false", "no", "0": return "false"
+        default: return nil
+        }
+    }
+
+    private static func defaultsPath(device: Device, bundleID: String) throws -> String {
+        let container = try runSimctl(["get_app_container", device.udid, bundleID, "data"]).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !container.isEmpty else { throw usage("simulator returned an empty data container path") }
+        return "\(container)/Library/Preferences/\(bundleID)"
+    }
+
+    private static func readDefaults(device: Device, bundleID: String) throws -> ([DefaultsEntry], String?) {
+        let path = try defaultsPath(device: device, bundleID: bundleID)
+        do {
+            let raw = try runSimctl(["spawn", device.udid, "defaults", "export", path, "-"])
+            let entries = try parseDefaultsEntries(raw)
+            if entries.isEmpty { return ([], "The app has written no defaults yet") }
+            return (entries, nil)
+        } catch {
+            let message = error.localizedDescription.lowercased()
+            if message.contains("no such file") || message.contains("not exist") || message.contains("could not be opened") || message.contains("empty") {
+                return ([], "The app has written no defaults yet")
+            }
+            throw error
+        }
+    }
+
+    private static func defaultsType(_ value: Any) -> String {
+        if value is String { return "string" }
+        if value is Bool { return "bool" }
+        if let number = value as? NSNumber {
+            return String(cString: number.objCType) == "d" || String(cString: number.objCType) == "f" ? "float" : "integer"
+        }
+        if value is [Any] { return "array" }
+        if value is [String: Any] { return "dictionary" }
+        if value is Data { return "data" }
+        if value is Date { return "date" }
+        return "string"
+    }
+
+    private static func parseRuntimes(_ raw: String) throws -> [Runtime] {
+        let object = try JSONSerialization.jsonObject(with: Data(raw.utf8)) as? [String: Any]
+        let items = object?["runtimes"] as? [[String: Any]] ?? []
+        return items.compactMap { item in
+            guard let identifier = item["identifier"] as? String, let name = item["name"] as? String else { return nil }
+            let version = item["version"] as? String ?? ""
+            let availability = item["isAvailable"] as? Bool ?? ((item["availability"] as? String) == "(available)")
+            return Runtime(identifier: identifier, name: name, version: version, isAvailable: availability)
+        }
+    }
+
+    private static func parseDeviceTypes(_ raw: String) throws -> [DeviceType] {
+        let object = try JSONSerialization.jsonObject(with: Data(raw.utf8)) as? [String: Any]
+        let items = object?["devicetypes"] as? [[String: Any]] ?? []
+        return items.compactMap { item in
+            guard let identifier = item["identifier"] as? String, let name = item["name"] as? String else { return nil }
+            return DeviceType(identifier: identifier, name: name)
+        }
     }
 
     private static func parseStatusBar(_ args: [String]) throws -> (overrides: [String: String], device: String?) {
@@ -774,4 +978,53 @@ public struct AddMediaPayload: Codable {
 public struct PasteboardPayload: Codable {
     public let udid: String; public let name: String; public let contents: String; public let didSet: Bool
     public init(udid: String, name: String, contents: String, didSet: Bool) { self.udid = udid; self.name = name; self.contents = contents; self.didSet = didSet }
+}
+
+public struct DefaultsEntry: Codable {
+    public let key: String
+    public let value: String
+    public let type: String
+    public init(key: String, value: String, type: String) { self.key = key; self.value = value; self.type = type }
+}
+
+public struct DefaultsPayload: Codable {
+    public let udid: String
+    public let name: String
+    public let bundleID: String
+    public let entries: [DefaultsEntry]
+    public let note: String?
+    public init(udid: String, name: String, bundleID: String, entries: [DefaultsEntry], note: String?) {
+        self.udid = udid; self.name = name; self.bundleID = bundleID; self.entries = entries; self.note = note
+    }
+}
+
+public struct DefaultsWritePayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String; public let key: String; public let value: String; public let type: String
+    public init(udid: String, name: String, bundleID: String, key: String, value: String, type: String) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.key = key; self.value = value; self.type = type }
+}
+
+public struct DefaultsDeletePayload: Codable {
+    public let udid: String; public let name: String; public let bundleID: String; public let key: String
+    public init(udid: String, name: String, bundleID: String, key: String) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.key = key }
+}
+
+public struct LogsPayload: Codable {
+    public let udid: String; public let name: String; public let lines: [String]; public let totalLines: Int; public let truncated: Bool; public let predicate: String?; public let window: String
+    public init(udid: String, name: String, lines: [String], totalLines: Int, truncated: Bool, predicate: String?, window: String) { self.udid = udid; self.name = name; self.lines = lines; self.totalLines = totalLines; self.truncated = truncated; self.predicate = predicate; self.window = window }
+}
+
+public struct Runtime: Codable {
+    public let identifier: String; public let name: String; public let version: String; public let isAvailable: Bool
+    public init(identifier: String, name: String, version: String, isAvailable: Bool) { self.identifier = identifier; self.name = name; self.version = version; self.isAvailable = isAvailable }
+}
+
+public struct DeviceType: Codable {
+    public let identifier: String; public let name: String
+    public init(identifier: String, name: String) { self.identifier = identifier; self.name = name }
+}
+
+public struct RuntimesPayload: Codable {
+    public let runtimes: [Runtime]
+    public let deviceTypes: [DeviceType]
+    public init(runtimes: [Runtime], deviceTypes: [DeviceType]) { self.runtimes = runtimes; self.deviceTypes = deviceTypes }
 }
