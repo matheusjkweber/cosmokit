@@ -215,7 +215,7 @@ The `set_location` tool schema looks like this when pretty-printed:
       },
       "device": {
         "type": "string",
-        "description": "UDID, exact name, or partial name; omit to use the booted simulator"
+        "description": "UDID or name; omit for the booted simulator"
       },
       "latitude": {
         "type": "number",
