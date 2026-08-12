@@ -117,7 +117,7 @@
       },
       "ai": {
         "title": "Funciona com o seu agente de IA",
-        "description": "Rode cosmokit mcp e qualquer cliente MCP, como o Claude Code ou o Cursor, descobre oito ferramentas de simulador para chamar com argumentos tipados: inicializar, captura, vídeo, GPS e deep links. Todo comando também aceita --json, então um agente que só roda shell recebe um resultado estruturado para interpretar, em vez de texto corrido."
+        "description": "Rode cosmokit mcp e qualquer cliente MCP, como o Claude Code ou o Cursor, descobre 32 ferramentas de simulador para chamar com argumentos tipados: instalar e abrir apps, tirar capturas e gravar vídeo, reproduzir rotas de GPS, disparar payloads de push, mudar permissões e ler UserDefaults e logs. Todo comando também aceita --json, então um agente que só roda shell recebe um resultado estruturado para interpretar, em vez de texto corrido."
       },
       "cli": {
         "title": "CLI cosmokit",
