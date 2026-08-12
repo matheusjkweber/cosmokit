@@ -42,6 +42,37 @@ public enum MCPServer {
             var args = [url]
             if let device = try optionalString(arguments, key: "device") { args.append(device) }
             return ("open", args, nil)
+        case "list_apps":
+            return ("apps", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "install_app":
+            let path = try requiredString(arguments, key: "path")
+            var args = [path]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("install", args, nil)
+        case "uninstall_app":
+            let bundleID = try requiredString(arguments, key: "bundle_id")
+            var args = [bundleID]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("uninstall", args, nil)
+        case "launch_app":
+            let bundleID = try requiredString(arguments, key: "bundle_id")
+            var args = [bundleID]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("launch", args, nil)
+        case "terminate_app":
+            let bundleID = try requiredString(arguments, key: "bundle_id")
+            var args = [bundleID]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("terminate", args, nil)
+        case "app_container":
+            let bundleID = try requiredString(arguments, key: "bundle_id")
+            let kind = try optionalString(arguments, key: "kind") ?? "app"
+            guard ["app", "data", "groups"].contains(kind) else {
+                throw usageError("argument kind must be one of: app, data, groups")
+            }
+            var args = [bundleID, kind]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            return ("container", args, nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -211,7 +242,13 @@ public enum MCPServer {
             tool("record_video", "Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": "Directory where the timestamped MP4 should be written"], "duration": ["type": "number", "description": "Number of seconds to record"]], required: ["duration"]),
             tool("set_location", "Set a simulator's GPS location using latitude and longitude; omit device to use the booted simulator.", properties: ["device": device, "latitude": ["type": "number", "description": "Latitude in decimal degrees"], "longitude": ["type": "number", "description": "Longitude in decimal degrees"]], required: ["latitude", "longitude"]),
             tool("open_url", "Open a deep link or URL in a simulator; omit device to use the booted simulator.", properties: ["device": device, "url": ["type": "string", "description": "URL or deep link to open"]], required: ["url"]),
-            tool("erase_simulator", "Erase a simulator back to a fresh install by UDID, exact name, or partial name; omit device to use the booted simulator.", properties: ["device": device], required: [])
+            tool("erase_simulator", "Erase a simulator back to a fresh install by UDID, exact name, or partial name; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("list_apps", "List installed apps and return bundle identifiers, display names, paths, and application types; omit device to use the booted simulator.", properties: ["device": device], required: []),
+            tool("install_app", "Install an .app bundle on a simulator; provide its path and optionally a device, otherwise the booted simulator is used.", properties: ["path": ["type": "string", "description": "Path to the .app bundle"], "device": device], required: ["path"]),
+            tool("uninstall_app", "Uninstall an app by bundle identifier; optionally provide a device, otherwise the booted simulator is used.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
+            tool("launch_app", "Launch an installed app by bundle identifier and return its child PID when simctl reports one; optionally provide a device.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
+            tool("terminate_app", "Terminate an installed app by bundle identifier; optionally provide a device, otherwise the booted simulator is used.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
+            tool("app_container", "Return the path to an app, data, or shared-app-groups container by bundle identifier; omit kind for the app container and omit device for the booted simulator.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "kind": ["type": "string", "enum": ["app", "data", "groups"], "description": "Container kind; defaults to app"], "device": device], required: ["bundle_id"])
         ]
     }
 
