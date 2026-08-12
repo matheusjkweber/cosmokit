@@ -189,7 +189,8 @@
       "f5": "Deep links",
       "f6": "Simulação de localização GPS",
       "f7": "5 entradas salvas por ferramenta",
-      "f8": "1 perfil de app"
+      "f8": "Ferramentas do simulador (aparência, barra de status, permissões, Face ID, keychain)",
+      "f9": "1 perfil de app"
     },
     "proFeatures": {
       "f1": "Simuladores ilimitados",
@@ -238,11 +239,11 @@
       },
       "q3": {
         "question": "O que está incluído no plano gratuito?",
-        "answer": "O plano gratuito inclui captura de tela e vídeo (com marca d'água), notificações push, teste de deep links, simulação de localização GPS, 1 perfil de app e 5 entradas salvas por ferramenta. Suporta um simulador por vez."
+        "answer": "O plano gratuito inclui captura de tela e gravação (com marca d'água), notificações push, teste de deep links, simulação de GPS, as ferramentas do simulador (aparência, barra de status, permissões, Face ID, keychain), o editor de UserDefaults, 1 perfil de app e 5 itens salvos por ferramenta. Ele suporta um simulador por vez."
       },
       "q4": {
         "question": "O que o CosmoKit Pro desbloqueia?",
-        "answer": "O Pro remove todas as marcas d'água, libera simuladores e perfis de app ilimitados, adiciona molduras e bordas de dispositivo nas capturas, gravação de áudio, indicadores de toque, proporções personalizadas, proxy de rede, ferramentas completas de gerenciamento de apps, o editor de UserDefaults, controles de aparência/barra de status/permissões/Face ID/chaveiro do simulador, rotas de localização e entradas salvas ilimitadas."
+        "answer": "O Pro remove todas as marcas d'água, libera simuladores e perfis de app ilimitados, adiciona molduras e bordas de dispositivo nas capturas, gravação de áudio, indicadores de toque, proporções personalizadas, proxy de rede, todas as ferramentas de gerenciamento de apps, geração de capturas para a App Store, rotas de localização e itens salvos ilimitados."
       },
       "q5": {
         "question": "Como funciona a cobrança?",

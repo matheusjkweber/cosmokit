@@ -189,7 +189,8 @@
       "f5": "Deep links",
       "f6": "GPS location simulation",
       "f7": "5 saved entries per tool",
-      "f8": "1 app profile"
+      "f8": "Simulator tools (appearance, status bar, permissions, Face ID, keychain)",
+      "f9": "1 app profile"
     },
     "proFeatures": {
       "f1": "Unlimited simulators",
@@ -238,11 +239,11 @@
       },
       "q3": {
         "question": "What's included in the free tier?",
-        "answer": "The free tier includes screenshot and video capture (with watermark), push notifications, deep link testing, GPS location simulation, 1 app profile, and 5 saved entries per tool. It supports one simulator at a time."
+        "answer": "The free tier includes screenshot and video capture (with watermark), push notifications, deep link testing, GPS location simulation, the simulator tools (appearance, status bar, permissions, Face ID, keychain), the UserDefaults editor, 1 app profile, and 5 saved entries per tool. It supports one simulator at a time."
       },
       "q4": {
         "question": "What does CosmoKit Pro unlock?",
-        "answer": "Pro removes all watermarks, unlocks unlimited simulators and app profiles, adds device frames and bezels for screenshots, audio recording, touch indicators, custom aspect ratios, network proxy, full app management tools, the UserDefaults editor, simulator appearance/status bar/permissions/Face ID/keychain controls, location routes, and unlimited saved entries."
+        "answer": "Pro removes all watermarks, unlocks unlimited simulators and unlimited app profiles, adds device frames and bezels for screenshots, audio recording, touch indicators, custom aspect ratios, network proxy, full app management tools, App Store screenshot generation, location routes, and unlimited saved entries."
       },
       "q5": {
         "question": "How does billing work?",

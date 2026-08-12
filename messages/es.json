@@ -189,7 +189,8 @@
       "f5": "Deep links",
       "f6": "Simulación de ubicación GPS",
       "f7": "5 entradas guardadas por herramienta",
-      "f8": "1 perfil de app"
+      "f8": "Herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain)",
+      "f9": "1 perfil de app"
     },
     "proFeatures": {
       "f1": "Simuladores ilimitados",
@@ -238,11 +239,11 @@
       },
       "q3": {
         "question": "¿Qué incluye el plan gratuito?",
-        "answer": "El plan gratuito incluye captura de pantalla y video (con marca de agua), notificaciones push, prueba de deep links, simulación de ubicación GPS, 1 perfil de app y 5 entradas guardadas por herramienta. Admite un simulador a la vez."
+        "answer": "El plan gratuito incluye captura de pantalla y grabación (con marca de agua), notificaciones push, prueba de deep links, simulación de GPS, las herramientas del simulador (apariencia, barra de estado, permisos, Face ID, keychain), el editor de UserDefaults, 1 perfil de app y 5 elementos guardados por herramienta. Admite un simulador a la vez."
       },
       "q4": {
         "question": "¿Qué desbloquea CosmoKit Pro?",
-        "answer": "Pro elimina todas las marcas de agua, desbloquea simuladores y perfiles de app ilimitados, añade marcos y biseles de dispositivo en las capturas, grabación de audio, indicadores de toque, proporciones personalizadas, proxy de red, herramientas completas de gestión de apps, el editor de UserDefaults, controles de apariencia/barra de estado/permisos/Face ID/llavero del simulador, rutas de ubicación y entradas guardadas ilimitadas."
+        "answer": "Pro quita todas las marcas de agua, desbloquea simuladores y perfiles de app ilimitados, añade marcos y biseles de dispositivo en las capturas, grabación de audio, indicadores táctiles, proporciones personalizadas, proxy de red, todas las herramientas de gestión de apps, generación de capturas para la App Store, rutas de ubicación y elementos guardados ilimitados."
       },
       "q5": {
         "question": "¿Cómo funciona la facturación?",
