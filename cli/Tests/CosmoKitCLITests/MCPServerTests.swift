@@ -8,6 +8,8 @@ final class MCPServerTests: XCTestCase {
         "install_app", "uninstall_app", "launch_app", "terminate_app", "app_container",
         "set_appearance", "set_status_bar", "clear_status_bar", "set_permission",
         "set_biometric_enrollment", "match_biometric"
+        ,"send_push", "list_location_scenarios", "run_location_scenario", "clear_location",
+        "add_media", "get_pasteboard", "set_pasteboard"
     ]
 
     override func tearDown() {
@@ -238,6 +240,54 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(received, ["match"])
     }
 
+    func testSendPushPreservesValidatedJSONObject() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":{"aps":{"alert":"Hello"}},"bundle_id":"com.example.app"}}}"#)
+        XCTAssertEqual(received[0], "com.example.app")
+        XCTAssertEqual(received[1], "--payload")
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(received[2].utf8)) as? [String: Any])
+        XCTAssertNotNil(payload["aps"])
+    }
+
+    func testPushValidationFailuresAndTargetBundle() throws {
+        let missingAPS = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":{},"bundle_id":"x"}}}"#)
+        XCTAssertEqual(try toolErrorCode(missingAPS), "usage")
+        let array = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":[1,2],"bundle_id":"x"}}}"#)
+        XCTAssertEqual(try toolErrorCode(array), "usage")
+        let target = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"send_push","arguments":{"payload":{"aps":{},"Simulator Target Bundle":"com.target"}}}}"#)
+        XCTAssertNil(target["error"])
+    }
+
+    func testOversizedPushReportsPayloadSize() throws {
+        let payload = String(repeating: "x", count: 5000)
+        let arguments: [String: Any] = ["payload": ["aps": ["alert": payload]], "bundle_id": "x"]
+        let data = try JSONSerialization.data(withJSONObject: ["jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": ["name": "send_push", "arguments": arguments]])
+        let response = try object(for: String(decoding: data, as: UTF8.self))
+        XCTAssertEqual(try toolErrorCode(response), "usage")
+        XCTAssertTrue((try toolErrorMessage(response)).contains("bytes"))
+    }
+
+    func testRoutesAndScenarioParsingPreserveNames() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"run_location_scenario","arguments":{"scenario":"City Run"}}}"#)
+        XCTAssertEqual(received, ["City Run"])
+        XCTAssertEqual(CLI.parseScenarios("Header\n\n City Run \nOcean Drive  \n"), ["City Run", "Ocean Drive"])
+    }
+
+    func testMediaAndPasteboardMappings() throws {
+        var calls: [(String, [String])] = []
+        MCPServer.execute = { command, args, _ in calls.append((command, args)); return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"add_media","arguments":{"paths":"/tmp/photo.jpg"}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"set_pasteboard","arguments":{"text":"hello"}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_pasteboard","arguments":{}}}"#)
+        XCTAssertEqual(calls.map { $0.0 }, ["addmedia", "pasteboard", "pasteboard"])
+        XCTAssertEqual(calls[0].1, ["/tmp/photo.jpg"])
+        XCTAssertEqual(calls[1].1, ["--set", "hello"])
+        XCTAssertEqual(calls[2].1, [])
+    }
+
     func testInitializeNegotiatesCurrentVersionAndServerInfo() throws {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}"#)
         XCTAssertEqual(protocolVersion(response), "2025-06-18")
@@ -270,7 +320,7 @@ final class MCPServerTests: XCTestCase {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)
         let result = response["result"] as! [String: Any]
         let tools = result["tools"] as! [[String: Any]]
-        XCTAssertEqual(tools.count, 20)
+        XCTAssertEqual(tools.count, 27)
         XCTAssertEqual(Set(tools.compactMap { $0["name"] as? String }), toolNames)
         for tool in tools {
             let schema = tool["inputSchema"] as! [String: Any]

@@ -70,6 +70,15 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(try json(BiometricMatchPayload(udid: "U", name: "iPhone", result: "match")), "{\"name\":\"iPhone\",\"result\":\"match\",\"udid\":\"U\"}")
     }
 
+    func testContentPayloadsEncodeWithStableKeys() throws {
+        XCTAssertEqual(try json(PushPayload(udid: "U", name: "iPhone", bundleID: "com.example.app", payloadBytes: 42)), "{\"bundleID\":\"com.example.app\",\"name\":\"iPhone\",\"payloadBytes\":42,\"udid\":\"U\"}")
+        XCTAssertEqual(try json(ScenariosPayload(udid: "U", name: "iPhone", scenarios: ["City Run"])), "{\"name\":\"iPhone\",\"scenarios\":[\"City Run\"],\"udid\":\"U\"}")
+        XCTAssertEqual(try json(RoutePayload(udid: "U", name: "iPhone", scenario: "City Run")), "{\"name\":\"iPhone\",\"scenario\":\"City Run\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(LocationClearPayload(udid: "U", name: "iPhone")), "{\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(AddMediaPayload(udid: "U", name: "iPhone", paths: ["/tmp/a.jpg"], count: 1)), "{\"count\":1,\"name\":\"iPhone\",\"paths\":[\"\\/tmp\\/a.jpg\"],\"udid\":\"U\"}")
+        XCTAssertEqual(try json(PasteboardPayload(udid: "U", name: "iPhone", contents: "hello", didSet: true)), "{\"contents\":\"hello\",\"didSet\":true,\"name\":\"iPhone\",\"udid\":\"U\"}")
+    }
+
     private func json<T: Encodable>(_ value: T) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
