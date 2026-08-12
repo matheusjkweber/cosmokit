@@ -286,6 +286,35 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(result.byteCount, 10)
     }
 
+    func testPushTargetResolutionMatchesAcrossCliAndMCP() throws {
+        let payload = #"{"aps":{},"Simulator Target Bundle":"com.b"}"#
+        let cli = try CLI.parsePush(["com.a", "--payload", payload])
+        let validated = try CLI.validatePushPayload(cli.data, bundleID: cli.bundleID)
+        let invocation = try MCPServer.commandInvocation(tool: "send_push", arguments: ["payload": payload, "bundle_id": "com.a"])
+        XCTAssertEqual(cli.targetBundle, "com.a")
+        XCTAssertEqual(validated.bundle, "com.a")
+        XCTAssertEqual(invocation.args.first, "com.a")
+    }
+
+    func testPushTargetResolutionUsesPayloadOrExplicitBundle() throws {
+        let payloadTarget = try CLI.validatePushPayload(Data(#"{"aps":{},"Simulator Target Bundle":"com.b"}"#.utf8), bundleID: nil)
+        let explicitTarget = try CLI.validatePushPayload(Data(#"{"aps":{}}"#.utf8), bundleID: "com.a")
+        XCTAssertEqual(payloadTarget.bundle, "com.b")
+        XCTAssertEqual(explicitTarget.bundle, "com.a")
+        XCTAssertThrowsError(try CLI.validatePushPayload(Data(#"{"aps":{}}"#.utf8), bundleID: nil)) { error in
+            XCTAssertTrue(error.localizedDescription.contains("bundle id is required unless payload contains Simulator Target Bundle"))
+        }
+    }
+
+    func testReadmeUsesCurrentDeviceDescription() throws {
+        let readme = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("README.md")
+        let text = try String(contentsOf: readme, encoding: .utf8)
+        XCTAssertTrue(text.contains("UDID or name; omit for the booted simulator"))
+        XCTAssertFalse(text.contains("UDID, exact name, or partial name; omit to use the booted simulator"))
+    }
+
     func testScenarioParserRemovesDuplicateRowsAndSorts() {
         XCTAssertEqual(CLI.parseScenarios("Name                 Description\nApple                Apple\nApple                Apple\n"), ["Apple"])
     }

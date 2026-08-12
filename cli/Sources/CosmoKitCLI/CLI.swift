@@ -526,6 +526,7 @@ public enum CLI {
         }
         guard dictionary["aps"] != nil else { throw CLIError(commandError: CommandError(code: .usage, message: "payload must contain aps")) }
         guard data.count <= 4096 else { throw CLIError(commandError: CommandError(code: .usage, message: "payload is \(data.count) bytes; maximum is 4096")) }
+        // An explicit bundle argument states this invocation's intent and wins over reusable payload metadata.
         let targetBundle = dictionary["Simulator Target Bundle"] as? String ?? ""
         guard let bundle = bundleID ?? (targetBundle.isEmpty ? nil : targetBundle) else {
             throw CLIError(commandError: CommandError(code: .usage, message: "bundle id is required unless payload contains Simulator Target Bundle"))
@@ -554,7 +555,7 @@ public enum CLI {
         return raw
     }
 
-    private static func parsePush(_ args: [String]) throws -> (data: Data, bundleID: String?, targetBundle: String, device: String?) {
+    public static func parsePush(_ args: [String]) throws -> (data: Data, bundleID: String?, targetBundle: String, device: String?) {
         var bundleID: String?
         var payload: String?
         var payloadFile: String?
@@ -581,9 +582,7 @@ public enum CLI {
         else if let payloadFile { guard let fileData = FileManager.default.contents(atPath: payloadFile) else { throw CLIError(commandError: CommandError(code: .usage, message: "payload file does not exist: \(payloadFile)")) }; data = fileData }
         else { data = FileHandle.standardInput.readDataToEndOfFile() }
         let validation = try validatePushPayload(data, bundleID: bundleID)
-        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let targetBundle = object?["Simulator Target Bundle"] as? String ?? ""
-        return (data, bundleID, targetBundle.isEmpty ? validation.bundle : targetBundle, device)
+        return (data, bundleID, validation.bundle, device)
     }
 
     private static func parseMediaArgs(_ args: [String]) throws -> ([String], String?) {
