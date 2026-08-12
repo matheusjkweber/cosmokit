@@ -9,7 +9,8 @@ final class MCPServerTests: XCTestCase {
         "set_appearance", "set_status_bar", "clear_status_bar", "set_permission",
         "set_biometric_enrollment", "match_biometric"
         ,"send_push", "list_location_scenarios", "run_location_scenario", "clear_location",
-        "add_media", "get_pasteboard", "set_pasteboard"
+        "add_media", "get_pasteboard", "set_pasteboard", "read_defaults", "write_default",
+        "delete_default", "get_logs", "list_runtimes"
     ]
 
     override func tearDown() {
@@ -320,7 +321,7 @@ final class MCPServerTests: XCTestCase {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)
         let result = response["result"] as! [String: Any]
         let tools = result["tools"] as! [[String: Any]]
-        XCTAssertEqual(tools.count, 27)
+        XCTAssertEqual(tools.count, 32)
         XCTAssertEqual(Set(tools.compactMap { $0["name"] as? String }), toolNames)
         for tool in tools {
             let schema = tool["inputSchema"] as! [String: Any]
@@ -333,6 +334,88 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(capture["required"] as? [String], [])
         let location = try tool(named: "set_location", in: tools)
         XCTAssertEqual(Set(location["required"] as? [String] ?? []), ["latitude", "longitude"])
+    }
+
+    func testDefaultsReadResolvesContainerBeforeExport() throws {
+        let device = Device(udid: "UDID", name: "iPhone", state: "Booted", isAvailable: true)
+        CLI.resolveDeviceForTesting = { _ in device }
+        var calls: [[String]] = []
+        CLI.runSimctlForTesting = { args in
+            calls.append(args)
+            if args.starts(with: ["get_app_container", "UDID", "com.example.app", "data"]) {
+                return "/var/mobile/Containers/Data/Application/ABC\n"
+            }
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><plist version=\"1.0\"><dict><key>enabled</key><true/><key>count</key><integer>3</integer><key>title</key><string>Hello</string><key>items</key><array><string>a</string></array></dict></plist>"
+        }
+        let outcome = try CLI.perform(command: "defaults", args: ["com.example.app", "UDID"], output: nil)
+        let envelope = try jsonObject(String(decoding: outcome.jsonData(), as: UTF8.self))
+        XCTAssertEqual(calls, [
+            ["get_app_container", "UDID", "com.example.app", "data"],
+            ["spawn", "UDID", "defaults", "export", "/var/mobile/Containers/Data/Application/ABC/Library/Preferences/com.example.app", "-"]
+        ])
+        XCTAssertEqual((envelope["entries"] as? [[String: Any]])?.compactMap { $0["type"] as? String }, ["integer", "bool", "array", "string"])
+    }
+
+    func testMissingDefaultsPlistIsSuccessfulWithNote() throws {
+        let device = Device(udid: "U", name: "iPhone", state: "Booted", isAvailable: true)
+        CLI.resolveDeviceForTesting = { _ in device }
+        CLI.runSimctlForTesting = { args in
+            if args.first == "get_app_container" { return "/container" }
+            throw SimctlError(kind: .commandFailed, message: "file does not exist")
+        }
+        let outcome = try CLI.perform(command: "defaults", args: ["com.example.app"], output: nil)
+        let envelope = try jsonObject(String(decoding: outcome.jsonData(), as: UTF8.self))
+        XCTAssertEqual((envelope["entries"] as? [[String: Any]])?.count, 0)
+        XCTAssertEqual(envelope["note"] as? String, "The app has written no defaults yet")
+    }
+
+    func testDefaultWriteInferenceAndExplicitType() throws {
+        var received: (String, [String])?
+        MCPServer.execute = { command, args, _ in
+            received = (command, args)
+            return CommandOutcome(human: "ok", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"write_default","arguments":{"bundle_id":"com.example.app","key":"enabled","value":true}}}"#)
+        XCTAssertEqual(received?.0, "defaults-write")
+        XCTAssertEqual(received?.1, ["com.example.app", "enabled", "true", "--type", "bool"])
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"write_default","arguments":{"bundle_id":"com.example.app","key":"count","value":3}}}"#)
+        XCTAssertEqual(received?.1, ["com.example.app", "count", "3", "--type", "int"])
+        _ = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"write_default","arguments":{"bundle_id":"com.example.app","key":"ratio","value":1.5}}}"#)
+        XCTAssertEqual(received?.1, ["com.example.app", "ratio", "1.5", "--type", "float"])
+        _ = try object(for: #"{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"write_default","arguments":{"bundle_id":"com.example.app","key":"count","value":3,"type":"string"}}}"#)
+        XCTAssertEqual(received?.1, ["com.example.app", "count", "3", "--type", "string"])
+        let invalid = try object(for: #"{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"write_default","arguments":{"bundle_id":"x","key":"k","value":true,"type":"bogus"}}}"#)
+        XCTAssertEqual(try toolErrorCode(invalid), "usage")
+    }
+
+    func testLogsValidateWindowPredicateAndBoundLines() throws {
+        var received: [String] = []
+        MCPServer.execute = { command, args, _ in
+            received = args
+            return CommandOutcome(human: "logs", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_logs","arguments":{"bundle_id":"com.example.app"}}}"#)
+        XCTAssertEqual(received, ["--bundle", "com.example.app"])
+        let invalid = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_logs","arguments":{"last":"banana"}}}"#)
+        XCTAssertEqual(try toolErrorCode(invalid), "usage")
+        let lines = (1...900).map(String.init).joined(separator: "\n")
+        let parsed = CLI.parseLogLines(lines)
+        let bounded = Array(parsed.suffix(500))
+        XCTAssertEqual(bounded.count, 500)
+        XCTAssertEqual(parsed.count, 900)
+        XCTAssertEqual(bounded.first, "401")
+    }
+
+    func testRuntimesDoesNotResolveDevice() throws {
+        CLI.resolveDeviceForTesting = { _ in XCTFail("runtimes must not resolve a device"); return Device(udid: "", name: "", state: "", isAvailable: false) }
+        var calls: [[String]] = []
+        CLI.runSimctlForTesting = { args in
+            calls.append(args)
+            if args == ["list", "runtimes", "--json"] { return #"{"runtimes":[]}"# }
+            return #"{"devicetypes":[]}"#
+        }
+        _ = try CLI.perform(command: "runtimes", args: [], output: nil)
+        XCTAssertEqual(calls, [["list", "runtimes", "--json"], ["list", "devicetypes", "--json"]])
     }
 
     func testUnknownMethodEchoesIdAndErrorCode() throws {
