@@ -4,7 +4,8 @@ import XCTest
 final class MCPServerTests: XCTestCase {
     private let toolNames: Set<String> = [
         "list_simulators", "boot_simulator", "shutdown_simulator", "capture_screenshot",
-        "record_video", "set_location", "open_url", "erase_simulator"
+        "record_video", "set_location", "open_url", "erase_simulator", "list_apps",
+        "install_app", "uninstall_app", "launch_app", "terminate_app", "app_container"
     ]
 
     override func tearDown() {
@@ -132,6 +133,52 @@ final class MCPServerTests: XCTestCase {
         XCTAssertNil(response["isError"])
     }
 
+    func testListAppsMapsWithoutArguments() throws {
+        var received: (String, [String])?
+        MCPServer.execute = { command, args, _ in
+            received = (command, args)
+            return CommandOutcome(human: "", json: AppsPayload(udid: "U", name: "iPhone", apps: []))
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_apps","arguments":{}}}"#)
+        XCTAssertEqual(received?.0, "apps")
+        XCTAssertEqual(received?.1, [])
+    }
+
+    func testInstallAndUninstallMapArguments() throws {
+        var calls: [(String, [String])] = []
+        MCPServer.execute = { command, args, _ in
+            calls.append((command, args))
+            return CommandOutcome(human: "", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"install_app","arguments":{"path":"/tmp/My.app"}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"uninstall_app","arguments":{"bundle_id":"com.example.app"}}}"#)
+        XCTAssertEqual(calls.map { $0.0 }, ["install", "uninstall"])
+        XCTAssertEqual(calls.map { $0.1 }, [["/tmp/My.app"], ["com.example.app"]])
+    }
+
+    func testLaunchMissingBundleIDIsUsage() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"launch_app","arguments":{}}}"#)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+        XCTAssertTrue((try toolErrorMessage(response)).contains("bundle_id"))
+    }
+
+    func testAppContainerMapsKindAndDefaultsToApp() throws {
+        var calls: [[String]] = []
+        MCPServer.execute = { _, args, _ in
+            calls.append(args)
+            return CommandOutcome(human: "", json: EmptyPayload())
+        }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"app_container","arguments":{"bundle_id":"x","kind":"data"}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"app_container","arguments":{"bundle_id":"x"}}}"#)
+        XCTAssertEqual(calls, [["x", "data"], ["x", "app"]])
+    }
+
+    func testAppContainerRejectsInvalidKind() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"app_container","arguments":{"bundle_id":"x","kind":"bogus"}}}"#)
+        XCTAssertEqual((response["result"] as? [String: Any])?["isError"] as? Bool, true)
+        XCTAssertEqual(try toolErrorCode(response), "usage")
+    }
+
     func testInitializeNegotiatesCurrentVersionAndServerInfo() throws {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}"#)
         XCTAssertEqual(protocolVersion(response), "2025-06-18")
@@ -164,7 +211,7 @@ final class MCPServerTests: XCTestCase {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)
         let result = response["result"] as! [String: Any]
         let tools = result["tools"] as! [[String: Any]]
-        XCTAssertEqual(tools.count, 8)
+        XCTAssertEqual(tools.count, 14)
         XCTAssertEqual(Set(tools.compactMap { $0["name"] as? String }), toolNames)
         for tool in tools {
             let schema = tool["inputSchema"] as! [String: Any]
@@ -232,6 +279,10 @@ final class MCPServerTests: XCTestCase {
 
     private func toolErrorCode(_ response: [String: Any]) throws -> String? {
         try (jsonObject(toolText(response))["error"] as? [String: Any])?["code"] as? String
+    }
+
+    private func toolErrorMessage(_ response: [String: Any]) throws -> String {
+        try ((jsonObject(toolText(response))["error"] as? [String: Any])?["message"] as? String) ?? ""
     }
 
     private func protocolVersion(_ response: [String: Any]) -> String? {

@@ -16,6 +16,51 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(try json(BootPayload(udid: "UDID", name: "iPhone", alreadyBooted: true)), "{\"alreadyBooted\":true,\"name\":\"iPhone\",\"udid\":\"UDID\"}")
     }
 
+    func testAppPayloadsEncodeWithStableKeys() throws {
+        XCTAssertEqual(try json(InstallPayload(udid: "U", name: "iPhone", path: "/tmp/My.app")), "{\"name\":\"iPhone\",\"path\":\"\\/tmp\\/My.app\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(UninstallPayload(udid: "U", name: "iPhone", bundleID: "com.example.app")), "{\"bundleID\":\"com.example.app\",\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(LaunchPayload(udid: "U", name: "iPhone", bundleID: "com.example.app", pid: 123)), "{\"bundleID\":\"com.example.app\",\"name\":\"iPhone\",\"pid\":123,\"udid\":\"U\"}")
+        XCTAssertEqual(try json(TerminatePayload(udid: "U", name: "iPhone", bundleID: "com.example.app")), "{\"bundleID\":\"com.example.app\",\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(ContainerPayload(udid: "U", name: "iPhone", bundleID: "com.example.app", kind: "data", path: "/data/app")), "{\"bundleID\":\"com.example.app\",\"kind\":\"data\",\"name\":\"iPhone\",\"path\":\"\\/data\\/app\",\"udid\":\"U\"}")
+    }
+
+    func testLaunchPayloadWithNilPIDKeepsIdentity() throws {
+        let data = try JSONEncoder().encode(LaunchPayload(udid: "U", name: "iPhone", bundleID: "com.example.app", pid: nil))
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(object["bundleID"] as? String, "com.example.app")
+        XCTAssertEqual(object["udid"] as? String, "U")
+        XCTAssertEqual(object["name"] as? String, "iPhone")
+    }
+
+    func testListAppsParsesOpenStepPlist() throws {
+        let sample = #"""
+        {
+            "com.example.alpha" = {
+                CFBundleIdentifier = "com.example.alpha";
+                CFBundleDisplayName = "Alpha App";
+                Bundle = "/Applications/Alpha.app";
+                ApplicationType = User;
+            };
+            "com.apple.system" = {
+                CFBundleIdentifier = "com.apple.system";
+                CFBundleDisplayName = "System; Tools";
+                Path = "/Applications/System.app";
+                ApplicationType = System;
+            };
+            "com.example.fallback" = {
+                CFBundleIdentifier = "com.example.fallback";
+                CFBundleName = "Fallback";
+            };
+        }
+        """#
+        let apps = try CLI.parseInstalledApps(sample)
+        XCTAssertEqual(apps.map(\.bundleID), ["com.apple.system", "com.example.alpha", "com.example.fallback"])
+        XCTAssertEqual(apps[0].name, "System; Tools")
+        XCTAssertEqual(apps[0].type, "System")
+        XCTAssertEqual(apps[1].path, "/Applications/Alpha.app")
+        XCTAssertEqual(apps[2].name, "Fallback")
+    }
+
     private func json<T: Encodable>(_ value: T) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
