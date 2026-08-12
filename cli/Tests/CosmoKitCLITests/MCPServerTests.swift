@@ -12,6 +12,16 @@ final class MCPServerTests: XCTestCase {
         "add_media", "get_pasteboard", "set_pasteboard", "read_defaults", "write_default",
         "delete_default", "get_logs", "list_runtimes"
     ]
+    private let orderedToolNames = [
+        "list_simulators", "list_runtimes",
+        "boot_simulator", "shutdown_simulator", "erase_simulator",
+        "list_apps", "install_app", "uninstall_app", "launch_app", "terminate_app", "app_container",
+        "capture_screenshot", "record_video",
+        "set_appearance", "set_status_bar", "clear_status_bar", "set_permission", "set_biometric_enrollment", "match_biometric",
+        "open_url", "send_push", "add_media", "get_pasteboard", "set_pasteboard",
+        "set_location", "list_location_scenarios", "run_location_scenario", "clear_location",
+        "read_defaults", "write_default", "delete_default", "get_logs"
+    ]
 
     override func tearDown() {
         MCPServer.execute = { try CLI.perform(command: $0, args: $1, output: $2) }
@@ -317,16 +327,21 @@ final class MCPServerTests: XCTestCase {
         XCTAssertNil(MCPServer.handle(line: #"{"jsonrpc":"2.0","method":"anything"}"#))
     }
 
-    func testToolsListAdvertisesEightToolsAndSchemas() throws {
+    func testToolsListAdvertisesGroupedToolSurfaceAndSchemas() throws {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)
         let result = response["result"] as! [String: Any]
         let tools = result["tools"] as! [[String: Any]]
         XCTAssertEqual(tools.count, 32)
+        XCTAssertEqual(tools.compactMap { $0["name"] as? String }, orderedToolNames)
         XCTAssertEqual(Set(tools.compactMap { $0["name"] as? String }), toolNames)
         for tool in tools {
+            XCTAssertTrue((tool["description"] as? String)?.count ?? 0 >= 40)
             let schema = tool["inputSchema"] as! [String: Any]
             XCTAssertEqual(schema["type"] as? String, "object")
-            XCTAssertNotNil(schema["properties"] as? [String: Any])
+            let properties = schema["properties"] as? [String: Any] ?? [:]
+            for required in schema["required"] as? [String] ?? [] {
+                XCTAssertNotNil(properties[required], "required key \(required) missing from properties")
+            }
         }
         let record = try tool(named: "record_video", in: tools)
         XCTAssertEqual(record["required"] as? [String], ["duration"])
