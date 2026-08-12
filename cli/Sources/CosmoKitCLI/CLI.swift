@@ -9,6 +9,7 @@
 //
 
 import Foundation
+import SystemConfiguration
 
 /// What a command produced. `human` is the exact line the CLI has always
 /// printed; `json` is the same result as an encodable payload.
@@ -40,7 +41,7 @@ public enum CLI {
     public static let version = "0.1.0"
     public static var runSimctlForTesting: (_ arguments: [String]) throws -> String = { try Simctl.run($0) }
     public static var runSimctlTimedForTesting: (_ arguments: [String], _ timeout: TimeInterval) throws -> String = { try Simctl.run($0, timeout: $1) }
-    public static var runScutilForTesting: () throws -> String = { try runScutilProcess() }
+    public static var proxySourceForTesting: () -> [String: Any]? = { SCDynamicStoreCopyProxies(nil) as? [String: Any] }
     public static var resolveDeviceForTesting: (_ query: String?) throws -> Device = { try Simctl.resolveDevice($0) }
 
     static func printUsage() {
@@ -486,8 +487,8 @@ public enum CLI {
             return CommandOutcome(human: "Reset keychain on \(device.name)", json: KeychainPayload(udid: device.udid, name: device.name, action: "reset", path: nil))
 
         case "proxy-status":
-            let payload = parseProxyStatus(try runScutil())
-            return CommandOutcome(human: "HTTP \(payload.httpEnabled ? "on" : "off"), HTTPS \(payload.httpsEnabled ? "on" : "off")", json: payload)
+            let payload = parseProxyStatus(proxySourceForTesting())
+            return CommandOutcome(human: proxyHumanText(payload), json: payload)
 
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
@@ -663,34 +664,22 @@ public enum CLI {
         catch { throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription)) }
     }
 
-    private static func runScutil() throws -> String {
-        do { return try runScutilForTesting() }
-        catch { throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription)) }
-    }
-
-    private static func runScutilProcess() throws -> String {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/sbin/scutil")
-        process.arguments = ["--proxy"]
-        let output = Pipe()
-        process.standardOutput = output
-        try process.run()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else { throw SimctlError(kind: .commandFailed, message: "scutil --proxy failed") }
-        return String(decoding: data, as: UTF8.self)
-    }
-
-    public static func parseProxyStatus(_ raw: String) -> ProxyStatusPayload {
-        guard let object = try? PropertyListSerialization.propertyList(from: Data(raw.utf8), format: nil),
-              let dictionary = object as? [String: Any] else {
-            return ProxyStatusPayload(httpEnabled: false, httpHost: nil, httpPort: nil, httpsEnabled: false, httpsHost: nil, httpsPort: nil, bypassList: [])
-        }
+    public static func parseProxyStatus(_ dictionary: [String: Any]?) -> ProxyStatusPayload {
+        guard let dictionary else { return ProxyStatusPayload(httpEnabled: false, httpHost: nil, httpPort: nil, httpsEnabled: false, httpsHost: nil, httpsPort: nil, bypassList: []) }
         func bool(_ key: String) -> Bool { (dictionary[key] as? NSNumber)?.boolValue ?? false }
         func string(_ key: String) -> String? { dictionary[key] as? String }
         func integer(_ key: String) -> Int? { (dictionary[key] as? NSNumber)?.intValue }
         let bypass = (dictionary["ExceptionsList"] as? [Any])?.compactMap { $0 as? String } ?? []
         return ProxyStatusPayload(httpEnabled: bool("HTTPEnable"), httpHost: string("HTTPProxy"), httpPort: integer("HTTPPort"), httpsEnabled: bool("HTTPSEnable"), httpsHost: string("HTTPSProxy"), httpsPort: integer("HTTPSPort"), bypassList: bypass)
+    }
+
+    public static func proxyHumanText(_ payload: ProxyStatusPayload) -> String {
+        func line(_ label: String, enabled: Bool, host: String?, port: Int?) -> String {
+            guard enabled else { return "\(label) off" }
+            return "\(label) on at \(host ?? "unknown"):\(port.map(String.init) ?? "unknown")"
+        }
+        let bypass = payload.bypassList.isEmpty ? "" : " (\(payload.bypassList.count) bypass rules)"
+        return "\(line("HTTP", enabled: payload.httpEnabled, host: payload.httpHost, port: payload.httpPort)), \(line("HTTPS", enabled: payload.httpsEnabled, host: payload.httpsHost, port: payload.httpsPort))\(bypass)"
     }
 
     private static func parseDefaultsReadArgs(_ args: [String]) throws -> (bundleID: String, device: String?) {
