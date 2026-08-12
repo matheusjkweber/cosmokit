@@ -1,4 +1,5 @@
 import XCTest
+import SystemConfiguration
 @testable import CosmoKitCLI
 
 final class MCPServerTests: XCTestCase {
@@ -27,7 +28,7 @@ final class MCPServerTests: XCTestCase {
         MCPServer.execute = { try CLI.perform(command: $0, args: $1, output: $2) }
         CLI.runSimctlForTesting = { try Simctl.run($0) }
         CLI.runSimctlTimedForTesting = { try Simctl.run($0, timeout: $1) }
-        CLI.runScutilForTesting = { "" }
+        CLI.proxySourceForTesting = { SCDynamicStoreCopyProxies(nil) as? [String: Any] }
         CLI.resolveDeviceForTesting = { try Simctl.resolveDevice($0) }
         super.tearDown()
     }
@@ -373,15 +374,23 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(calls.map { $0.0 }, ["keychain", "keychain-reset", "proxy-status"])
     }
 
-    func testProxyStatusParsesDisabledEnabledAndInvalidFixtures() throws {
-        let disabled = #"<?xml version="1.0"?><plist version="1.0"><dict><key>HTTPEnable</key><integer>0</integer><key>HTTPSEnable</key><integer>0</integer></dict></plist>"#
-        let enabled = #"<?xml version="1.0"?><plist version="1.0"><dict><key>HTTPEnable</key><integer>1</integer><key>HTTPProxy</key><string>proxy.local</string><key>HTTPPort</key><integer>8080</integer><key>HTTPSEnable</key><integer>1</integer><key>HTTPSProxy</key><string>secure.local</string><key>HTTPSPort</key><integer>8443</integer><key>ExceptionsList</key><array><string>localhost</string><string>*.local</string></array></dict></plist>"#
+    func testProxyStatusReadsSystemConfigurationShape() throws {
+        let disabled: [String: Any] = ["HTTPEnable": 0, "HTTPSEnable": 0]
+        let enabled: [String: Any] = ["HTTPEnable": 1, "HTTPProxy": "proxy.local", "HTTPPort": 8080, "HTTPSEnable": 1, "HTTPSProxy": "secure.local", "HTTPSPort": 8443, "ExceptionsList": ["localhost", "*.local"], "__SCOPED__": ["ignored": ["HTTPEnable": 1]]]
         XCTAssertFalse(CLI.parseProxyStatus(disabled).httpEnabled)
         let status = CLI.parseProxyStatus(enabled)
         XCTAssertEqual(status.httpsHost, "secure.local")
         XCTAssertEqual(status.httpsPort, 8443)
         XCTAssertEqual(status.bypassList, ["localhost", "*.local"])
-        XCTAssertFalse(CLI.parseProxyStatus("not a dictionary").httpsEnabled)
+        XCTAssertFalse(CLI.parseProxyStatus(nil).httpsEnabled)
+        XCTAssertTrue(CLI.proxyHumanText(status).contains("HTTPS on at secure.local:8443"))
+        XCTAssertTrue(CLI.proxyHumanText(status).contains("2 bypass rules"))
+    }
+
+    func testRealProxySourceContainsSystemConfigurationKeys() throws {
+        let source = SCDynamicStoreCopyProxies(nil) as? [String: Any]
+        XCTAssertNotNil(source)
+        XCTAssertNotNil(source?["HTTPEnable"])
     }
 
     func testOversizedPushReportsPayloadSize() throws {
