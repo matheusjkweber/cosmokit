@@ -250,7 +250,8 @@ The CLI can install the CA a simulator needs and report the system proxy that
 simulators inherit. Capturing traffic and rewriting responses remain in the
 CosmoKit app, where the proxy engine, TLS stack, and privileged helper live.
 The CLI deliberately does not toggle the system proxy live because that changes
-every network service on the Mac and requires root authorization.
+every network service on the Mac and requires root authorization. This boundary
+keeps the free CLI simctl-only while the app owns the privileged proxy workflow.
 
 send_push requires a JSON object containing aps and rejects payloads over 4096
 bytes. Defaults tools address the bundle's preferences by absolute path inside
