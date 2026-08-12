@@ -183,6 +183,16 @@ public enum MCPServer {
             return ("logs", args, nil)
         case "list_runtimes":
             return ("runtimes", [], nil)
+        case "install_certificate":
+            let path = try requiredString(arguments, key: "path")
+            var args = [path]
+            if let device = try optionalString(arguments, key: "device") { args.append(device) }
+            if let untrusted = arguments["untrusted"] as? Bool, untrusted { args.append("--untrusted") }
+            return ("keychain", args, nil)
+        case "reset_keychain":
+            return ("keychain-reset", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
+        case "proxy_status":
+            return ("proxy-status", [], nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -418,6 +428,8 @@ public enum MCPServer {
             tool("set_permission", "Grant, revoke, or reset a simulator privacy permission; some changes terminate the running app, and omit device to use the booted simulator.", properties: ["action": ["type": "string", "enum": ["grant", "revoke", "reset"]], "service": ["type": "string", "enum": ["all", "calendar", "contacts-limited", "contacts", "location", "location-always", "photos-add", "photos", "media-library", "microphone", "motion", "reminders", "siri"]], "bundle_id": ["type": "string"], "device": device], required: ["action", "service"]),
             tool("set_biometric_enrollment", "Set biometric enrollment on or off; enrollment must be on before a biometric match can affect an app prompt, and omit device to use the booted simulator.", properties: ["enrolled": ["type": "boolean"], "device": device], required: ["enrolled"]),
             tool("match_biometric", "Post a Face ID or Touch ID match result while an app is showing its biometric prompt; enrollment must be on first, and omit device to use the booted simulator.", properties: ["result": ["type": "string", "enum": ["match", "nomatch"]], "device": device], required: []),
+            tool("install_certificate", "Install a certificate into the simulator keychain; add-root-cert makes its CA trusted, so a holder of the private key can read HTTPS traffic. Reset the keychain to undo it.", properties: ["path": ["type": "string", "description": "Certificate file path"], "untrusted": ["type": "boolean", "description": "Use add-cert instead of the trusted root action"], "device": device], required: ["path"]),
+            tool("reset_keychain", "Reset the simulator keychain, undoing installed debugging certificates and restoring its clean trust state.", properties: ["device": device], required: []),
             tool("open_url", "Open a deep link or URL in a simulator; omit device to use the booted simulator.", properties: ["device": device, "url": ["type": "string", "description": "URL or deep link to open"]], required: ["url"]),
             tool("send_push", "Send a validated APNs push payload to an app; payload must be a JSON object with aps and may include Simulator Target Bundle, otherwise provide bundle_id.", properties: ["payload": ["type": "object", "description": "JSON push payload containing aps"], "bundle_id": ["type": "string"], "device": device], required: ["payload"]),
             tool("add_media", "Add one or more photo or video files to a simulator's library; omit device to use the booted simulator.", properties: ["paths": ["type": "array", "items": ["type": "string"]], "device": device], required: ["paths"]),
@@ -430,7 +442,8 @@ public enum MCPServer {
             tool("read_defaults", "Read an app's UserDefaults by resolving its data container path; an empty result means the app has not written defaults yet.", properties: ["bundle_id": ["type": "string"], "device": device], required: ["bundle_id"]),
             tool("write_default", "Write an app UserDefaults value. Restart the app for the changed default to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "value": ["type": ["string", "number", "boolean", "array", "object"], "description": "String, number, boolean, array, or dictionary"], "type": ["type": "string", "enum": ["string", "bool", "int", "float", "array", "dict"]], "device": device], required: ["bundle_id", "key", "value"]),
             tool("delete_default", "Delete an app UserDefaults value. Restart the app for the change to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "device": device], required: ["bundle_id", "key"]),
-            tool("get_logs", "Read the last bounded simulator log window, keeping at most the last 500 lines.", properties: ["last": ["type": "string", "description": "30s, 5m, or 1h; defaults to 1m"], "predicate": ["type": "string"], "bundle_id": ["type": "string", "description": "Convenience subsystem predicate when predicate is omitted"], "device": device], required: [])
+            tool("get_logs", "Read the last bounded simulator log window, keeping at most the last 500 lines.", properties: ["last": ["type": "string", "description": "30s, 5m, or 1h; defaults to 1m"], "predicate": ["type": "string"], "bundle_id": ["type": "string", "description": "Convenience subsystem predicate when predicate is omitted"], "device": device], required: []),
+            tool("proxy_status", "Read the system HTTP and HTTPS proxy inherited by simulators, including hosts, ports, and bypass entries; this command never changes settings.", properties: [:], required: [])
         ]
     }
 
