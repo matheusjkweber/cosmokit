@@ -8,6 +8,10 @@
 import Foundation
 
 public enum MCPServer {
+    /// Shared across device-bearing schemas so tools/list does not repeat boilerplate.
+    private static let deviceDescription = "UDID or name; omit for the booted simulator"
+    private static let outputDirectoryDescription = "Directory for the timestamped output file"
+
     /// How a tool call reaches the simulator. Tests substitute a stub so the
     /// mapping can be proven without a simulator.
     public static var execute: (_ command: String, _ args: [String], _ output: String?) throws -> CommandOutcome = {
@@ -392,7 +396,7 @@ public enum MCPServer {
     private static func tools() -> [[String: Any]] {
         let device = [
             "type": "string",
-            "description": "UDID, exact name, or partial name; omit to use the booted simulator"
+            "description": deviceDescription
         ]
         return [
             tool("list_simulators", "List available iOS Simulators, sorted by name. Takes no arguments.", properties: [:], required: []),
@@ -406,8 +410,8 @@ public enum MCPServer {
             tool("launch_app", "Launch an installed app by bundle identifier and return its child PID when simctl reports one; optionally provide a device.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
             tool("terminate_app", "Terminate an installed app by bundle identifier; optionally provide a device, otherwise the booted simulator is used.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "device": device], required: ["bundle_id"]),
             tool("app_container", "Return the path to an app, data, or shared-app-groups container by bundle identifier; omit kind for the app container and omit device for the booted simulator.", properties: ["bundle_id": ["type": "string", "description": "Installed app bundle identifier"], "kind": ["type": "string", "enum": ["app", "data", "groups"], "description": "Container kind; defaults to app"], "device": device], required: ["bundle_id"]),
-            tool("capture_screenshot", "Capture a PNG screenshot from a simulator; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": "Directory where the timestamped PNG should be written"]], required: []),
-            tool("record_video", "Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": "Directory where the timestamped MP4 should be written"], "duration": ["type": "number", "description": "Number of seconds to record"]], required: ["duration"]),
+            tool("capture_screenshot", "Capture a PNG screenshot from a simulator; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": outputDirectoryDescription]], required: []),
+            tool("record_video", "Record simulator video for a fixed number of seconds; omit device to use the booted simulator and output to use the current directory.", properties: ["device": device, "output": ["type": "string", "description": outputDirectoryDescription], "duration": ["type": "number", "description": "Number of seconds to record"]], required: ["duration"]),
             tool("set_appearance", "Set or read a simulator's light or dark appearance; omit appearance to read the current value and omit device to use the booted simulator.", properties: ["appearance": ["type": "string", "enum": ["light", "dark"]], "device": device], required: []),
             tool("set_status_bar", "Override simulator status bar values for a screenshot; provide at least one override and omit device to use the booted simulator.", properties: ["time": ["type": "string"], "battery_level": ["type": "number"], "battery_state": ["type": "string"], "wifi_bars": ["type": "number"], "cellular_bars": ["type": "number"], "cellular_mode": ["type": "string"], "data_network": ["type": "string"], "operator_name": ["type": "string"], "device": device], required: []),
             tool("clear_status_bar", "Clear all simulator status bar overrides; omit device to use the booted simulator.", properties: ["device": device], required: []),
