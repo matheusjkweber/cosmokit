@@ -61,6 +61,15 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(apps[2].name, "Fallback")
     }
 
+    func testSimulatorStatePayloadsEncodeWithStableKeys() throws {
+        XCTAssertEqual(try json(AppearancePayload(udid: "U", name: "iPhone", appearance: "dark")), "{\"appearance\":\"dark\",\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(StatusBarPayload(udid: "U", name: "iPhone", overrides: ["time": "9:41"])), "{\"name\":\"iPhone\",\"overrides\":{\"time\":\"9:41\"},\"udid\":\"U\"}")
+        XCTAssertEqual(try json(StatusBarClearPayload(udid: "U", name: "iPhone")), "{\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(PermissionPayload(udid: "U", name: "iPhone", action: "grant", service: "photos", bundleID: "com.example.app")), "{\"action\":\"grant\",\"bundleID\":\"com.example.app\",\"name\":\"iPhone\",\"service\":\"photos\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(BiometricEnrollPayload(udid: "U", name: "iPhone", enrolled: true)), "{\"enrolled\":true,\"name\":\"iPhone\",\"udid\":\"U\"}")
+        XCTAssertEqual(try json(BiometricMatchPayload(udid: "U", name: "iPhone", result: "match")), "{\"name\":\"iPhone\",\"result\":\"match\",\"udid\":\"U\"}")
+    }
+
     private func json<T: Encodable>(_ value: T) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]

@@ -5,11 +5,15 @@ final class MCPServerTests: XCTestCase {
     private let toolNames: Set<String> = [
         "list_simulators", "boot_simulator", "shutdown_simulator", "capture_screenshot",
         "record_video", "set_location", "open_url", "erase_simulator", "list_apps",
-        "install_app", "uninstall_app", "launch_app", "terminate_app", "app_container"
+        "install_app", "uninstall_app", "launch_app", "terminate_app", "app_container",
+        "set_appearance", "set_status_bar", "clear_status_bar", "set_permission",
+        "set_biometric_enrollment", "match_biometric"
     ]
 
     override func tearDown() {
         MCPServer.execute = { try CLI.perform(command: $0, args: $1, output: $2) }
+        CLI.runSimctlForTesting = { try Simctl.run($0) }
+        CLI.resolveDeviceForTesting = { try Simctl.resolveDevice($0) }
         super.tearDown()
     }
 
@@ -179,6 +183,61 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(try toolErrorCode(response), "usage")
     }
 
+    func testAppearanceMapsAndReadsWithoutArguments() throws {
+        var calls: [[String]] = []
+        MCPServer.execute = { _, args, _ in calls.append(args); return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_appearance","arguments":{"appearance":"dark"}}}"#)
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"set_appearance","arguments":{}}}"#)
+        XCTAssertEqual(calls, [["dark"], []])
+    }
+
+    func testAppearanceRejectsUnknownValue() throws {
+        let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_appearance","arguments":{"appearance":"sepia"}}}"#)
+        XCTAssertEqual(try toolErrorCode(response), "usage")
+        XCTAssertTrue((try toolErrorMessage(response)).contains("light"))
+    }
+
+    func testStatusBarMapsIntegerAndRejectsEmptyOrOutOfRange() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_status_bar","arguments":{"time":"9:41","battery_level":100}}}"#)
+        XCTAssertEqual(received, ["--time", "9:41", "--batteryLevel", "100"])
+        let empty = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"set_status_bar","arguments":{}}}"#)
+        XCTAssertEqual(try toolErrorCode(empty), "usage")
+        let high = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"set_status_bar","arguments":{"battery_level":150}}}"#)
+        XCTAssertEqual(try toolErrorCode(high), "usage")
+    }
+
+    func testPermissionValidation() throws {
+        let missing = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"set_permission","arguments":{"action":"grant","service":"photos"}}}"#)
+        XCTAssertEqual(try toolErrorCode(missing), "usage")
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"set_permission","arguments":{"action":"reset","service":"all"}}}"#)
+        XCTAssertEqual(received, ["reset", "all"])
+        let invalid = try object(for: #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"set_permission","arguments":{"action":"reset","service":"unknown"}}}"#)
+        XCTAssertEqual(try toolErrorCode(invalid), "usage")
+        XCTAssertTrue((try toolErrorMessage(invalid)).contains("photos"))
+    }
+
+    func testBiometricEnrollmentPostsStateThenChange() throws {
+        var calls: [[String]] = []
+        CLI.runSimctlForTesting = { args in calls.append(args); return "" }
+        CLI.resolveDeviceForTesting = { _ in Device(udid: "U", name: "Test Device", state: "Booted", isAvailable: true) }
+        _ = try CLI.perform(command: "biometric-enroll", args: ["on"], output: nil)
+        XCTAssertEqual(calls, [
+            ["spawn", "U", "notifyutil", "-s", "com.apple.BiometricKit.enrollmentChanged", "1"],
+            ["spawn", "U", "notifyutil", "-p", "com.apple.BiometricKit.enrollmentChanged"]
+        ])
+    }
+
+    func testBiometricMatchDefaultsToMatch() throws {
+        var received: [String] = []
+        MCPServer.execute = { _, args, _ in received = args; return CommandOutcome(human: "", json: EmptyPayload()) }
+        _ = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"match_biometric","arguments":{}}}"#)
+        XCTAssertEqual(received, ["match"])
+    }
+
     func testInitializeNegotiatesCurrentVersionAndServerInfo() throws {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}"#)
         XCTAssertEqual(protocolVersion(response), "2025-06-18")
@@ -211,7 +270,7 @@ final class MCPServerTests: XCTestCase {
         let response = try object(for: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#)
         let result = response["result"] as! [String: Any]
         let tools = result["tools"] as! [[String: Any]]
-        XCTAssertEqual(tools.count, 14)
+        XCTAssertEqual(tools.count, 20)
         XCTAssertEqual(Set(tools.compactMap { $0["name"] as? String }), toolNames)
         for tool in tools {
             let schema = tool["inputSchema"] as! [String: Any]
