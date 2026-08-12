@@ -38,6 +38,8 @@ public struct CLIError: LocalizedError {
 
 public enum CLI {
     public static let version = "0.1.0"
+    public static var runSimctlForTesting: (_ arguments: [String]) throws -> String = { try Simctl.run($0) }
+    public static var resolveDeviceForTesting: (_ query: String?) throws -> Device = { try Simctl.resolveDevice($0) }
 
     static func printUsage() {
         print("""
@@ -61,6 +63,12 @@ public enum CLI {
           launch <bundle> [name|udid] Launch an app
           terminate <bundle> [name|udid] Terminate an app
           container <bundle> [kind] [name|udid] Get an app container path
+          appearance [light|dark] [name|udid] Set or read appearance
+          statusbar [flags] [name|udid] Set status bar overrides
+          statusbar-clear [name|udid]   Clear status bar overrides
+          permission <action> <service> [bundle] [name|udid] Set privacy permission
+          biometric-enroll <on|off> [name|udid] Set biometric enrollment
+          biometric-match [match|nomatch] [name|udid] Trigger biometric result
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -289,6 +297,60 @@ public enum CLI {
             let path = try runSimctl(simctlArgs).trimmingCharacters(in: .whitespacesAndNewlines)
             return CommandOutcome(human: path, json: ContainerPayload(udid: device.udid, name: device.name, bundleID: bundleID, kind: kind, path: path))
 
+        case "appearance":
+            let value = args.first.flatMap { ["light", "dark"].contains($0) ? $0 : nil }
+            if args.first != nil && value == nil {
+                throw CLIError(commandError: CommandError(code: .usage, message: "appearance must be one of: light, dark"))
+            }
+            let device = try resolveDevice(value == nil ? args.first : (args.count > 1 ? args[1] : nil))
+            let simctlArgs = value.map { ["ui", device.udid, "appearance", $0] } ?? ["ui", device.udid, "appearance"]
+            let appearance = try runSimctl(simctlArgs).trimmingCharacters(in: .whitespacesAndNewlines)
+            return CommandOutcome(human: appearance, json: AppearancePayload(udid: device.udid, name: device.name, appearance: appearance))
+
+        case "statusbar":
+            let parsed = try parseStatusBar(args)
+            let device = try resolveDevice(parsed.device)
+            guard !parsed.overrides.isEmpty else {
+                throw CLIError(commandError: CommandError(code: .usage, message: "statusbar requires at least one override"))
+            }
+            var simctlArgs = ["status_bar", device.udid, "override"]
+            for (flag, value) in parsed.overrides { simctlArgs += ["--\(flag)", value] }
+            try runSimctl(simctlArgs)
+            return CommandOutcome(human: "Overrode status bar on \(device.name)", json: StatusBarPayload(udid: device.udid, name: device.name, overrides: parsed.overrides))
+
+        case "statusbar-clear":
+            let device = try resolveDevice(args.first)
+            try runSimctl(["status_bar", device.udid, "clear"])
+            return CommandOutcome(human: "Cleared status bar on \(device.name)", json: StatusBarClearPayload(udid: device.udid, name: device.name))
+
+        case "permission":
+            let permission = try parsePermission(args)
+            let device = try resolveDevice(permission.device)
+            var simctlArgs = ["privacy", device.udid, permission.action, permission.service]
+            if let bundleID = permission.bundleID { simctlArgs.append(bundleID) }
+            try runSimctl(simctlArgs)
+            return CommandOutcome(human: "Set \(permission.action) \(permission.service) on \(device.name)", json: PermissionPayload(udid: device.udid, name: device.name, action: permission.action, service: permission.service, bundleID: permission.bundleID))
+
+        case "biometric-enroll":
+            guard let raw = args.first, ["on", "off"].contains(raw) else {
+                throw CLIError(commandError: CommandError(code: .usage, message: "biometric-enroll requires on or off"))
+            }
+            let device = try resolveDevice(args.count > 1 ? args[1] : nil)
+            let value = raw == "on" ? "1" : "0"
+            try runSimctl(["spawn", device.udid, "notifyutil", "-s", "com.apple.BiometricKit.enrollmentChanged", value])
+            try runSimctl(["spawn", device.udid, "notifyutil", "-p", "com.apple.BiometricKit.enrollmentChanged"])
+            return CommandOutcome(human: "Biometric enrollment \(raw) on \(device.name)", json: BiometricEnrollPayload(udid: device.udid, name: device.name, enrolled: raw == "on"))
+
+        case "biometric-match":
+            let result = args.first.flatMap { ["match", "nomatch"].contains($0) ? $0 : nil } ?? "match"
+            if args.first != nil && !["match", "nomatch"].contains(args.first!) {
+                throw CLIError(commandError: CommandError(code: .usage, message: "biometric-match result must be match or nomatch"))
+            }
+            let device = try resolveDevice(result == args.first ? (args.count > 1 ? args[1] : nil) : args.first)
+            let notification = result == "match" ? "com.apple.BiometricKit_Sim.fingerTouch.match" : "com.apple.BiometricKit_Sim.fingerTouch.nomatch"
+            try runSimctl(["spawn", device.udid, "notifyutil", "-p", notification])
+            return CommandOutcome(human: "Biometric \(result) on \(device.name)", json: BiometricMatchPayload(udid: device.udid, name: device.name, result: result))
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
@@ -322,6 +384,37 @@ public enum CLI {
         }.sorted { $0.bundleID < $1.bundleID }
     }
 
+    private static func parseStatusBar(_ args: [String]) throws -> (overrides: [String: String], device: String?) {
+        let supported = Set(["time", "dataNetwork", "wifiMode", "wifiBars", "cellularMode", "cellularBars", "operatorName", "batteryState", "batteryLevel"])
+        var overrides: [String: String] = [:]
+        var device: String?
+        var index = 0
+        while index < args.count {
+            guard args[index].hasPrefix("--") else { device = args[index]; index += 1; continue }
+            let flag = String(args[index].dropFirst(2))
+            guard supported.contains(flag), index + 1 < args.count else { throw CLIError(commandError: CommandError(code: .usage, message: "invalid statusbar flag or missing value: \(args[index])")) }
+            let value = args[index + 1]
+            if ["wifiBars", "cellularBars", "batteryLevel"].contains(flag) {
+                guard Int(value) != nil else { throw CLIError(commandError: CommandError(code: .usage, message: "\(flag) must be an integer")) }
+                if flag == "batteryLevel", let level = Int(value), !(0...100).contains(level) { throw CLIError(commandError: CommandError(code: .usage, message: "batteryLevel must be between 0 and 100")) }
+            }
+            overrides[flag] = value
+            index += 2
+        }
+        return (overrides, device)
+    }
+
+    private static func parsePermission(_ args: [String]) throws -> (action: String, service: String, bundleID: String?, device: String?) {
+        let actions = ["grant", "revoke", "reset"]
+        let services = ["all", "calendar", "contacts-limited", "contacts", "location", "location-always", "photos-add", "photos", "media-library", "microphone", "motion", "reminders", "siri"]
+        guard args.count >= 2, actions.contains(args[0]) else { throw CLIError(commandError: CommandError(code: .usage, message: "action must be one of: grant, revoke, reset")) }
+        guard services.contains(args[1]) else { throw CLIError(commandError: CommandError(code: .usage, message: "service must be one of: \(services.joined(separator: ", "))")) }
+        guard args[0] == "reset" || args.count >= 3 else { throw CLIError(commandError: CommandError(code: .usage, message: "grant and revoke require a bundle id")) }
+        let bundleID = args.count > 2 ? args[2] : nil
+        let device = args.count > 3 ? args[3] : nil
+        return (args[0], args[1], bundleID, device)
+    }
+
     private static func requiredBundle(_ args: [String], command: String) throws -> String {
         guard let bundle = args.first, !bundle.isEmpty else {
             throw CLIError(commandError: CommandError(code: .usage, message: "usage: cosmokit \(command) <bundle_id> [name|udid] (missing bundle_id)"))
@@ -331,7 +424,7 @@ public enum CLI {
 
     private static func resolveDevice(_ query: String?) throws -> Device {
         do {
-            return try Simctl.resolveDevice(query)
+            return try resolveDeviceForTesting(query)
         } catch {
             throw CLIError(commandError: CommandError(code: errorCode(for: error), message: error.localizedDescription))
         }
@@ -348,7 +441,7 @@ public enum CLI {
     @discardableResult
     private static func runSimctl(_ arguments: [String]) throws -> String {
         do {
-            return try Simctl.run(arguments)
+            return try runSimctlForTesting(arguments)
         } catch {
             throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription))
         }
@@ -497,4 +590,34 @@ public struct TerminatePayload: Codable {
 public struct ContainerPayload: Codable {
     public let udid: String; public let name: String; public let bundleID: String; public let kind: String; public let path: String
     public init(udid: String, name: String, bundleID: String, kind: String, path: String) { self.udid = udid; self.name = name; self.bundleID = bundleID; self.kind = kind; self.path = path }
+}
+
+public struct AppearancePayload: Codable {
+    public let udid: String; public let name: String; public let appearance: String
+    public init(udid: String, name: String, appearance: String) { self.udid = udid; self.name = name; self.appearance = appearance }
+}
+
+public struct StatusBarPayload: Codable {
+    public let udid: String; public let name: String; public let overrides: [String: String]
+    public init(udid: String, name: String, overrides: [String: String]) { self.udid = udid; self.name = name; self.overrides = overrides }
+}
+
+public struct StatusBarClearPayload: Codable {
+    public let udid: String; public let name: String
+    public init(udid: String, name: String) { self.udid = udid; self.name = name }
+}
+
+public struct PermissionPayload: Codable {
+    public let udid: String; public let name: String; public let action: String; public let service: String; public let bundleID: String?
+    public init(udid: String, name: String, action: String, service: String, bundleID: String?) { self.udid = udid; self.name = name; self.action = action; self.service = service; self.bundleID = bundleID }
+}
+
+public struct BiometricEnrollPayload: Codable {
+    public let udid: String; public let name: String; public let enrolled: Bool
+    public init(udid: String, name: String, enrolled: Bool) { self.udid = udid; self.name = name; self.enrolled = enrolled }
+}
+
+public struct BiometricMatchPayload: Codable {
+    public let udid: String; public let name: String; public let result: String
+    public init(udid: String, name: String, result: String) { self.udid = udid; self.name = name; self.result = result }
 }
