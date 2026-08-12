@@ -385,6 +385,15 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(Set(location["required"] as? [String] ?? []), ["latitude", "longitude"])
     }
 
+    func testToolsListStaysWithinItsContextBudget() throws {
+        let response = try XCTUnwrap(MCPServer.handle(line: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#))
+        let data = Data(response.utf8)
+        let object = try jsonObject(response)
+        let tools = (object["result"] as? [String: Any])?["tools"] as? [[String: Any]]
+        XCTAssertEqual(tools?.count, 32)
+        XCTAssertLessThan(data.count, 14_000)
+    }
+
     func testDefaultsReadResolvesContainerBeforeExport() throws {
         let device = Device(udid: "UDID", name: "iPhone", state: "Booted", isAvailable: true)
         CLI.resolveDeviceForTesting = { _ in device }
