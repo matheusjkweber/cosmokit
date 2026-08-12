@@ -230,6 +230,14 @@ The `set_location` tool schema looks like this when pretty-printed:
 The full response lists all thirty-two tools in purpose-based groups. The
 ordering is for navigation; it has no protocol meaning.
 
+### Context cost
+
+The `tools/list` response is roughly 12 KB, or about 3,100 tokens at four
+bytes per token, loaded once per conversation by an MCP client. That is the
+deliberate price of keeping the full simulator surface in one server; splitting
+it would move complexity into every user's configuration. Reproduce the
+measurement with `printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .build/release/cosmokit mcp | wc -c` from `cli/`; a test keeps the response under 14,000 bytes so growth cannot go unnoticed.
+
 send_push requires a JSON object containing aps and rejects payloads over 4096
 bytes. Defaults tools address the bundle's preferences by absolute path inside
 its data container because an unqualified bundle domain silently reads the
