@@ -39,6 +39,8 @@ public struct CLIError: LocalizedError {
 public enum CLI {
     public static let version = "0.1.0"
     public static var runSimctlForTesting: (_ arguments: [String]) throws -> String = { try Simctl.run($0) }
+    public static var runSimctlTimedForTesting: (_ arguments: [String], _ timeout: TimeInterval) throws -> String = { try Simctl.run($0, timeout: $1) }
+    public static var runScutilForTesting: () throws -> String = { try runScutilProcess() }
     public static var resolveDeviceForTesting: (_ query: String?) throws -> Device = { try Simctl.resolveDevice($0) }
 
     static func printUsage() {
@@ -88,6 +90,9 @@ public enum CLI {
           defaults-write <bundle> <key> <value> Write an app UserDefaults value
           defaults-delete <bundle> <key> Delete an app UserDefaults value
           logs [--last <duration>]       Read a bounded simulator log window
+          keychain <path> [name|udid] Add-root-cert trusts a CA for HTTPS debugging
+          keychain-reset [name|udid]  Reset the simulator keychain
+          proxy-status                Read the system proxy inherited by simulators
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -463,6 +468,27 @@ public enum CLI {
             let payload = RuntimesPayload(runtimes: runtimes, deviceTypes: deviceTypes)
             return CommandOutcome(human: runtimes.map { "\($0.name)  \($0.identifier)" }.joined(separator: "\n"), json: payload)
 
+        case "keychain":
+            let parsed = try parseKeychainArgs(args)
+            let device = try resolveDevice(parsed.device)
+            let source = URL(fileURLWithPath: parsed.path).standardizedFileURL.path
+            guard FileManager.default.fileExists(atPath: source) else { throw usage("certificate path does not exist: \(source)") }
+            let staged = try stageCertificate(source)
+            let cleanupURL = staged.cleanupURL
+            defer { if let cleanupURL { try? FileManager.default.removeItem(at: cleanupURL) } }
+            let action = parsed.untrusted ? "add-cert" : "add-root-cert"
+            _ = try runSimctlTimed(["keychain", device.udid, action, staged.installPath], timeout: 180)
+            return CommandOutcome(human: "\(action) installed on \(device.name): \(source)", json: KeychainPayload(udid: device.udid, name: device.name, action: action, path: source))
+
+        case "keychain-reset":
+            let device = try resolveDevice(args.first)
+            _ = try runSimctlTimed(["keychain", device.udid, "reset"], timeout: 180)
+            return CommandOutcome(human: "Reset keychain on \(device.name)", json: KeychainPayload(udid: device.udid, name: device.name, action: "reset", path: nil))
+
+        case "proxy-status":
+            let payload = parseProxyStatus(try runScutil())
+            return CommandOutcome(human: "HTTP \(payload.httpEnabled ? "on" : "off"), HTTPS \(payload.httpsEnabled ? "on" : "off")", json: payload)
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
@@ -603,6 +629,68 @@ public enum CLI {
         let text = readsStdin ? nil : args[index + 1]
         let device = index + 2 < args.count ? args[index + 2] : nil
         return (text, device, readsStdin)
+    }
+
+    private static func parseKeychainArgs(_ args: [String]) throws -> (path: String, device: String?, untrusted: Bool) {
+        guard let path = args.first, !path.isEmpty else { throw usage("keychain requires a certificate path") }
+        let untrusted = args.contains("--untrusted")
+        let positional = args.filter { $0 != "--untrusted" }
+        return (path, positional.count > 1 ? positional[1] : nil, untrusted)
+    }
+
+    // CoreSimulatorService cannot read another app's sandbox container, so stage
+    // container certificates outside it before simctl opens the file.
+    private static func stageCertificate(_ source: String) throws -> (installPath: String, cleanupURL: URL?) {
+        let home = URL(fileURLWithPath: NSHomeDirectory()).standardizedFileURL.path
+        let containerPrefix = home + "/Library/Containers/"
+        guard source.hasPrefix(containerPrefix) else {
+            return (source, nil)
+        }
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("cosmokit-keychain-\(UUID().uuidString)", isDirectory: true)
+        let destination = directory.appendingPathComponent(URL(fileURLWithPath: source).lastPathComponent)
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try FileManager.default.copyItem(atPath: source, toPath: destination.path)
+            return (destination.path, directory)
+        } catch {
+            try? FileManager.default.removeItem(at: directory)
+            return (source, nil)
+        }
+    }
+
+    private static func runSimctlTimed(_ arguments: [String], timeout: TimeInterval) throws -> String {
+        do { return try runSimctlTimedForTesting(arguments, timeout) }
+        catch { throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription)) }
+    }
+
+    private static func runScutil() throws -> String {
+        do { return try runScutilForTesting() }
+        catch { throw CLIError(commandError: CommandError(code: .simctlFailed, message: error.localizedDescription)) }
+    }
+
+    private static func runScutilProcess() throws -> String {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/scutil")
+        process.arguments = ["--proxy"]
+        let output = Pipe()
+        process.standardOutput = output
+        try process.run()
+        let data = output.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else { throw SimctlError(kind: .commandFailed, message: "scutil --proxy failed") }
+        return String(decoding: data, as: UTF8.self)
+    }
+
+    public static func parseProxyStatus(_ raw: String) -> ProxyStatusPayload {
+        guard let object = try? PropertyListSerialization.propertyList(from: Data(raw.utf8), format: nil),
+              let dictionary = object as? [String: Any] else {
+            return ProxyStatusPayload(httpEnabled: false, httpHost: nil, httpPort: nil, httpsEnabled: false, httpsHost: nil, httpsPort: nil, bypassList: [])
+        }
+        func bool(_ key: String) -> Bool { (dictionary[key] as? NSNumber)?.boolValue ?? false }
+        func string(_ key: String) -> String? { dictionary[key] as? String }
+        func integer(_ key: String) -> Int? { (dictionary[key] as? NSNumber)?.intValue }
+        let bypass = (dictionary["ExceptionsList"] as? [Any])?.compactMap { $0 as? String } ?? []
+        return ProxyStatusPayload(httpEnabled: bool("HTTPEnable"), httpHost: string("HTTPProxy"), httpPort: integer("HTTPPort"), httpsEnabled: bool("HTTPSEnable"), httpsHost: string("HTTPSProxy"), httpsPort: integer("HTTPSPort"), bypassList: bypass)
     }
 
     private static func parseDefaultsReadArgs(_ args: [String]) throws -> (bundleID: String, device: String?) {
@@ -860,6 +948,9 @@ public enum CLI {
           defaults-write <bundle> <key> <value> Write an app UserDefaults value
           defaults-delete <bundle> <key> Delete an app UserDefaults value
           logs [--last <duration>]    Read a bounded simulator log window
+          keychain <path> [name|udid] Add-root-cert trusts a CA for HTTPS debugging
+          keychain-reset [name|udid]  Reset the simulator keychain
+          proxy-status                Read the system proxy inherited by simulators
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -1107,4 +1198,17 @@ public struct RuntimesPayload: Codable {
     public let runtimes: [Runtime]
     public let deviceTypes: [DeviceType]
     public init(runtimes: [Runtime], deviceTypes: [DeviceType]) { self.runtimes = runtimes; self.deviceTypes = deviceTypes }
+}
+
+public struct KeychainPayload: Codable {
+    public let udid: String; public let name: String; public let action: String; public let path: String?
+    public init(udid: String, name: String, action: String, path: String?) { self.udid = udid; self.name = name; self.action = action; self.path = path }
+}
+
+public struct ProxyStatusPayload: Codable {
+    public let httpEnabled: Bool; public let httpHost: String?; public let httpPort: Int?
+    public let httpsEnabled: Bool; public let httpsHost: String?; public let httpsPort: Int?; public let bypassList: [String]
+    public init(httpEnabled: Bool, httpHost: String?, httpPort: Int?, httpsEnabled: Bool, httpsHost: String?, httpsPort: Int?, bypassList: [String]) {
+        self.httpEnabled = httpEnabled; self.httpHost = httpHost; self.httpPort = httpPort; self.httpsEnabled = httpsEnabled; self.httpsHost = httpsHost; self.httpsPort = httpsPort; self.bypassList = bypassList
+    }
 }
