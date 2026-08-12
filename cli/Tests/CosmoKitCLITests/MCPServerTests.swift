@@ -415,12 +415,13 @@ final class MCPServerTests: XCTestCase {
     }
 
     func testToolsListStaysWithinItsContextBudget() throws {
+        // The current response measured 12,232 bytes; 12,800 leaves about 5% for wording edits while making an unreviewed tool addition fail.
         let response = try XCTUnwrap(MCPServer.handle(line: #"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#))
         let data = Data(response.utf8)
         let object = try jsonObject(response)
         let tools = (object["result"] as? [String: Any])?["tools"] as? [[String: Any]]
         XCTAssertEqual(tools?.count, 32)
-        XCTAssertLessThan(data.count, 14_000)
+        XCTAssertLessThan(data.count, 12_800)
     }
 
     func testDefaultsReadResolvesContainerBeforeExport() throws {
