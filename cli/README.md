@@ -97,6 +97,8 @@ types are string, bool, int, float, array, and dict. Log windows accept 30s,
 5m, and 1h. Status bar flags are time, dataNetwork, wifiMode, wifiBars,
 cellularMode, cellularBars, operatorName, batteryState, and batteryLevel.
 Pasteboard writes use --set.
+proxy-status names enabled proxy hosts and ports in human output, and counts
+non-empty bypass rules.
 
 ## JSON output
 
