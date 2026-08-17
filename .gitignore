@@ -19,3 +19,11 @@ TANYA_FIX_*.md
 CosmoKit-Context.md
 MANUAL_QA_SIM_TOOLS.md
 GOOGLE_ADS_TUNING_GUIDE.md
+
+# CosmoKit/ and landing/ are each their OWN git repo (separate remotes:
+# matheusjkweber/cosmokit-app, maththedev42/cosmokit), nested inside this one.
+# This repo never tracked their contents — ignoring them just stops `git status`
+# / `git add -A` from treating them as untracked clutter or an accidental
+# embedded-repo add. 2026-08-17.
+/CosmoKit/
+/landing/
