@@ -3,7 +3,7 @@ name = "cosmokit"
 
 [targets.backend]
 kind = "container-azure"
-after = []
+after = ["landing"]
 context = "backend"
 registry = "ghcr.io/maththedev42"
 image = "cosmokit-api"
@@ -30,3 +30,10 @@ version_from = { file = "CosmoKit/ProxyHelper/Sources/CosmoKitProxyHelper/main.s
 notary_profile = "cosmokit-notary"
 publish_to = "public/downloads/CosmoKitProxyHelper.pkg"
 published_url = "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg"
+
+[targets.app]
+kind = "macos-app"
+fastlane_dir = "CosmoKit"
+lane = "mac deploy"
+xcodeproj = "CosmoKit/CosmoKit.xcodeproj"
+scheme = "CosmoKit"

@@ -1,8 +1,8 @@
 # Content (What's New / Notifications / Helper)
 
 This package embeds `data.json` and serves it through the three macOS-app
-endpoints under `/v1/`. Updating content is a redeploy: edit `data.json`,
-push the backend image to ACR, retarget the App Service.
+endpoints under `/v1/`. Updating content is a backend release handled by
+cosmoship.
 
 ## Release policy
 
