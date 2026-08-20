@@ -133,26 +133,26 @@
   ],
   "notifications": [
     {
-      "id": "helper-1.0.9-update",
+      "id": "helper-1.1.0-update",
       "severity": "info",
       "category": "helper",
-      "publishedAt": "2026-07-16T00:00:00Z",
+      "publishedAt": "2026-08-20T00:00:00Z",
       "expiresAt": null,
-      "minHelperVersion": "1.0.9",
+      "minHelperVersion": "1.1.0",
       "localizations": {
         "en": {
           "title": "Update the Proxy Helper",
-          "body": "A new helper (1.0.9) makes per-simulator traffic attribution reliable — including Safari and short-lived connections. Re-download it to apply the fix.",
+          "body": "A new helper (1.1.0) boots the simulator you pick from CosmoKit, instead of asking Simulator.app to reopen whichever one it had open last. Download it to enable booting.",
           "actionLabel": "Download"
         },
         "pt": {
           "title": "Atualize o Proxy Helper",
-          "body": "Uma nova versão do helper (1.0.9) torna a atribuição de tráfego por simulador confiável — incluindo Safari e conexões curtas. Baixe de novo para aplicar a correção.",
+          "body": "Uma nova versão do helper (1.1.0) inicia o simulador que você escolhe no CosmoKit, em vez de pedir ao Simulator.app para reabrir o último que estava aberto. Baixe para ativar o boot.",
           "actionLabel": "Baixar"
         },
         "es": {
           "title": "Actualiza el Proxy Helper",
-          "body": "Una nueva versión del helper (1.0.9) hace confiable la atribución de tráfico por simulador — incluidos Safari y conexiones cortas. Descárgalo otra vez para aplicar la corrección.",
+          "body": "Una nueva versión del helper (1.1.0) inicia el simulador que eliges en CosmoKit, en lugar de pedirle a Simulator.app que reabra el último que tuvo abierto. Descárgalo para activar el arranque.",
           "actionLabel": "Descargar"
         }
       },
@@ -233,14 +233,14 @@
     }
   },
   "helper": {
-    "latestVersion": "1.0.9",
+    "latestVersion": "1.1.0",
     "downloadUrl": "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg",
     "blockProxy": false,
     "minRequiredVersion": null,
     "releaseNotes": {
-      "en": "Reliable per-simulator traffic attribution (rolling socket snapshot) — Safari and short-lived connections now land under the right simulator. Includes all 1.0.7 bypass fixes.",
-      "pt": "Atribuição de tráfego por simulador confiável (snapshot contínuo de sockets) — Safari e conexões curtas agora aparecem no simulador certo. Inclui todas as correções de bypass da 1.0.7.",
-      "es": "Atribución de tráfico por simulador confiable (snapshot continuo de sockets) — Safari y conexiones cortas ahora aparecen bajo el simulador correcto. Incluye todas las correcciones de bypass de la 1.0.7."
+      "en": "Boots the simulator you pick from CosmoKit. The app is sandboxed and cannot boot one itself, so without the helper Simulator.app reopens whichever device it had open last. Includes everything in 1.0.9.",
+      "pt": "Inicia o simulador que você escolhe no CosmoKit. O app roda em sandbox e não consegue iniciar um sozinho, então sem o helper o Simulator.app reabre o último dispositivo que estava aberto. Inclui tudo da 1.0.9.",
+      "es": "Inicia el simulador que eliges en CosmoKit. La app está en sandbox y no puede iniciar uno por sí misma, así que sin el helper Simulator.app reabre el último dispositivo que tuvo abierto. Incluye todo lo de 1.0.9."
     }
   }
 }
