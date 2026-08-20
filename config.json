@@ -1,0 +1,87 @@
+{
+  "latestVersion": "4.3.0",
+  "minimumVersion": "4.0.0",
+  "featureFlags": {
+    "mediaPreviewEnabled": true,
+    "dynamicTrialEnabled": true,
+    "lifetimeAccessEnabled": true
+  },
+  "whatsNew": {
+    "4.3.0": {
+      "features": [
+        {
+          "icon": "network",
+          "iconColor": "blue",
+          "localizations": {
+            "en": {
+              "title": "Network Proxy",
+              "description": "Intercept and inspect HTTP and HTTPS requests from your simulator apps. See headers, response bodies, and mock API responses."
+            },
+            "pt": {
+              "title": "Proxy de Rede",
+              "description": "Intercepte e inspecione requisicoes HTTP e HTTPS dos apps no simulador. Veja headers, corpos de resposta e simule APIs."
+            },
+            "es": {
+              "title": "Proxy de Red",
+              "description": "Intercepta e inspecciona solicitudes HTTP y HTTPS de tus apps en el simulador. Revisa headers, respuestas y simula APIs."
+            }
+          }
+        },
+        {
+          "icon": "point.topleft.down.to.point.bottomright.curvepath.fill",
+          "iconColor": "green",
+          "localizations": {
+            "en": {
+              "title": "Location Routes",
+              "description": "Simulate movement between two points by driving, walking, or biking. Perfect for testing navigation and location features."
+            },
+            "pt": {
+              "title": "Rotas de Localizacao",
+              "description": "Simule movimento entre dois pontos de carro, a pe ou de bicicleta. Ideal para testar navegacao e recursos de localizacao."
+            },
+            "es": {
+              "title": "Rutas de Ubicacion",
+              "description": "Simula movimiento entre dos puntos en auto, caminando o en bicicleta. Ideal para probar navegacion y funciones de ubicacion."
+            }
+          }
+        },
+        {
+          "icon": "hand.tap.fill",
+          "iconColor": "orange",
+          "localizations": {
+            "en": {
+              "title": "Touch Indicators",
+              "description": "Show animated touch markers on simulator recordings for demos, tutorials, and App Store preview videos."
+            },
+            "pt": {
+              "title": "Indicadores de Toque",
+              "description": "Mostre marcadores de toque animados em gravacoes do simulador para demos, tutoriais e previews da App Store."
+            },
+            "es": {
+              "title": "Indicadores de Toque",
+              "description": "Muestra marcadores de toque animados en grabaciones del simulador para demos, tutoriales y previews de App Store."
+            }
+          }
+        },
+        {
+          "icon": "lock.shield.fill",
+          "iconColor": "purple",
+          "localizations": {
+            "en": {
+              "title": "HTTPS Decryption",
+              "description": "Install a local CA certificate and inspect encrypted traffic, including methods, paths, status codes, and JSON bodies."
+            },
+            "pt": {
+              "title": "Descriptografia HTTPS",
+              "description": "Instale um certificado CA local e inspecione trafego criptografado, incluindo metodos, rotas, status e corpos JSON."
+            },
+            "es": {
+              "title": "Descifrado HTTPS",
+              "description": "Instala un certificado CA local e inspecciona trafico cifrado, incluyendo metodos, rutas, estados y cuerpos JSON."
+            }
+          }
+        }
+      ]
+    }
+  }
+}
