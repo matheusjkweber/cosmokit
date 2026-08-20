@@ -21,3 +21,12 @@ output = "out"
 branch = "gh-pages"
 verify_url = "https://usecosmoskittool.com/"
 must_publish = [{ from = "public/downloads/CosmoKitProxyHelper.pkg", to = "downloads/CosmoKitProxyHelper.pkg" }]
+
+[targets.helper]
+kind = "macos-pkg"
+package_path = "CosmoKit/ProxyHelper"
+identifier = "apps.mjkweber.CosmoKit.ProxyHelper.pkg"
+version_from = { file = "CosmoKit/ProxyHelper/Sources/CosmoKitProxyHelper/main.swift", regex = '^let HelperVersion = "(.+)"$' }
+notary_profile = "cosmokit-notary"
+publish_to = "public/downloads/CosmoKitProxyHelper.pkg"
+published_url = "https://usecosmoskittool.com/downloads/CosmoKitProxyHelper.pkg"
