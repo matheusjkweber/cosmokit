@@ -1,0 +1,14 @@
+[project]
+name = "cosmokit"
+
+[targets.backend]
+kind = "container-azure"
+after = []
+context = "backend"
+registry = "ghcr.io/maththedev42"
+image = "cosmokit-api"
+resource_group = "cosmokit"
+container_app = "cosmokit-api"
+verify_url = "https://api.usecosmoskittool.com/v1/helper/latest"
+verify_json_path = "latestVersion"
+version_from = { file = "backend/internal/content/data.json", json_path = "helper.latestVersion" }
