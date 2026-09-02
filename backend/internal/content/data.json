@@ -129,6 +129,89 @@
         }
       ],
       "publishedAt": "2026-07-13T00:00:00Z"
+    },
+    {
+      "version": "4.6.2",
+      "title": {
+        "en": "A faster first run, and a save-location fix",
+        "pt": "Um primeiro uso mais rápido, e correção do local de salvamento",
+        "es": "Un primer uso más rápido, y corrección del lugar de guardado"
+      },
+      "items": [
+        {
+          "icon": "camera.viewfinder",
+          "iconColor": "blue",
+          "localizations": {
+            "en": {
+              "title": "Straight to your first screenshot",
+              "description": "Fresh installs now open on Screenshot instead of Push Notifications — boot a simulator and capture your first shot in under two minutes."
+            },
+            "pt": {
+              "title": "Direto para a sua primeira captura",
+              "description": "Instalações novas agora abrem em Captura de Tela em vez de Notificações Push — inicie um simulador e capture sua primeira tela em menos de dois minutos."
+            },
+            "es": {
+              "title": "Directo a tu primera captura",
+              "description": "Las instalaciones nuevas ahora abren en Captura de pantalla en lugar de Notificaciones push — arranca un simulador y toma tu primera captura en menos de dos minutos."
+            }
+          }
+        },
+        {
+          "icon": "network",
+          "iconColor": "purple",
+          "localizations": {
+            "en": {
+              "title": "Try the network proxy before deciding on Pro",
+              "description": "The proxy now gives you a few free sessions to inspect and mock traffic, so you can see if it fits your workflow before upgrading."
+            },
+            "pt": {
+              "title": "Experimente o proxy de rede antes de decidir pelo Pro",
+              "description": "O proxy agora te dá algumas sessões gratuitas para inspecionar e simular tráfego, para você ver se ele encaixa no seu fluxo antes de assinar o Pro."
+            },
+            "es": {
+              "title": "Prueba el proxy de red antes de decidirte por Pro",
+              "description": "El proxy ahora te da varias sesiones gratis para inspeccionar y simular tráfico, para que veas si encaja en tu flujo antes de pasarte a Pro."
+            }
+          }
+        },
+        {
+          "icon": "arrow.counterclockwise",
+          "iconColor": "orange",
+          "localizations": {
+            "en": {
+              "title": "Restore yesterday's setup with one click",
+              "description": "CosmoKit remembers your last working setup automatically — bring it back without rebuilding your simulator, app and tool selections by hand."
+            },
+            "pt": {
+              "title": "Restaure a configuração de ontem com um clique",
+              "description": "O CosmoKit lembra automaticamente da sua última configuração de trabalho — restaure-a sem precisar refazer simulador, app e ferramentas na mão."
+            },
+            "es": {
+              "title": "Restaura la configuración de ayer con un clic",
+              "description": "CosmoKit recuerda automáticamente tu última configuración de trabajo — recupérala sin tener que rehacer a mano el simulador, la app y las herramientas."
+            }
+          }
+        },
+        {
+          "icon": "folder.badge.checkmark",
+          "iconColor": "green",
+          "localizations": {
+            "en": {
+              "title": "Save location fixed",
+              "description": "Screenshots and recordings now always save to a folder you can find in Finder — Settings shows the real path instead of a location hidden inside the app."
+            },
+            "pt": {
+              "title": "Local de salvamento corrigido",
+              "description": "Capturas e gravações agora sempre são salvas em uma pasta que você consegue encontrar no Finder — os Ajustes mostram o caminho real em vez de um local escondido dentro do app."
+            },
+            "es": {
+              "title": "Lugar de guardado corregido",
+              "description": "Las capturas y grabaciones ahora siempre se guardan en una carpeta que puedes encontrar en Finder — Ajustes muestra la ruta real en lugar de un lugar escondido dentro de la app."
+            }
+          }
+        }
+      ],
+      "publishedAt": "2026-09-02T00:00:00Z"
     }
   ],
   "notifications": [
