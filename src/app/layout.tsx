@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { GoogleAds } from "@/components/analytics/GoogleAds";
 import { PostHogAnalytics } from "@/components/analytics/PostHogAnalytics";
+import { AppStoreAttribution } from "@/components/analytics/AppStoreAttribution";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -95,6 +96,7 @@ export default function RootLayout({
         />
         <GoogleAds />
         <PostHogAnalytics />
+        <AppStoreAttribution />
         {children}
       </body>
     </html>
