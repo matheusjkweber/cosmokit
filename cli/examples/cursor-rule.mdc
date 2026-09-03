@@ -1,0 +1,13 @@
+---
+description: Drive and verify an iOS simulator with CosmoKit
+globs: "**/*"
+alwaysApply: false
+---
+
+Use `cosmokit doctor` and then `cosmokit agent start` before driving an iOS
+app. Read `cosmokit ui tree --mode act` first, decide using refs, perform one
+action such as `ui tap <ref>` or `ui type`, and read one fresh tree afterward.
+Prefer refs over coordinates, `act` over `debug`, and `--max` for long screens.
+Use a screenshot only when visual layout matters. On `refStale`, take a new
+tree; on `driverUnavailable`, start the agent; if the keyboard is not up, tap
+the field first. Stop with `cosmokit agent stop`.

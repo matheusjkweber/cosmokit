@@ -38,7 +38,7 @@ public struct CLIError: LocalizedError {
 }
 
 public enum CLI {
-    public static let version = "0.1.0"
+    public static let version = "0.2.0"
     public static var runSimctlForTesting: (_ arguments: [String]) throws -> String = { try Simctl.run($0) }
     public static var runSimctlTimedForTesting: (_ arguments: [String], _ timeout: TimeInterval) throws -> String = { try Simctl.run($0, timeout: $1) }
     public static var proxySourceForTesting: () -> [String: Any]? = { SCDynamicStoreCopyProxies(nil) as? [String: Any] }
@@ -94,6 +94,11 @@ public enum CLI {
           keychain <path> [name|udid] Add-root-cert trusts a CA for HTTPS debugging
           keychain-reset [name|udid]  Reset the simulator keychain
           proxy-status                Read the system proxy inherited by simulators
+          agent start|stop|status     Start, stop, or inspect the UI driver
+          ui tree|tap|press|swipe     Inspect and drive the app UI
+          ui type|button|alert        Type text or press UI/hardware controls
+          ui screenshot|find          Capture or search the UI
+          doctor                      Check local simulator and driver setup
           mcp                         Run as an MCP server over stdio (for AI agents)
           help                        Show this message
 
@@ -490,9 +495,54 @@ public enum CLI {
             let payload = parseProxyStatus(proxySourceForTesting())
             return CommandOutcome(human: proxyHumanText(payload), json: payload)
 
+        case "agent":
+            guard let action = args.first, ["start", "stop", "status"].contains(action) else { throw usage("usage: cosmokit agent start|stop|status [name|udid] [--port N]") }
+            let device = args.dropFirst().first(where: { !$0.hasPrefix("--") })
+            if action == "status" { return CommandOutcome(human: Driver.status(device: device).running ? "Driver running" : "Driver stopped", json: Driver.status(device: device)) }
+            if action == "stop" { let result = try Driver.stop(device: device); return CommandOutcome(human: result.message, json: result) }
+            var port = 8877; if let index = args.firstIndex(of: "--port"), index + 1 < args.count, let value = Int(args[index + 1]) { port = value }
+            let result = try Driver.start(device: device, port: port); return CommandOutcome(human: "Driver running on port \(result.port ?? port)", json: result)
+
+        case "ui":
+            return try performUI(args)
+
+        case "doctor":
+            let result = Doctor.run(); return CommandOutcome(human: result.lines.joined(separator: "\n"), json: result)
+
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown command: \(command)"))
         }
+    }
+
+    private static func performUI(_ args: [String]) throws -> CommandOutcome {
+        guard let action = args.first else { throw usage("usage: cosmokit ui tree|tap|press|swipe|type|button|alert|screenshot|find") }
+        switch action {
+        case "tree":
+            var mode = UITreeMode.act; var depth: String?; var max = 80; var app: String?; var index = 1
+            while index < args.count { switch args[index] { case "--mode": guard index + 1 < args.count, let value = UITreeMode(rawValue: args[index + 1]) else { throw usage("mode must be nav, act, or debug") }; mode = value; index += 2; case "--depth": guard index + 1 < args.count else { throw usage("--depth requires a value") }; depth = args[index + 1]; index += 2; case "--max": guard index + 1 < args.count, let value = Int(args[index + 1]), value > 0 else { throw usage("--max requires a positive integer") }; max = value; index += 2; case "--app": guard index + 1 < args.count else { throw usage("--app requires a bundle id") }; app = args[index + 1]; index += 2; default: index += 1 } }
+            var query: [String: Any] = [:]; if let depth { query["depth"] = Int(depth) ?? depth }; query["max_elements"] = max; if let app { query["app"] = app }
+            let data = try Driver.call("/tree", method: "GET", json: query); let snapshot = try UITree.parse(data); return CommandOutcome(human: UITree.compact(snapshot, mode: mode, maxLines: max), json: snapshot)
+        case "find":
+            guard args.count > 1 else { throw usage("ui find requires text") }; let snapshot = try UITree.parse(Driver.call("/tree")); let matches = UITree.find(snapshot, text: args.dropFirst().joined(separator: " ")); return CommandOutcome(human: matches.map { "[\($0.ref)] \($0.type) \($0.label ?? $0.value ?? "")" }.joined(separator: "\n"), json: matches)
+        case "tap":
+            guard args.count > 1 else { throw usage("ui tap requires a ref or x,y") }; return try uiAction("/tap", args: Array(args.dropFirst()))
+        case "press":
+            guard args.count > 1 else { throw usage("ui press requires a ref") }; return try uiAction("/press", args: Array(args.dropFirst()))
+        case "swipe":
+            guard args.count > 1 else { throw usage("ui swipe requires a direction or coordinates") }; return try uiAction("/swipe", args: Array(args.dropFirst()))
+        case "type":
+            guard args.count > 1 else { throw usage("ui type requires text") }; return try uiAction("/type", args: Array(args.dropFirst()))
+        case "button", "alert":
+            guard args.count > 1 else { throw usage("ui \(action) requires an action") }; return try uiAction("/\(action)", args: Array(args.dropFirst()))
+        case "screenshot":
+            let output = args.firstIndex(of: "--output").flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil } ?? FileManager.default.currentDirectoryPath
+            let directory = URL(fileURLWithPath: output, isDirectory: true); try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true); let path = directory.appendingPathComponent("CosmoKit-UI-\(Int(Date().timeIntervalSince1970)).png").path; let data = try Driver.call("/screenshot"); try data.write(to: URL(fileURLWithPath: path)); return CommandOutcome(human: path, json: UIScreenshotPayload(path: path, width: 0, height: 0, bytes: data.count))
+        default: throw usage("unknown ui action \(action)")
+        }
+    }
+
+    private static func uiAction(_ path: String, args: [String]) throws -> CommandOutcome {
+        var body: [String: Any] = [:]; if let first = args.first { if let ref = Int(first) { body["ref"] = ref } else if first.contains(",") { let values = first.split(separator: ",").compactMap { Double($0) }; if values.count == 2 { body["x"] = values[0]; body["y"] = values[1] } else { body["action"] = args.joined(separator: " ") } } else { body["action"] = args.joined(separator: " ") } }; if path == "/type" { body["text"] = args.joined(separator: " ") }; _ = try Driver.call(path, method: "POST", json: body); return CommandOutcome(human: "OK", json: DriverActionPayload(message: "OK"))
     }
 
     public static func parseLocation(_ args: [String]) throws -> (latitude: Double, longitude: Double, query: String?) {

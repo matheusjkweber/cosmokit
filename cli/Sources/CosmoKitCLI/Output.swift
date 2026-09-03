@@ -16,6 +16,34 @@ public enum ErrorCode: String, Codable {
     case noSimulator
     case simctlFailed
     case unknownCommand
+    case driverUnavailable
+    case refStale
+    case refNotFound
+    case unsupported
+}
+
+public struct DriverStatusPayload: Codable {
+    public let running: Bool
+    public let port: Int?
+    public let pid: Int?
+    public let app: String?
+    public init(running: Bool, port: Int? = nil, pid: Int? = nil, app: String? = nil) {
+        self.running = running; self.port = port; self.pid = pid; self.app = app
+    }
+}
+
+public struct DriverActionPayload: Codable {
+    public let ok: Bool
+    public let message: String
+    public init(ok: Bool = true, message: String) { self.ok = ok; self.message = message }
+}
+
+public struct UIScreenshotPayload: Codable {
+    public let path: String
+    public let width: Int
+    public let height: Int
+    public let bytes: Int
+    public init(path: String, width: Int, height: Int, bytes: Int) { self.path = path; self.width = width; self.height = height; self.bytes = bytes }
 }
 
 public struct CommandError: Codable {

@@ -193,6 +193,28 @@ public enum MCPServer {
             return ("keychain-reset", try optionalString(arguments, key: "device").map { [$0] } ?? [], nil)
         case "proxy_status":
             return ("proxy-status", [], nil)
+        case "agent_start":
+            var args = ["start"]; if let device = try optionalString(arguments, key: "device") { args.append(device) }; if let port = arguments["port"] { args += ["--port", try integerString(port, key: "port", battery: false)] }; return ("agent", args, nil)
+        case "agent_stop":
+            return ("agent", ["stop"] + (try optionalString(arguments, key: "device").map { [$0] } ?? []), nil)
+        case "agent_status":
+            return ("agent", ["status"] + (try optionalString(arguments, key: "device").map { [$0] } ?? []), nil)
+        case "ui_tree":
+            var args = ["tree"]; if let mode = try optionalString(arguments, key: "mode") { guard ["nav", "act", "debug"].contains(mode) else { throw usageError("mode must be one of: nav, act, debug") }; args += ["--mode", mode] }; if let depth = arguments["depth"] { args += ["--depth", try integerString(depth, key: "depth", battery: false)] }; if let max = arguments["max"] { args += ["--max", try integerString(max, key: "max", battery: false)] }; if let app = try optionalString(arguments, key: "app") { args += ["--app", app] }; if let raw = arguments["raw"] as? Bool, raw { args.append("--raw") }; return ("ui", args, nil)
+        case "ui_tap":
+            let ref = try optionalInt(arguments, key: "ref"); let x = try optionalDouble(arguments, key: "x"); let y = try optionalDouble(arguments, key: "y"); if ref == nil && (x == nil || y == nil) || ref != nil && (x != nil || y != nil) { throw usageError("ui_tap requires ref or both x and y") }; return ("ui", ["tap", ref.map(String.init) ?? "\(x!),\(y!)"], nil)
+        case "ui_press":
+            var args = ["press", String(try requiredInt(arguments, key: "ref"))]; if let seconds = arguments["seconds"] { args += ["--seconds", try scalarString(seconds, key: "seconds")] }; return ("ui", args, nil)
+        case "ui_swipe":
+            var args = ["swipe"]; if let direction = try optionalString(arguments, key: "direction") { args.append(direction) }; if let ref = try optionalInt(arguments, key: "ref") { args += ["--on", String(ref)] }; if let from = try optionalString(arguments, key: "from") { args.append(from) }; if let to = try optionalString(arguments, key: "to") { args.append(to) }; guard args.count > 1 else { throw usageError("ui_swipe requires direction or coordinates") }; return ("ui", args, nil)
+        case "ui_type":
+            var args = ["type", try requiredString(arguments, key: "text")]; if let ref = try optionalInt(arguments, key: "ref") { args += ["--into", String(ref)] }; return ("ui", args, nil)
+        case "ui_button": return ("ui", ["button", try requiredString(arguments, key: "name")], nil)
+        case "ui_alert": return ("ui", ["alert", try requiredString(arguments, key: "action")], nil)
+        case "ui_screenshot":
+            var args = ["screenshot"]; if let scale = arguments["scale"] { args += ["--scale", try scalarString(scale, key: "scale")] }; return ("ui", args + (try optionalString(arguments, key: "output").map { ["--output", $0] } ?? []), nil)
+        case "ui_find": return ("ui", ["find", try requiredString(arguments, key: "text")], nil)
+        case "doctor": return ("doctor", [], nil)
         default:
             throw CLIError(commandError: CommandError(code: .unknownCommand, message: "Unknown tool: \(tool)"))
         }
@@ -249,7 +271,12 @@ public enum MCPServer {
             do {
                 let invocation = try commandInvocation(tool: name, arguments: arguments)
                 let outcome = try execute(invocation.command, invocation.args, invocation.output)
-                let text = try String(decoding: outcome.jsonData(), as: UTF8.self)
+                let encoded = try outcome.jsonData()
+                let text = String(decoding: encoded, as: UTF8.self)
+                if name == "ui_screenshot", let object = try? JSONSerialization.jsonObject(with: encoded) as? [String: Any], let path = object["path"] as? String, let image = try? Data(contentsOf: URL(fileURLWithPath: path)) {
+                    let base64 = image.base64EncodedString()
+                    return response(id: request["id"] ?? NSNull(), result: ["content": [["type": "text", "text": text], ["type": "image", "data": base64, "mimeType": "image/png"]]])
+                }
                 return response(id: request["id"] ?? NSNull(), result: [
                     "content": [["type": "text", "text": text]]
                 ])
@@ -303,6 +330,22 @@ public enum MCPServer {
         guard let value = arguments[key] else { return nil }
         guard let string = value as? String, !string.isEmpty else { throw usageError("argument \(key) must be a non-empty string") }
         return string
+    }
+
+    private static func optionalInt(_ arguments: [String: Any], key: String) throws -> Int? {
+        guard let value = arguments[key] else { return nil }
+        if let number = value as? NSNumber, number.doubleValue.rounded() == number.doubleValue { return number.intValue }
+        if let string = value as? String, let number = Int(string) { return number }
+        throw usageError("argument \(key) must be an integer")
+    }
+
+    private static func requiredInt(_ arguments: [String: Any], key: String) throws -> Int { guard let value = try optionalInt(arguments, key: key) else { throw usageError("missing required argument: \(key)") }; return value }
+
+    private static func optionalDouble(_ arguments: [String: Any], key: String) throws -> Double? {
+        guard let value = arguments[key] else { return nil }
+        if let number = value as? NSNumber { return number.doubleValue }
+        if let string = value as? String, let number = Double(string) { return number }
+        throw usageError("argument \(key) must be a number")
     }
 
     private static func requiredCoordinate(_ arguments: [String: Any], key: String) throws -> String {
@@ -443,7 +486,20 @@ public enum MCPServer {
             tool("write_default", "Write an app UserDefaults value. Restart the app for the changed default to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "value": ["type": ["string", "number", "boolean", "array", "object"], "description": "String, number, boolean, array, or dictionary"], "type": ["type": "string", "enum": ["string", "bool", "int", "float", "array", "dict"]], "device": device], required: ["bundle_id", "key", "value"]),
             tool("delete_default", "Delete an app UserDefaults value. Restart the app for the change to take effect.", properties: ["bundle_id": ["type": "string"], "key": ["type": "string"], "device": device], required: ["bundle_id", "key"]),
             tool("get_logs", "Read the last bounded simulator log window, keeping at most the last 500 lines.", properties: ["last": ["type": "string", "description": "30s, 5m, or 1h; defaults to 1m"], "predicate": ["type": "string"], "bundle_id": ["type": "string", "description": "Convenience subsystem predicate when predicate is omitted"], "device": device], required: []),
-            tool("proxy_status", "Read the system HTTP and HTTPS proxy inherited by simulators, including hosts, ports, and bypass entries; this command never changes settings.", properties: [:], required: [])
+            tool("proxy_status", "Read the system HTTP and HTTPS proxy inherited by simulators, including hosts, ports, and bypass entries; this command never changes settings.", properties: [:], required: []),
+            tool("agent_start", "Start the XCUITest simulator driver; use this before UI commands. It needs Xcode on the first run and is warm afterward.", properties: ["device": device, "port": ["type": "integer"]], required: []),
+            tool("agent_stop", "Stop the XCUITest simulator driver when UI work is finished.", properties: ["device": device], required: []),
+            tool("agent_status", "Check whether the XCUITest simulator driver is reachable.", properties: ["device": device], required: []),
+            tool("ui_tree", "Inspect the compact UI tree; use this before ui_screenshot because it is much cheaper, and use a screenshot only when visual layout matters. In debug mode, raw may return the JSON snapshot.", properties: ["mode": ["type": "string", "enum": ["nav", "act", "debug"]], "depth": ["type": "integer"], "max": ["type": "integer"], "app": ["type": "string"], "raw": ["type": "boolean"]], required: []),
+            tool("ui_tap", "Tap a UI reference from the latest ui_tree or provide both x and y coordinates.", properties: ["ref": ["type": "integer"], "x": ["type": "number"], "y": ["type": "number"]], required: []),
+            tool("ui_press", "Long press a UI reference for an optional number of seconds.", properties: ["ref": ["type": "integer"], "seconds": ["type": "number"]], required: ["ref"]),
+            tool("ui_swipe", "Swipe by direction, optionally on a UI reference, or between coordinate strings.", properties: ["direction": ["type": "string", "enum": ["up", "down", "left", "right"]], "ref": ["type": "integer"], "from": ["type": "string"], "to": ["type": "string"]], required: []),
+            tool("ui_type", "Type text, optionally tapping a UI reference first.", properties: ["text": ["type": "string"], "ref": ["type": "integer"]], required: ["text"]),
+            tool("ui_button", "Press a simulator hardware button: home, volume-up, volume-down, or siri.", properties: ["name": ["type": "string", "enum": ["home", "volume-up", "volume-down", "siri"]]], required: ["name"]),
+            tool("ui_alert", "Accept, dismiss, or press a named simulator alert button.", properties: ["action": ["type": "string"]], required: ["action"]),
+            tool("ui_screenshot", "Capture the UI as PNG; use ui_tree first and use this only when layout or visual appearance matters.", properties: ["scale": ["type": "number"], "output": ["type": "string"]], required: []),
+            tool("ui_find", "Find UI elements by case-insensitive text in label, value, or identifier.", properties: ["text": ["type": "string"]], required: []),
+            tool("doctor", "Check Xcode, simctl, a booted simulator, driver cache/reachability, and proxy status without changing anything.", properties: [:], required: [])
         ]
     }
 

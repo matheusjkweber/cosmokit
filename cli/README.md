@@ -30,7 +30,7 @@ signed rather than notarized, so macOS quarantines it on download and you have
 to clear that yourself:
 
 ```sh
-tar xzf cosmokit-0.1.0-macos-universal.tar.gz
+tar xzf cosmokit-0.2.0-macos-universal.tar.gz
 xattr -d com.apple.quarantine cosmokit
 mv cosmokit /usr/local/bin/
 ```
@@ -80,6 +80,19 @@ cosmokit logs [--last <duration>]    Read a bounded log window
 cosmokit keychain <path> [name|udid] Install a trusted or untrusted certificate
 cosmokit keychain-reset [name|udid]  Reset the simulator keychain
 cosmokit proxy-status                Read the inherited system proxy
+cosmokit agent start [name|udid]     Start the XCUITest simulator driver
+cosmokit agent stop [name|udid]      Stop the simulator driver
+cosmokit agent status [name|udid]    Check driver reachability
+cosmokit ui tree                     Print the compact UI tree
+cosmokit ui tap <ref|x,y>            Tap an element or coordinate
+cosmokit ui press <ref>              Long-press an element
+cosmokit ui swipe <direction>        Swipe up, down, left, or right
+cosmokit ui type <text>              Type into the active field
+cosmokit ui button <name>            Press a hardware button
+cosmokit ui alert <action>           Accept, dismiss, or press an alert button
+cosmokit ui screenshot               Capture the current UI as PNG
+cosmokit ui find <text>              Find matching UI elements
+cosmokit doctor                      Check simulator and driver setup
 cosmokit mcp                         Run as an MCP server over stdio
 ```
 
@@ -115,13 +128,17 @@ The stable error codes are:
 | `noSimulator` | No simulator was available for the operation. |
 | `simctlFailed` | `xcrun simctl` returned a failure. |
 | `unknownCommand` | The command or tool name is not recognised. |
+| `driverUnavailable` | The XCUITest driver is not reachable; start it first. |
+| `refStale` | A UI reference belongs to an older tree snapshot. |
+| `refNotFound` | No element exists for the requested UI reference. |
+| `unsupported` | The driver or simulator cannot perform the requested action. |
 
 Exit codes are unchanged, so a script can branch on either the process exit
 status or the JSON `ok` field.
 
 ```sh
 cosmokit --json version
-# {"ok":true,"version":"0.1.0"}
+# {"ok":true,"version":"0.2.0"}
 
 cosmokit --json list
 # {"devices":[{"available":true,"booted":false,"name":"iPad mini","state":"Shutdown","udid":"F4A10318-6B19-444B-A55D-A76536BC2196"},{"available":true,"booted":false,"name":"iPhone 15 Pro","state":"Shutdown","udid":"3F6F3AE3-D548-4486-83C7-42FC5604B436"},{"available":true,"booted":true,"name":"iPhone 16","state":"Booted","udid":"535B96FA-19EB-4682-868F-6DD1C53B6474"},{"available":true,"booted":true,"name":"iPhone 16 Pro","state":"Booted","udid":"B5029438-33A9-47E0-ACA4-C7B790A12E64"}],"ok":true}
@@ -235,16 +252,41 @@ The `set_location` tool schema looks like this when pretty-printed:
 }
 ```
 
-The full response lists all thirty-five tools in purpose-based groups. The
+The full response lists all forty-eight tools in purpose-based groups. The
 ordering is for navigation; it has no protocol meaning.
+
+## Drive the UI
+
+The XCUITest driver runs as a loopback HTTP server on the simulator, while the
+CLI provides compact tree inspection and input commands. It requires Xcode;
+the first `agent start` builds the driver (about one minute cold), and later
+starts use the version/Xcode cache and are warm in roughly ten seconds.
+
+| Command | Purpose |
+| --- | --- |
+| `ui tree --mode act` | List interactive elements and stable refs. |
+| `ui tap <ref>` | Tap the element identified by the latest tree. |
+| `ui press <ref> --seconds 1` | Long-press an element. |
+| `ui swipe up --on <ref>` | Swipe relative to an element. |
+| `ui type "text" --into <ref>` | Type after focusing a field. |
+| `ui button home` | Press a hardware button. |
+| `ui alert accept` | Resolve the current alert. |
+| `ui screenshot --scale 0.5` | Capture visual evidence when layout matters. |
+| `ui find "General"` | Find matching labels, values, or identifiers. |
+
+Install the Claude Code skill with `cp -r skills/cosmokit-simulator ~/.claude/skills/`.
+The MCP server additionally exposes `agent_start`, `agent_stop`, `agent_status`,
+`ui_tree`, `ui_tap`, `ui_press`, `ui_swipe`, `ui_type`, `ui_button`, `ui_alert`,
+`ui_screenshot`, `ui_find`, and `doctor`. Use `ui_tree` before `ui_screenshot`:
+tree output is compact and cheap, while a screenshot is for visual assertions.
 
 ### Context cost
 
-The `tools/list` response is roughly 13 KB, or about 3,300 tokens at four
+The `tools/list` response is roughly 16.6 KB, or about 4,150 tokens at four
 bytes per token, loaded once per conversation by an MCP client. That is the
 deliberate price of keeping the full simulator surface in one server; splitting
 it would move complexity into every user's configuration. Reproduce the
-measurement with `printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .build/release/cosmokit mcp | wc -c` from `cli/`; the 35-tool response measured 13,308 bytes including its newline, and a test keeps it under 14,000 bytes so growth cannot go unnoticed.
+measurement with `printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | .build/release/cosmokit mcp | wc -c` from `cli/`; the 48-tool response measured 16,659 bytes including its newline, and a test keeps it under 18,330 bytes so growth cannot go unnoticed.
 
 ### Proxy boundary
 
